@@ -1,0 +1,146 @@
+.footer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 40px 0 20px;
+  margin-top: 50px;
+}
+
+.footerContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+.footerSection h3 {
+  color: #f7b731;
+  margin-bottom: 20px;
+  font-size: 22px;
+  position: relative;
+}
+
+.footerSection h3:after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(45deg, #ff6b35, #f7b731);
+  border-radius: 2px;
+}
+
+.footerSection p,
+.footerSection a {
+  color: #bdc3c7;
+  text-decoration: none;
+  margin-bottom: 10px;
+  transition: color 0.3s ease;
+  display: block;
+}
+
+.footerSection a:hover {
+  color: #f7b731;
+  transform: translateX(5px);
+}
+
+.socialLinks {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.socialLink {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #ff6b35, #f7b731);
+  display: flex !important;
+  align-items: center;
+  justify-content: center !important;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  align-content: space-evenly;
+  justify-self: center;
+}
+
+.socialLink svg {
+    width: 22px;
+    height: 22px;
+    color: #391aeb;
+}
+
+.socialLink:hover {
+  transform: translateY(-3px) scale(1.1);
+  box-shadow: 0 8px 25px rgba(247, 183, 49, 0.4);
+}
+
+.footerBottom {
+  border-top: 1px solid #34495e;
+  padding-top: 20px;
+  text-align: center;
+  color: #95a5a6;
+}
+
+.footerLogo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.footerLogo span {
+  margin-left: 10px;
+  background: linear-gradient(45deg, #f7b731, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.skeleton {
+  background-color: #34495e;
+  border-radius: 4px;
+  color: transparent;
+  position: relative;
+  overflow: hidden;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  height: 100%;
+  width: 150%;
+  background: linear-gradient(to right, transparent 0%, #4a627a 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
+}
+
+@media (max-width: 768px) {
+  .footerContent {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .socialLinks {
+    justify-content: center;
+  }
+}

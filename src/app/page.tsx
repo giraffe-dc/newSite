@@ -1,95 +1,141 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import React, { useState, useEffect } from 'react';
+import Hero from "@/components/Hero";
+import PhotoSlider from "../components/PhotoSlider";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "../components/ui/Card";
+import { Shield, Gamepad2, PartyPopper, Coffee, Users, Star } from "lucide-react";
+import styles from "@/styles/Home.module.css";
+import globalStyles from "@/styles/GlobalStyles.module.css";
+import Link from 'next/link';
 
-export default function Home() {
+interface Feature {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  color: string;
+}
+
+const iconMap: { [key: string]: React.ComponentType<{ className?: string }> } = {
+  Безпека: Shield,
+  Розваги: Gamepad2,
+  Свята: PartyPopper,
+  Кафе: Coffee,
+  Сімейна: Users,
+  Рейтинги: Star,
+};
+
+const colorMap: { [key: string]: string } = {
+  Безпека: styles.colorPrimary,
+  Розваги: styles.colorAccent,
+  Свята: styles.colorPink,
+  Кафе: styles.colorBlue,
+  Сімейна: styles.colorSecondary,
+  Рейтинги: styles.colorPrimary,
+};
+
+const Home: React.FC = () => {
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fotos, setFotos] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchHomeData = async () => {
+      try {
+        const response = await fetch('/api/data/home');
+        if (response.ok) {
+          const data = await response.json();
+
+          const dynamicFeatures = data.features.map((featureString: string) => {
+            const [title, description] = featureString.split(':');
+            const key = Object.keys(iconMap).find(k => title.includes(k));
+            return {
+              icon: key ? iconMap[key] : Star, // Іконка за замовчуванням
+              title,
+              description,
+              color: key ? colorMap[key] : styles.colorPrimary,
+            };
+          });
+          setFeatures(dynamicFeatures);
+          setFotos(data.images || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch features:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHomeData();
+  }, []);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className={`${styles.container} ${globalStyles.body}`}>
+      <Hero />
+      <PhotoSlider photos={fotos} />
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+      <section className={styles.aboutSection}>
+        <div className={styles.containerInner}>
+          <div className={styles.textCenter}>
+            <h2 className={styles.sectionTitle}>Чому обирають Жирафик?</h2>
+            <p className={styles.sectionDescription}>
+              Ми створили унікальне місце, де кожна дитина та батьки можуть відчути справжню радість
+            </p>
+          </div>
+
+          <div className={styles.featuresGrid}>
+            {loading ? (
+              [...Array(6)].map((_, index) => (
+                <Card key={index} className={`${styles.card} ${styles.skeleton}`}>
+                  <CardContent className={styles.cardContent}>
+                    <div className={`${styles.iconWrapper} ${styles.skeletonCircle}`}></div>
+                    <h3 className={`${styles.cardTitle} ${styles.skeletonText}`}>&nbsp;</h3>
+                    <p className={`${styles.cardDescription} ${styles.skeletonText}`}>&nbsp;</p>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              features.map((feature, index) => (
+                <Card
+                  key={index}
+                  className={`${styles.card} ${styles.cardAnimation}`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <CardContent className={styles.cardContent}>
+                    <div className={`${styles.iconWrapper} ${feature.color}`}>
+                      <feature.icon className={styles.icon} />
+                    </div>
+                    <h3 className={styles.cardTitle}>{feature.title}</h3>
+                    <p className={styles.cardDescription}>{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      <section className={styles.ctaSection}>
+        <div className={styles.ctaOverlay} />
+        <div className={`${styles.containerInner} ${styles.ctaContent}`}>
+          <h2 className={styles.ctaTitle}>Готові до незабутніх вражень?</h2>
+          <p className={styles.ctaDescription}>
+            Забронюйте свій візит вже зараз і отримайте знижку 10% на перше відвідування
+          </p>
+          <div className={styles.ctaButtons}>
+            <Button variant="hero" size="xl" className={styles.primaryButton}>
+              Забронювати зараз
+            </Button>
+            <Link href="/prices">
+              <Button variant="playful" size="xl" className={styles.outlineButton}>
+                Подивитися ціни
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
-}
+};
+
+export default Home;

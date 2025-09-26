@@ -1,0 +1,40 @@
+/* Responsive styles for various devices */
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .header {
+    font-size: 1.5rem;
+    padding: 10px;
+  }
+  
+  .hero {
+    background-image: url('../images/hero-image-mobile.jpg');
+    height: 300px;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .header {
+    font-size: 2rem;
+    padding: 20px;
+  }
+  
+  .hero {
+    background-image: url('../images/hero-image-tablet.jpg');
+    height: 400px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+  .header {
+    font-size: 2.5rem;
+    padding: 30px;
+  }
+  
+  .hero {
+    background-image: url('../images/hero-image-desktop.jpg');
+    height: 500px;
+  }
+}
