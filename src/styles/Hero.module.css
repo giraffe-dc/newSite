@@ -20,13 +20,6 @@
   }
 }
 
-.backgroundImage {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
-}
 
 .decorCircle {
   position: absolute;
