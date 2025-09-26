@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
     const { username, password } = await request.json()
 
     // Check credentials
-    const adminUsername = process.env.ADMIN_USERNAME || 'admin'
-    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || await bcrypt.hash('admin123', 12)
-// console.log(process.env.ADMIN_PASSWORD_HASH)
+    const adminUsername = process.env.ADMIN_USERNAME
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || await bcrypt.hash('giraFfe2025', 12)
+console.log(process.env.ADMIN_PASSWORD_HASH)
     if (username !== adminUsername) {
       return NextResponse.json(
         { error: 'Invalid credentials' },

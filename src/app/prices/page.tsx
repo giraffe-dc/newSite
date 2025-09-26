@@ -13,96 +13,46 @@ interface PriceItem {
   category: string;
 }
 
+interface CategoryItem {
+  _id?: string;
+  key: string;
+  label: string;
+  icon: string;
+}
+
 const PricesPage = () => {
   const [prices, setPrices] = useState<PriceItem[]>([])
+  const [categories, setCategories] = useState<CategoryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
 
   useEffect(() => {
-    fetchPrices()
+    fetchData()
   }, [])
 
-  const fetchPrices = async () => {
+  const fetchData = async () => {
+    setLoading(true)
     try {
-      const response = await fetch('/api/data/prices')
-      if (response.ok) {
-        const data = await response.json()
-        setPrices(data)
-      } else {
-        // Fallback data
-        setPrices([
-          {
-            name: "Дитяча ігрова зона",
-            price: "150",
-            description: "Доступ до всіх ігрових атракціонів для дітей до 12 років",
-            duration: "2 години",
-            category: "games"
-          },
-          {
-            name: "Сімейний пакет",
-            price: "400",
-            description: "Ігрова зона + кафе для сім'ї до 4 осіб",
-            duration: "3 години",
-            category: "family"
-          },
-          {
-            name: "День народження (базовий)",
-            price: "800",
-            description: "Святкування для 8 дітей: декор, аніматор, торт",
-            duration: "2 години",
-            category: "birthday"
-          },
-          {
-            name: "День народження (преміум)",
-            price: "1200",
-            description: "Розширене святкування: фотограф, шоу програма, подарунки",
-            duration: "3 години",
-            category: "birthday"
-          },
-          {
-            name: "Аніматор",
-            price: "300",
-            description: "Професійний аніматор на вашe свято",
-            duration: "1 година",
-            category: "services"
-          },
-          {
-            name: "Фотосесія",
-            price: "500",
-            description: "Професійна фотосесія в нашій фотозоні",
-            duration: "1 година",
-            category: "services"
-          },
-          {
-            name: "Майстер-клас",
-            price: "200",
-            description: "Творчий майстер-клас для дітей",
-            duration: "1 година",
-            category: "services"
-          },
-          {
-            name: "Оренда залу",
-            price: "1000",
-            description: "Оренда всього залу для приватних заходів",
-            duration: "4 години",
-            category: "family"
-          }
-        ])
+      const [pricesRes, categoriesRes] = await Promise.all([
+        fetch('/api/data/prices'),
+        fetch('/api/data/price-categories')
+      ]);
+
+      if (pricesRes.ok) {
+        const pricesData = await pricesRes.json();
+        setPrices(pricesData);
       }
+      if (categoriesRes.ok) {
+        const categoriesData = await categoriesRes.json();
+        setCategories([{ key: 'all', label: 'Всі послуги', icon: '🎪' }, ...categoriesData]);
+      }
+
     } catch (error) {
-      console.error('Error fetching prices:', error)
+      console.error('Error fetching data:', error)
     } finally {
       setLoading(false)
     }
   }
-
-  const categories = [
-    { key: 'all', label: 'Всі послуги', icon: '🎪' },
-    { key: 'games', label: 'Ігрові зони', icon: '🎮' },
-    { key: 'birthday', label: 'Дні народження', icon: '🎂' },
-    { key: 'family', label: 'Сімейні пакети', icon: '👨‍👩‍👧‍👦' },
-    { key: 'services', label: 'Додаткові послуги', icon: '⭐' }
-  ]
 
   const filteredPrices = selectedCategory === 'all' 
     ? prices 

@@ -1,6 +1,7 @@
 import React from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { StatisticsCollector } from '@/components/StatisticsCollector'
 import './globals.css'
 
 export const metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <body>
+        <StatisticsCollector />
         <Header />
         <main>{children}</main>
         <Footer />
