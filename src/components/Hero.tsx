@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { Star, MapPin, Clock } from 'lucide-react'
 import styles from '../styles/Hero.module.css'
@@ -7,6 +7,7 @@ import heroImage from '@/assets/hero-image.jpg'
 import giraffeMascot from '@/assets/giraffe-logo.png'
 import Link from 'next/link'
 import Image from 'next/image'
+import BookingModal from './BookingModal'
 
 interface FeatureCard {
     title: string
@@ -22,6 +23,7 @@ interface HomeData {
 }
 
 const Hero: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
+    const [open, setOpen] = useState(false)
     return (
         <section className={styles.hero}>
             <Image
@@ -47,7 +49,7 @@ const Hero: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
                             src={giraffeMascot}
                             alt="Жирафик талісман"
                             // width={150}
-                            height={150}
+                            height={250}
                             className={styles.mascotImage}
                         />
                     </div>
@@ -82,6 +84,7 @@ const Hero: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
                             variant="hero"
                             size="xl"
                             className={styles.button}
+                            onClick={() => setOpen(true)}
                         >
                             Забронювати зараз
                         </Button>
@@ -95,6 +98,8 @@ const Hero: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
                             </Button>
                         </Link>
                     </div>
+
+                    <BookingModal open={open} onClose={() => setOpen(false)} />
 
                     <div className={styles.featureCards}>
                         {homeData?.featureCards

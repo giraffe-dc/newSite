@@ -39,3 +39,22 @@ export interface ContactInfo {
     telegram?: string;
   };
 }
+
+export interface OrderItem {
+    serviceId?: string
+    serviceName: string
+    quantity?: number
+    price?: string
+}
+
+export interface Order {
+    _id?: string
+    customerName: string
+    phone: string
+    date?: string // ISO date of event
+    time?: string // optional time string
+    notes?: string
+    items?: OrderItem[]
+    createdAt?: string
+    status?: 'new' | 'confirmed' | 'cancelled'
+}

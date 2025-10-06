@@ -2,6 +2,7 @@ import React from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { StatisticsCollector } from '@/components/StatisticsCollector'
+import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata = {
@@ -15,13 +16,14 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="uk">
-      <body>
-        <StatisticsCollector />
-        <Header />
-        <main>{children}</main>
-        <Footer />
-      </body>
-    </html>
+      <html lang="uk">
+          <body>
+              <StatisticsCollector />
+              <Header />
+              <main>{children}</main>
+              <Analytics />
+              <Footer />
+          </body>
+      </html>
   )
 }

@@ -13,12 +13,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const pathname = usePathname()
 
   const menuItems = [
-    { href: '/admin', icon: '🏠', label: 'Головна', exact: true },
-    { href: '/admin/home', icon: '🏠', label: 'Контент головної' },
-    { href: '/admin/features', icon: '✨', label: 'Особливості' },
-    { href: '/admin/prices', icon: '💰', label: 'Ціни' },
-    { href: '/admin/news', icon: '📰', label: 'Новини' },
-    { href: '/admin/contacts', icon: '📞', label: 'Контакти' },
+      { href: '/admin', icon: '🏠', label: 'Головна', exact: true },
+      { href: '/admin/home', icon: '🏠', label: 'Контент головної' },
+      { href: '/admin/features', icon: '✨', label: 'Особливості' },
+      { href: '/admin/prices', icon: '💰', label: 'Ціни' },
+      { href: '/admin/news', icon: '📰', label: 'Новини' },
+      { href: '/admin/contacts', icon: '📞', label: 'Контакти' },
+      { href: '/admin/orders', icon: '🧾', label: 'Замовлення' },
   ]
 
   const isActive = (href: string, exact = false) => {

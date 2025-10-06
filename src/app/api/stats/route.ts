@@ -3,7 +3,7 @@ import clientPromise from '@/lib/mongodb'
 
 export async function POST(request: NextRequest) {
   try {
-    const { path } = await request.json()
+    const { path, referrer, screen } = await request.json()
     const userAgent = request.headers.get('user-agent')
     const ip = request.headers.get('x-forwarded-for')
 
@@ -11,10 +11,12 @@ export async function POST(request: NextRequest) {
     const db = client.db('zhyrafyk')
 
     await db.collection('statistics').insertOne({
-      path,
-      userAgent,
-      ip,
-      timestamp: new Date(),
+        path,
+        userAgent,
+        ip,
+        referrer: referrer || null,
+        screen: screen || null,
+        timestamp: new Date(),
     })
 
     return NextResponse.json({ success: true }, { status: 201 })

@@ -1,0 +1,95 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.modalContent {
+  text-align: start;
+  width: 100%;
+  max-width: 560px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--card-foreground);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-primary);
+  padding: 24px;
+  animation: modalIn 0.25s var(--transition-smooth) both;
+}
+
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modalTitle {
+  margin: 0 0 16px 0;
+  font-size: 1.5rem;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modalForm label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.modalForm input,
+.modalForm textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) * 0.6);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+.modalForm input[aria-invalid="true"] {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--destructive) 20%, transparent);
+}
+
+.modalForm textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.errorText {
+  color: var(--destructive);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 640px) {
+  .modalRow {
+    grid-template-columns: 1fr;
+  }
+}
+
