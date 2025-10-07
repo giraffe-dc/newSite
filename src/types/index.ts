@@ -40,6 +40,18 @@ export interface ContactInfo {
   };
 }
 
+export interface OfferItem {
+    _id?: string
+    title: string
+    description: string
+    active?: boolean
+    startDate?: string // ISO
+    endDate?: string // ISO
+    priority?: number
+    recommended?: boolean
+    icon?: string // emoji or icon code
+}
+
 export interface OrderItem {
     serviceId?: string
     serviceName: string

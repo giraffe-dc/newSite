@@ -27,6 +27,9 @@ const PricesPage = () => {
     const [loading, setLoading] = useState(true)
     const [selectedCategory, setSelectedCategory] = useState('all')
     const [open, setOpen] = useState(false)
+    const [offers, setOffers] = useState<
+        { _id?: string; title: string; description: string }[]
+    >([])
 
     useEffect(() => {
         fetchData()
@@ -35,9 +38,10 @@ const PricesPage = () => {
     const fetchData = async () => {
         setLoading(true)
         try {
-            const [pricesRes, categoriesRes] = await Promise.all([
+            const [pricesRes, categoriesRes, offersRes] = await Promise.all([
                 fetch('/api/data/prices'),
                 fetch('/api/data/price-categories'),
+                fetch('/api/data/offers'),
             ])
 
             if (pricesRes.ok) {
@@ -50,6 +54,10 @@ const PricesPage = () => {
                     { key: 'all', label: 'Всі послуги', icon: '🎪' },
                     ...categoriesData,
                 ])
+            }
+            if (offersRes.ok) {
+                const offersData = await offersRes.json()
+                setOffers(offersData)
             }
         } catch (error) {
             console.error('Error fetching data:', error)
@@ -158,28 +166,29 @@ const PricesPage = () => {
                             Спеціальні пропозиції
                         </h2>
                         <div className={styles.offersGrid}>
-                            <div className={styles.offerItem}>
-                                <h3 className={styles.offerTitle}>
-                                    Знижка 10%
-                                </h3>
-                                <p className={styles.offerDescription}>
-                                    На перше відвідування
-                                </p>
-                            </div>
-                            <div className={styles.offerItem}>
-                                <h3 className={styles.offerTitle}>
-                                    День сім'ї
-                                </h3>
-                                <p className={styles.offerDescription}>
-                                    Неділя - знижка 15% для родин
-                                </p>
-                            </div>
-                            <div className={styles.offerItem}>
-                                <h3 className={styles.offerTitle}>Абонемент</h3>
-                                <p className={styles.offerDescription}>
-                                    10 відвідувань - економія 20%
-                                </p>
-                            </div>
+                            {offers.map((o: any) => (
+                                <div
+                                    key={o._id || o.title}
+                                    className={styles.offerItem}
+                                    data-recommended={
+                                        o.recommended ? 'true' : 'false'
+                                    }
+                                >
+                                    <div className={styles.offerHeader}>
+                                        <h3 className={styles.offerTitle}>
+                                            {(o.icon || '🏷️') + ' ' + o.title}
+                                        </h3>
+                                        {o.recommended && (
+                                            <span className={styles.offerBadge}>
+                                                ⭐ Рекомендовано
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className={styles.offerDescription}>
+                                        {o.description}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
                         <Button
                             variant="hero"

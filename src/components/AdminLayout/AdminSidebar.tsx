@@ -20,6 +20,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
       { href: '/admin/news', icon: '📰', label: 'Новини' },
       { href: '/admin/contacts', icon: '📞', label: 'Контакти' },
       { href: '/admin/orders', icon: '🧾', label: 'Замовлення' },
+      { href: '/admin/offers', icon: '🏷️', label: 'Спецпропозиції' },
   ]
 
   const isActive = (href: string, exact = false) => {

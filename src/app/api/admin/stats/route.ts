@@ -36,7 +36,8 @@ export async function GET(request: NextRequest) {
 
     const topReferrers = await statsCollection
         .aggregate([
-            { $match: { referrer: { $ne: null, $ne: '' } } },
+            { $match: { referrer: { $ne: null } } },
+            { $match: { referrer: { $ne: '' } } },
             { $group: { _id: '$referrer', count: { $sum: 1 } } },
             { $sort: { count: -1 } },
             { $limit: 10 },
