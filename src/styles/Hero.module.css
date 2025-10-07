@@ -145,11 +145,7 @@
   .title {
     font-size: 3.75rem;
   }
-;
 
-.mascotImage {
-  height: 4rem;
-}
 }
 
 @media (max-width: 768px) {

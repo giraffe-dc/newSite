@@ -39,6 +39,20 @@ const Header = () => {
                           Наші ціни
                       </Link>
                       <Link
+                          href="/rules"
+                          className={styles.navLink}
+                          onClick={() => setIsMenuOpen(false)}
+                      >
+                          Правила
+                      </Link>
+                      <Link
+                          href="/cafe"
+                          className={styles.navLink}
+                          onClick={() => setIsMenuOpen(false)}
+                      >
+                          Кафе
+                      </Link>
+                      <Link
                           href="/news-contacts"
                           className={styles.navLink}
                           onClick={() => setIsMenuOpen(false)}

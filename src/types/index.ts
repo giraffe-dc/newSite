@@ -70,3 +70,12 @@ export interface Order {
     createdAt?: string
     status?: 'new' | 'confirmed' | 'cancelled'
 }
+
+export interface CafeItem {
+  _id?: string;
+  name: string;
+  description: string;
+  price: number;
+  image?: string;
+  category: string;
+}

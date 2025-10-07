@@ -6,6 +6,7 @@
   top: 0;
   z-index: 100;
   animation: slideDown 0.6s ease;
+  /* height: 13%; */
 
 }
 
@@ -75,7 +76,7 @@
 .navLink {
   color: white;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 150%;
   font-weight: 600;
   padding: 10px 15px;
   border-radius: 25px;
