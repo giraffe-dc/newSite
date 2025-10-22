@@ -12,6 +12,7 @@ interface PriceItem {
     description: string
     duration?: string
     category: string
+    video?: string | undefined
 }
 
 interface CategoryItem {
@@ -134,6 +135,7 @@ const PricesPage = () => {
                                 duration={price.duration}
                                 category={price.category}
                                 index={index}
+                                video={price.video}
                             />
                         ))}
                     </div>

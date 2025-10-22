@@ -44,122 +44,149 @@ interface Photo {
 // ];
 
 const PhotoSlider: React.FC<{ photos: string[] }> = ({ photos }) => {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isAutoplay, setIsAutoplay] = useState<boolean>(true);
+    const [currentIndex, setCurrentIndex] = useState<number>(0)
+    const [isAutoplay, setIsAutoplay] = useState<boolean>(true)
 
-  useEffect(() => {
-    if (!isAutoplay) return;
+    // Fallback photos when none provided from server
+    const defaultPhotos = [
+        heroImage.src,
+        playground1.src,
+        birthdayParty.src,
+        cafeArea.src,
+    ]
 
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % photos.length);
-    }, 4000);
+    const slidePhotos =
+        Array.isArray(photos) && photos.length > 0 ? photos : defaultPhotos
 
-    return () => clearInterval(interval);
-  }, [isAutoplay]);
+    useEffect(() => {
+        if (!isAutoplay || slidePhotos.length === 0) return
 
-  const goToSlide = (index: number): void => {
-    setCurrentIndex(index);
-    setIsAutoplay(false);
-    setTimeout(() => setIsAutoplay(true), 5000);
-  };
+        const interval = setInterval(() => {
+            setCurrentIndex((prev) => (prev + 1) % slidePhotos.length)
+        }, 4000)
 
-  const goToPrevious = (): void => {
-    setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
-    setIsAutoplay(false);
-    setTimeout(() => setIsAutoplay(true), 5000);
-  };
+        return () => clearInterval(interval)
+    }, [isAutoplay, slidePhotos.length])
 
-  const goToNext = (): void => {
-    setCurrentIndex((prev) => (prev + 1) % photos.length);
-    setIsAutoplay(false);
-    setTimeout(() => setIsAutoplay(true), 5000);
-  };
+    const scheduleResume = () => {
+        setIsAutoplay(false)
+        // resume after a short pause
+        const t = setTimeout(() => setIsAutoplay(true), 5000)
+        return () => clearTimeout(t)
+    }
 
-  return (
-    <section className={styles.section}>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Наші розваги</h2>
-          <p className={styles.description}>
-            Подивіться на наші неймовірні ігрові зони та атмосферу веселощів
-          </p>
-        </div>
+    const goToSlide = (index: number): void => {
+        if (slidePhotos.length === 0) return
+        setCurrentIndex(index)
+        scheduleResume()
+    }
 
-        <div className={styles.sliderWrapper}>
-          {/* Основний слайдер */}
-          <div className={styles.slider}>
-            <div
-              className={styles.slides}
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
-              {photos.map((photo,index) => (
-                <div key={index} className={styles.slide}>
-                  <img
-                    src={photo}
-                    // alt={photo.alt}
-                    className={styles.slideImage}
-                  />
-                  {/* <div className={styles.slideCaption}>
-                    <h3 className={styles.captionText}>{photo.caption}</h3>
-                  </div> */}
+    const goToPrevious = (): void => {
+        if (slidePhotos.length === 0) return
+        setCurrentIndex(
+            (prev) => (prev - 1 + slidePhotos.length) % slidePhotos.length
+        )
+        scheduleResume()
+    }
+
+    const goToNext = (): void => {
+        if (slidePhotos.length === 0) return
+        setCurrentIndex((prev) => (prev + 1) % slidePhotos.length)
+        scheduleResume()
+    }
+
+    return (
+        <section className={styles.section}>
+            <div className={styles.container}>
+                <div className={styles.header}>
+                    <h2 className={styles.title}>Наші розваги</h2>
+                    <p className={styles.description}>
+                        Подивіться на наші неймовірні ігрові зони та атмосферу
+                        веселощів
+                    </p>
                 </div>
-              ))}
+
+                <div className={styles.sliderWrapper}>
+                    {/* Основний слайдер */}
+                    <div className={styles.slider}>
+                        <div
+                            className={styles.slides}
+                            style={{
+                                transform: `translateX(-${
+                                    currentIndex * 100
+                                }%)`,
+                            }}
+                        >
+                            {slidePhotos.map((photo, index) => (
+                                <div key={index} className={styles.slide}>
+                                    <img
+                                        src={photo}
+                                        alt={`slide-${index}`}
+                                        className={styles.slideImage}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Стрілки навігації */}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={goToPrevious}
+                            className={styles.navButtonLeft}
+                        >
+                            <ChevronLeft className={styles.navIcon} />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={goToNext}
+                            className={styles.navButtonRight}
+                        >
+                            <ChevronRight className={styles.navIcon} />
+                        </Button>
+                    </div>
+
+                    {/* Індикатори */}
+                    <div className={styles.indicators}>
+                        {slidePhotos.map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goToSlide(index)}
+                                aria-label={`Go to slide ${index + 1}`}
+                                className={`${styles.indicator} ${
+                                    index === currentIndex
+                                        ? styles.indicatorActive
+                                        : ''
+                                }`}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Мініатюри для десктопа */}
+                    <div className={styles.thumbnails}>
+                        {slidePhotos.map((photo, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goToSlide(index)}
+                                className={`${styles.thumbnail} ${
+                                    index === currentIndex
+                                        ? styles.thumbnailActive
+                                        : ''
+                                }`}
+                            >
+                                <img
+                                    src={photo}
+                                    alt={`thumbnail-${index}`}
+                                    className={styles.thumbnailImage}
+                                />
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
-
-            {/* Стрілки навігації */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={goToPrevious}
-              className={styles.navButtonLeft}
-            >
-              <ChevronLeft className={styles.navIcon} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={goToNext}
-              className={styles.navButtonRight}
-            >
-              <ChevronRight className={styles.navIcon} />
-            </Button>
-          </div>
-
-          {/* Індикатори */}
-          <div className={styles.indicators}>
-            {photos.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`${styles.indicator} ${
-                  index === currentIndex ? styles.indicatorActive : ""
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* Мініатюри для десктопа */}
-          <div className={styles.thumbnails}>
-            {photos.map((photo, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`${styles.thumbnail} ${
-                  index === currentIndex ? styles.thumbnailActive : ""
-                }`}
-              >
-                <img
-                  src={photo}
-                  // alt={photo.alt}
-                  className={styles.thumbnailImage}
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    )
 };
 
 export default PhotoSlider;

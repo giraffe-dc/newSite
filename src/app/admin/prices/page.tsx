@@ -11,6 +11,7 @@ interface PriceItem {
     description: string
     duration: string
     category: string
+    video:string
 }
 
 interface CategoryItem {
@@ -27,6 +28,7 @@ const newPriceInitialState: PriceItem = {
     description: '',
     duration: '',
     category: '',
+    video:""
 }
 
 const newCategoryInitialState: CategoryItem = {
@@ -543,6 +545,21 @@ const AdminPricesPage = () => {
                                 required
                             />
                         </div>
+                        <div className={styles.inputGroup}>
+                            <label>Відео</label>
+                            <input
+                                type="text"
+                                value={newPrice.video}
+                                onChange={(e) =>
+                                    handleNewPriceChange(
+                                        'video',
+                                        e.target.value
+                                    )
+                                }
+                                className={styles.input}
+                                required
+                            />
+                        </div>
                         <div className={styles.formActionsNew}>
                             <button
                                 type="submit"
@@ -638,6 +655,21 @@ const AdminPricesPage = () => {
                                     }
                                     className={styles.textarea}
                                     rows={3}
+                                />
+                            </div>
+                            <div className={styles.inputGroupFullWidth}>
+                                <label>Відео</label>
+                                <input
+                                    type="text"
+                                    value={item.video}
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            index,
+                                            'video',
+                                            e.target.value
+                                        )
+                                    }
+                                    className={styles.input}
                                 />
                             </div>
                         </div>

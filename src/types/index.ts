@@ -10,12 +10,13 @@ export interface HomeData {
 }
 
 export interface PriceItem {
-  _id?: string;
-  name: string;
-  price: string;
-  description: string;
-  duration?: string;
-  category: string;
+    _id?: string
+    name: string
+    price: string
+    description: string
+    duration?: string
+    category: string
+    video?: string | undefined
 }
 
 export interface NewsItem {
