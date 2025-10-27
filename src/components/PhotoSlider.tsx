@@ -98,13 +98,13 @@ const PhotoSlider: React.FC<{ photos: string[] }> = ({ photos }) => {
     return (
         <section className={styles.section}>
             <div className={styles.container}>
-                <div className={styles.header}>
+                {/* <div className={styles.header}>
                     <h2 className={styles.title}>Наші розваги</h2>
                     <p className={styles.description}>
                         Подивіться на наші неймовірні ігрові зони та атмосферу
                         веселощів
                     </p>
-                </div>
+                </div> */}
 
                 <div className={styles.sliderWrapper}>
                     {/* Основний слайдер */}
