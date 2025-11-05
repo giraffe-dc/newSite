@@ -7,12 +7,44 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.titleContainer {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .title {
   font-size: 1.75rem;
   color: var(--primary-orange);
   margin: 0;
+}
+
+.exportButton {
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-orange);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.exportButton:hover {
+  background-color: var(--primary-orange-dark);
+}
+
+.exportButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .filter {
