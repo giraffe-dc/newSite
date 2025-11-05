@@ -10,6 +10,7 @@ interface NewsItem {
     date: string
     type: 'news' | 'event'
     images: string[]
+    survey?: any
 }
 
 interface ContactInfo {
@@ -162,12 +163,14 @@ const NewsContactsPage = () => {
                             {news.map((item, index) => (
                                 <NewsCard
                                     key={item._id || index}
+                                    id={item._id}
                                     title={item.title}
                                     content={item.content}
                                     date={item.date}
                                     type={item.type}
                                     images={item.images}
                                     index={index}
+                                    survey={item.survey}
                                 />
                             ))}
                         </div>

@@ -1,0 +1,93 @@
+/* Survey Section */
+.surveySection {
+    margin-top: 24px;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 24px;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.sectionHeader h3 {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    margin: 0;
+}
+
+.addSurveyBtn {
+    padding: 8px 16px;
+    background: var(--primary-orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.addSurveyBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255,107,53,0.2);
+}
+
+/* Survey Card in News List */
+.surveyBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: #f3f4f6;
+    border-radius: 16px;
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-right: 8px;
+}
+
+.surveyIcon {
+    font-size: 1.1rem;
+}
+
+.surveyMetaInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 8px;
+}
+
+.surveyMetaInfo span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Survey Preview in News Card */
+.surveyPreview {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.surveyPreviewQuestion {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.surveyPreviewMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+}

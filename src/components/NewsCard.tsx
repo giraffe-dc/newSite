@@ -7,6 +7,8 @@ import {
     getGoogleDriveImageUrl,
 } from '@/lib/googleDrive'
 
+import { Survey } from '@/types'
+
 interface NewsCardProps {
     title: string
     content: string
@@ -14,6 +16,8 @@ interface NewsCardProps {
     type: 'news' | 'event'
     images: string[]
     index: number
+    survey?: Survey
+    id?: string
 }
 
 const NewsCard: React.FC<NewsCardProps> = ({
@@ -23,6 +27,8 @@ const NewsCard: React.FC<NewsCardProps> = ({
     type,
     images,
     index,
+    survey,
+    id,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [processedImages, setProcessedImages] = useState<string[]>([])
@@ -105,7 +111,54 @@ const NewsCard: React.FC<NewsCardProps> = ({
 
                     <p className={styles.newsContent}>{content}</p>
 
+                    {survey && (
+                        <div className={styles.surveyPreview}>
+                            <div className={styles.surveyPreviewQuestion}>
+                                {survey.question}
+                            </div>
+                            <div className={styles.surveyPreviewMeta}>
+                                {/* {(() => {
+                                    const count =
+                                        (survey.options &&
+                                            survey.options.length) ||
+                                        (survey.fields &&
+                                            survey.fields.length) ||
+                                        0
+                                    const label = survey.options
+                                        ? 'варіантів'
+                                        : 'полів'
+                                    return (
+                                        <span>
+                                            📊 {count} {label}
+                                        </span>
+                                    )
+                                })()} */}
+                                {survey.endDate && (
+                                    <span>
+                                        ⏳ до {formatDate(survey.endDate)}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
                     <div className={styles.cardFooter}>
+                        <div className={styles.footerMeta}>
+                            {survey && (
+                                <span className={styles.surveyBadge}>
+                                    <span className={styles.surveyIcon}>
+                                        📊
+                                    </span>
+                                    Опитування
+                                </span>
+                            )}
+                            {images && images.length > 0 && (
+                                <span className={styles.photoBadge}>
+                                    <span className={styles.photoIcon}>📷</span>
+                                    {images.length} фото
+                                </span>
+                            )}
+                        </div>
                         <button
                             className={styles.readMoreButton}
                             onClick={() => setIsModalOpen(true)}
@@ -125,6 +178,8 @@ const NewsCard: React.FC<NewsCardProps> = ({
                 date={date}
                 type={type}
                 images={processedImages}
+                survey={survey}
+                newsId={id}
             />
         </>
     )

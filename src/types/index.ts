@@ -19,13 +19,48 @@ export interface PriceItem {
     video?: string | undefined
 }
 
+export interface SurveyOption {
+    id: string
+    text: string
+}
+
+export interface SurveyField {
+    id: string
+    label: string
+}
+
+export interface SurveyVoteData {
+    newsId: string
+    optionIds: string[]
+    votedAt: string // ISO date
+    // можна додати userId або інші дані про голосуючого
+}
+
+export interface SurveyResults {
+    totalVotes: number
+    optionResults: Record<string, number> // optionId -> count
+    lastVoteAt: string // ISO date
+}
+
+export interface Survey {
+    question: string
+    options: SurveyOption[]
+    allowMultiple?: boolean
+    endDate?: string // ISO date when survey ends
+    results?: SurveyResults
+    // for free-form text surveys
+    fields?: SurveyField[]
+}
+
 export interface NewsItem {
-  _id?: string;
-  title: string;
-  content: string;
-  date: string;
-  type: 'news' | 'event';
-  image?: string;
+    _id?: string
+    title: string
+    content: string
+    date: string
+    type: 'news' | 'event'
+    image?: string
+    images?: string[]
+    survey?: Survey
 }
 
 export interface ContactInfo {

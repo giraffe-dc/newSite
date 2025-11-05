@@ -7,19 +7,21 @@ import {
     extractGoogleDriveFileId,
     getGoogleDriveImageUrl,
 } from '@/lib/googleDrive'
-
-interface NewsItem {
-    _id?: string
-    title: string
-    content: string
-    date: string
-    type: 'news' | 'event'
-    images: string[]
+import SurveyForm from '@/components/admin/SurveyForm'
+import type { FC } from 'react'
+type SurveyFormProps = {
+    survey: Survey
+    onChange: (survey: Survey) => void
+    onValidityChange?: (v: boolean) => void
+    onRemove: () => void
 }
+const SurveyFormTyped = SurveyForm as unknown as FC<SurveyFormProps>
+import { NewsItem, Survey } from '@/types'
 
 const AdminNewsPage = () => {
     const [news, setNews] = useState<NewsItem[]>([])
     const [loading, setLoading] = useState(true)
+    const [surveyValid, setSurveyValid] = useState(true)
     const [imageInput, setImageInput] = useState('')
     const [imageError, setImageError] = useState('')
     const [showAddForm, setShowAddForm] = useState(false)
@@ -33,8 +35,9 @@ const AdminNewsPage = () => {
         date: new Date().toISOString().split('T')[0],
         type: 'news',
         images: [],
+        survey: undefined,
     })
-
+    console.log(formData)
     useEffect(() => {
         fetchNews()
     }, [])
@@ -94,6 +97,7 @@ const AdminNewsPage = () => {
             date: new Date().toISOString().split('T')[0],
             type: 'news',
             images: [],
+            survey: undefined,
         })
         setShowAddForm(false)
         setEditingItem(null)
@@ -340,7 +344,8 @@ const AdminNewsPage = () => {
                                                     setFormData({
                                                         ...formData,
                                                         images: [
-                                                            ...formData.images,
+                                                            ...(formData.images ||
+                                                                []),
                                                             ...valid,
                                                         ],
                                                     })
@@ -365,7 +370,8 @@ const AdminNewsPage = () => {
                                                 setFormData({
                                                     ...formData,
                                                     images: [
-                                                        ...formData.images,
+                                                        ...(formData.images ||
+                                                            []),
                                                         ...lines,
                                                     ],
                                                 })
@@ -444,7 +450,8 @@ const AdminNewsPage = () => {
                                                                 onClick={() => {
                                                                     const copy =
                                                                         [
-                                                                            ...formData.images,
+                                                                            ...(formData.images ||
+                                                                                []),
                                                                         ]
                                                                     copy.splice(
                                                                         idx,
@@ -502,6 +509,63 @@ const AdminNewsPage = () => {
                             </div>
                         )} */}
 
+                        {/* Survey Section */}
+                        <div className={styles.surveySection}>
+                            <div className={styles.sectionHeader}>
+                                <h3>Опитування</h3>
+                                {!formData.survey && (
+                                    <button
+                                        type="button"
+                                        className={styles.addSurveyBtn}
+                                        onClick={() => {
+                                            setFormData({
+                                                ...formData,
+                                                survey: {
+                                                    question: '',
+                                                    options: [
+                                                        { id: '1', text: '' },
+                                                        { id: '2', text: '' },
+                                                    ],
+                                                    allowMultiple: false,
+                                                    endDate: new Date(
+                                                        Date.now() +
+                                                            7 *
+                                                                24 *
+                                                                60 *
+                                                                60 *
+                                                                1000
+                                                    )
+                                                        .toISOString()
+                                                        .split('T')[0],
+                                                },
+                                            })
+                                            setSurveyValid(false)
+                                        }}
+                                    >
+                                        ➕ Додати опитування
+                                    </button>
+                                )}
+                            </div>
+
+                            {formData.survey && (
+                                <SurveyFormTyped
+                                    survey={formData.survey}
+                                    onChange={(survey: Survey) =>
+                                        setFormData({ ...formData, survey })
+                                    }
+                                    onValidityChange={(v: boolean) =>
+                                        setSurveyValid(v)
+                                    }
+                                    onRemove={() =>
+                                        setFormData({
+                                            ...formData,
+                                            survey: undefined,
+                                        })
+                                    }
+                                />
+                            )}
+                        </div>
+
                         <div className={styles.formActions}>
                             <button
                                 type="button"
@@ -510,7 +574,11 @@ const AdminNewsPage = () => {
                             >
                                 ❌ Скасувати
                             </button>
-                            <button type="submit" className={styles.saveButton}>
+                            <button
+                                type="submit"
+                                className={styles.saveButton}
+                                disabled={!!formData.survey && !surveyValid}
+                            >
                                 {editingItem
                                     ? '💾 Зберегти'
                                     : '➕ Опублікувати'}

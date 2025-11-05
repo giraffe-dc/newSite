@@ -1,0 +1,112 @@
+/* Survey Form */
+.surveyForm {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.surveyHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.surveyTitle {
+    font-size: 1.25rem;
+    color: var(--primary-orange);
+    margin: 0;
+}
+
+.removeSurveyBtn {
+    padding: 8px 16px;
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.removeSurveyBtn:hover {
+    background-color: #fca5a5;
+}
+
+.surveyContent {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.optionsSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.optionItem {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.optionItem .input {
+    flex: 1;
+}
+
+.removeOptionBtn {
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.removeOptionBtn:hover {
+    opacity: 1;
+}
+
+.addOptionBtn {
+    margin-top: 8px;
+    padding: 8px 16px;
+    background-color: #e5e7eb;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #374151;
+    transition: all 0.2s ease;
+}
+
+.addOptionBtn:hover {
+    background-color: #d1d5db;
+}
+
+.surveySettings {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.checkboxLabel {
+    font-size: 0.9rem;
+    color: #4b5563;
+    cursor: pointer;
+}
