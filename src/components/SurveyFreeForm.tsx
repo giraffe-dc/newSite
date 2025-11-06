@@ -17,36 +17,38 @@ function SurveyFreeForm({ survey, newsId }: Props) {
 
   const [values, setValues] = useState<Record<string, string>>(initial)
   const [submitting, setSubmitting] = useState(false)
+  const [submit, setSubmit] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
   const handleChange = (id: string, v: string) => {
-    setValues((s) => ({ ...s, [id]: v }))
+      setValues((s) => ({ ...s, [id]: v }))
   }
 
   const handleSubmit = async () => {
-    if (!newsId) {
-      setMessage('Missing news id')
-      return
-    }
-    setSubmitting(true)
-    setMessage(null)
-    try {
-      const res = await fetch('/api/survey/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newsId, answers: values }),
-      })
-      if (res.ok) {
-        setMessage('Дякуємо за відповідь')
-      } else {
-        const err = await res.json()
-        setMessage(err.error || 'Помилка')
+      if (!newsId) {
+          setMessage('Missing news id')
+          return
       }
-    } catch (err) {
-      setMessage('Помилка відправки')
-    } finally {
-      setSubmitting(false)
-    }
+      setSubmitting(true)
+      setMessage(null)
+      try {
+          const res = await fetch('/api/survey/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ newsId, answers: values }),
+          })
+          if (res.ok) {
+              setMessage('Дякуємо за відповідь')
+          } else {
+              const err = await res.json()
+              setMessage(err.error || 'Помилка')
+          }
+      } catch (err) {
+          setMessage('Помилка відправки')
+      } finally {
+          setSubmitting(false)
+          setSubmit(true)
+      }
   }
 
   return (
@@ -81,23 +83,25 @@ function SurveyFreeForm({ survey, newsId }: Props) {
           </div>
 
           <div>
-              <button
-                  className={styles.voteButton}
-                  onClick={handleSubmit}
-                  disabled={submitting}
-              >
-                  {submitting ? (
-                      <>
-                          <span>Відправляємо...</span>
-                          <span className={styles.spinner}>⌛</span>
-                      </>
-                  ) : (
-                      <>
-                          <span>Зберегти відповідь</span>
-                          <span>→</span>
-                      </>
-                  )}
-              </button>
+              {!submit && (
+                  <button
+                      className={styles.voteButton}
+                      onClick={handleSubmit}
+                      disabled={submitting}
+                  >
+                      {submitting ? (
+                          <>
+                              <span>Відправляємо...</span>
+                              <span className={styles.spinner}>⌛</span>
+                          </>
+                      ) : (
+                          <>
+                              <span>Зберегти відповідь</span>
+                              <span>→</span>
+                          </>
+                      )}
+                  </button>
+              )}
           </div>
 
           {message && (
