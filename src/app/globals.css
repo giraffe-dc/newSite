@@ -27,7 +27,11 @@ body {
   line-height: 1.6;
   /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
   min-height: 100vh;
-  margin-top: 3%
+  margin-top: 3%;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   }
 
   @media (max-width: 768px) {
@@ -40,6 +44,18 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+.selectable-text,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea,
+[contenteditable="true"] {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
 }
 
 .btn-primary {

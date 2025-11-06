@@ -191,7 +191,9 @@ const NewsContactsPage = () => {
                                         Зв'яжіться з нами
                                     </h3>
                                 </div>
-                                <div className={styles.contactInfo}>
+                                <div
+                                    className={`${styles.contactInfo} selectable-text`}
+                                >
                                     <div className={styles.contactItem}>
                                         <span
                                             className={styles.contactItemIcon}
