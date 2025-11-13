@@ -83,25 +83,27 @@ function SurveyFreeForm({ survey, newsId }: Props) {
           </div>
 
           <div>
-              {!submit && (
-                  <button
-                      className={styles.voteButton}
-                      onClick={handleSubmit}
-                      disabled={submitting}
-                  >
-                      {submitting ? (
-                          <>
-                              <span>Відправляємо...</span>
-                              <span className={styles.spinner}>⌛</span>
-                          </>
-                      ) : (
-                          <>
-                              <span>Зберегти відповідь</span>
-                              <span>→</span>
-                          </>
-                      )}
-                  </button>
-              )}
+              {survey?.endDate && new Date(survey.endDate) > new Date()
+                  ? !submit && (
+                        <button
+                            className={styles.voteButton}
+                            onClick={handleSubmit}
+                            disabled={submitting}
+                        >
+                            {submitting ? (
+                                <>
+                                    <span>Відправляємо...</span>
+                                    <span className={styles.spinner}>⌛</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>Зберегти відповідь</span>
+                                    <span>→</span>
+                                </>
+                            )}
+                        </button>
+                    )
+                  : null}
           </div>
 
           {message && (
