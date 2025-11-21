@@ -557,7 +557,6 @@ const AdminPricesPage = () => {
                                     )
                                 }
                                 className={styles.input}
-                                required
                             />
                         </div>
                         <div className={styles.formActionsNew}>
