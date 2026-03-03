@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
     // send External notification (best-effort)
     const baseUrl = process.env.NOTIFICATIONS_BASE_URL
     if (baseUrl) {
-      fetch(`${baseUrl}/api/notifications/incoming`, {
+    const res= await  fetch(`${baseUrl}/api/notifications/incoming`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,7 +64,9 @@ export async function POST(request: NextRequest) {
           source: 'website',
           metadata: doc
         })
-      }).catch(err => console.error('External notification error:', err))
+      }
+    
+    ).then(res => console.log(res)).catch(err => console.error('External notification error:', err))
     }
 
     return NextResponse.json({ success: true, id: result.insertedId })
