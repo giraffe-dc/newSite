@@ -7,9 +7,9 @@ function formatOrderForTelegram(order: Order) {
   const lines: string[] = []
   lines.push('<b>Нове замовлення</b> 🎉')
   lines.push(`Ім'я: <b>${order.customerName}</b>`) // safe enough for Telegram HTML
-  lines.push(`Телефон: <b>${order.phone}</b>`) 
-  if (order.date) lines.push(`Дата: <b>${order.date}</b>`) 
-  if (order.time) lines.push(`Час: <b>${order.time}</b>`) 
+  lines.push(`Телефон: <b>${order.phone}</b>`)
+  if (order.date) lines.push(`Дата: <b>${order.date}</b>`)
+  if (order.time) lines.push(`Час: <b>${order.time}</b>`)
   if (order.items?.length) {
     lines.push('Послуги:')
     order.items.forEach((it, idx) => {
@@ -44,10 +44,28 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await db.collection('orders').insertOne(doc as any)
+    const orderId = result.insertedId.toString()
 
     // send Telegram notification (best-effort)
     const message = formatOrderForTelegram(doc)
-    sendTelegramMessage(message).catch(() => {})
+    sendTelegramMessage(message).catch(() => { })
+
+    // send External notification (best-effort)
+    const baseUrl = process.env.NOTIFICATIONS_BASE_URL
+    if (baseUrl) {
+      fetch(`${baseUrl}/api/notifications/incoming`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey: process.env.NOTIFICATIONS_API_KEY,
+          title: 'Нове замовлення',
+          message: `Замовлення #${orderId} від ${doc.customerName}`,
+          type: 'success',
+          source: 'website',
+          metadata: doc
+        })
+      }).catch(err => console.error('External notification error:', err))
+    }
 
     return NextResponse.json({ success: true, id: result.insertedId })
   } catch (error) {
