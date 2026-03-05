@@ -1,36 +1,36 @@
-'use client'
-import React, { useEffect, useState } from 'react'
-import styles from '@/styles/admin/AdminDashboard.module.css'
+"use client";
+import React, { useEffect, useState } from "react";
+import styles from "@/styles/admin/AdminDashboard.module.css";
 
 interface Order {
-  _id: string
-  customerName: string
-  phone: string
-  date?: string
-  time?: string
-  notes?: string
-  createdAt?: string
-  status?: string
+  _id: string;
+  customerName: string;
+  phone: string;
+  date?: string;
+  time?: string;
+  notes?: string;
+  createdAt?: string;
+  status?: string;
 }
 
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch('/api/orders', { cache: 'no-store' })
+        const res = await fetch("/api/orders", { cache: "no-store" });
         if (res.ok) {
-          const data = await res.json()
-          setOrders(data)
+          const data = await res.json();
+          setOrders(data);
         }
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    load()
-  }, [])
+    };
+    load();
+  }, []);
 
   return (
     <div className={styles.adminDashboard}>
@@ -49,14 +49,15 @@ export default function AdminOrdersPage() {
                 {o.date && <p>Дата: {o.date}</p>}
                 {o.time && <p>Час: {o.time}</p>}
                 {o.notes && <p>Коментар: {o.notes}</p>}
-                <p>Статус: {o.status || 'new'}</p>
-                {o.createdAt && <p>Створено: {new Date(o.createdAt).toLocaleString()}</p>}
+                <p>Статус: {o.status || "new"}</p>
+                {o.createdAt && (
+                  <p>Створено: {new Date(o.createdAt).toLocaleString()}</p>
+                )}
               </div>
             </div>
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }
-

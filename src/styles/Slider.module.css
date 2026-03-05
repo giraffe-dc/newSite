@@ -23,7 +23,9 @@
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0;
-  transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+  transition:
+    opacity 1s ease-in-out,
+    transform 1s ease-in-out;
   transform: scale(1.1);
   z-index: 0;
 }
@@ -40,10 +42,10 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(
-    135deg, 
-    rgba(255,107,53,0.6) 0%, 
-    rgba(247,183,49,0.6) 50%,
-    rgba(95,39,205,0.6) 100%
+    135deg,
+    rgba(255, 107, 53, 0.6) 0%,
+    rgba(247, 183, 49, 0.6) 50%,
+    rgba(95, 39, 205, 0.6) 100%
   );
   z-index: 1;
   pointer-events: none; /* allow clicks to pass through to nav buttons/indicators */
@@ -53,7 +55,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.9);
   border: none;
   width: 50px;
   height: 50px;
@@ -67,13 +69,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .navButton:hover {
   background: white;
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .prevButton {
@@ -99,7 +101,7 @@
   height: 15px;
   border-radius: 50%;
   border: 2px solid white;
-  background: rgba(255,255,255,0.5);
+  background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -108,7 +110,7 @@
 .indicator.indicatorActive {
   background: white;
   transform: scale(1.2);
-  box-shadow: 0 0 15px rgba(255,255,255,0.6);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
 }
 
 .indicatorActive {
@@ -122,19 +124,19 @@
     height: 40px;
     font-size: 14px;
   }
-  
+
   .prevButton {
     left: 15px;
   }
-  
+
   .nextButton {
     right: 15px;
   }
-  
+
   .indicators {
     bottom: 20px;
   }
-  
+
   .indicator {
     width: 12px;
     height: 12px;

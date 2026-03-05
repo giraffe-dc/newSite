@@ -1,45 +1,48 @@
-'use client'
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import styles from '@/styles/admin/AdminLogin.module.css'
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import styles from "@/styles/admin/AdminLogin.module.css";
 
 const AdminLoginPage = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
     try {
-      const response = await fetch('/api/auth', {
-        method: 'POST',
+      const response = await fetch("/api/auth", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(credentials),
-      })
+      });
 
       if (response.ok) {
-        router.push('/admin')
+        router.push("/admin");
       } else {
-        const data = await response.json()
-        setError(data.error || 'Помилка входу')
+        const data = await response.json();
+        setError(data.error || "Помилка входу");
       }
     } catch (error) {
-      setError('Помилка підключення до сервера')
+      setError("Помилка підключення до сервера");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setCredentials(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className={styles.loginPage}>
@@ -51,7 +54,9 @@ const AdminLoginPage = () => {
               <h1 className={styles.logoTitle}>Жирафик</h1>
             </div>
             <h2 className={styles.loginTitle}>Адмін панель</h2>
-            <p className={styles.loginSubtitle}>Увійдіть для керування сайтом</p>
+            <p className={styles.loginSubtitle}>
+              Увійдіть для керування сайтом
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className={styles.loginForm}>
@@ -105,9 +110,7 @@ const AdminLoginPage = () => {
                   Вхід...
                 </>
               ) : (
-                <>
-                  🚀 Увійти
-                </>
+                <>🚀 Увійти</>
               )}
             </button>
           </form>
@@ -120,7 +123,7 @@ const AdminLoginPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminLoginPage
+export default AdminLoginPage;

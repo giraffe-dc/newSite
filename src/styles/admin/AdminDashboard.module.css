@@ -19,7 +19,8 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -64,7 +65,7 @@
   background: white;
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   gap: 20px;
@@ -73,19 +74,23 @@
 
 .statCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .statIcon {
   font-size: 2.5rem;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   border-radius: 50%;
   width: 70px;
   height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
 }
 
 .statInfo h3 {
@@ -112,7 +117,7 @@
   background: white;
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   text-decoration: none;
   color: var(--text-dark);
   transition: all 0.3s ease;
@@ -125,7 +130,7 @@
 }
 
 .dashboardCard:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -141,20 +146,24 @@
 
 .dashboardCard:hover {
   transform: translateY(-8px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
   border-color: var(--card-color, var(--primary-orange));
 }
 
 .cardIcon {
   font-size: 2.5rem;
-  background: linear-gradient(45deg, var(--card-color, var(--primary-orange)), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--card-color, var(--primary-orange)),
+    var(--primary-yellow)
+  );
   border-radius: 50%;
   width: 70px;
   height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .cardContent {
@@ -187,7 +196,7 @@
   background: white;
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .sectionTitle {
@@ -204,7 +213,11 @@
 }
 
 .actionButton {
-  background: linear-gradient(45deg, var(--primary-green), var(--secondary-blue));
+  background: linear-gradient(
+    45deg,
+    var(--primary-green),
+    var(--secondary-blue)
+  );
   color: white;
   border: none;
   padding: 15px 20px;
@@ -212,12 +225,12 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .actionButton:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .chartsGrid {
@@ -231,7 +244,7 @@
   background: white;
   padding: 30px;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -240,20 +253,20 @@
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .statsGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .dashboardGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .dashboardCard {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .actionsGrid {
     grid-template-columns: 1fr;
   }

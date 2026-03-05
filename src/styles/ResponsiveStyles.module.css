@@ -6,9 +6,9 @@
     font-size: 1.5rem;
     padding: 10px;
   }
-  
+
   .hero {
-    background-image: url('../images/hero-image-mobile.jpg');
+    background-image: url("../images/hero-image-mobile.jpg");
     height: 300px;
   }
 }
@@ -19,9 +19,9 @@
     font-size: 2rem;
     padding: 20px;
   }
-  
+
   .hero {
-    background-image: url('../images/hero-image-tablet.jpg');
+    background-image: url("../images/hero-image-tablet.jpg");
     height: 400px;
   }
 }
@@ -32,9 +32,9 @@
     font-size: 2.5rem;
     padding: 30px;
   }
-  
+
   .hero {
-    background-image: url('../images/hero-image-desktop.jpg');
+    background-image: url("../images/hero-image-desktop.jpg");
     height: 500px;
   }
 }

@@ -10,7 +10,7 @@
 .newsCard:hover {
   border-color: var(--type-color, var(--primary-orange));
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
 }
 
 .imageContainer {
@@ -34,7 +34,7 @@
   position: absolute;
   top: 15px;
   right: 15px;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.9);
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -42,7 +42,7 @@
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .typeIcon {
@@ -66,13 +66,17 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: linear-gradient(45deg, var(--type-color, var(--primary-orange)), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--type-color, var(--primary-orange)),
+    var(--primary-yellow)
+  );
   color: white;
   padding: 8px 15px;
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 600;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .badgeIcon {
@@ -124,7 +128,11 @@
 }
 
 .readMoreButton {
-  background: linear-gradient(45deg, var(--type-color, var(--primary-orange)), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--type-color, var(--primary-orange)),
+    var(--primary-yellow)
+  );
   color: white;
   border: none;
   padding: 12px 20px;
@@ -136,12 +144,12 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .readMoreButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 .buttonIcon {
@@ -157,25 +165,25 @@
   .imageContainer {
     height: 160px;
   }
-  
+
   .cardContent {
     padding: 20px;
   }
-  
+
   .cardHeader {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .newsTitle {
     font-size: 1.2rem;
   }
-  
+
   .newsContent {
     font-size: 0.95rem;
   }
-  
+
   .readMoreButton {
     width: 100%;
     justify-content: center;

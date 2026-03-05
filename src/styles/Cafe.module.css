@@ -34,14 +34,18 @@
 }
 
 .title:after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 100px;
   height: 4px;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   border-radius: 2px;
 }
 
@@ -61,14 +65,16 @@
 .menuCard {
   background: white;
   border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .menuCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .cardImage {

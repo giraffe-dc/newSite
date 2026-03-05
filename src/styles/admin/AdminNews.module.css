@@ -27,7 +27,11 @@
   align-items: center;
   margin-bottom: 40px;
   padding: 30px;
-  background: linear-gradient(135deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    135deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   border-radius: 20px;
   color: white;
 }
@@ -58,7 +62,7 @@
 
 .headerActions .addButton:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* Messages */
@@ -94,8 +98,8 @@
   padding: 28px;
   border-radius: 12px;
   margin-bottom: 40px;
-  border: 1px solid rgba(0,0,0,0.06);
-  box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.04);
 }
 
 .formTitle {
@@ -140,7 +144,9 @@
   border: 1px solid #e6e9ee;
   border-radius: 10px;
   font-size: 1rem;
-  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+  transition:
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
   background: #fcfcfd;
 }
 
@@ -148,7 +154,7 @@
 .textarea:focus {
   outline: none;
   border-color: var(--primary-orange);
-  box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
 .textarea {
@@ -182,13 +188,19 @@
   background: var(--primary-orange);
   color: white;
   font-weight: 600;
-  box-shadow: 0 8px 18px rgba(16,24,40,0.04);
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.04);
 }
 
-.pasteBtn { background: var(--secondary-blue); }
-.clearImagesBtn { background: #6c757d }
+.pasteBtn {
+  background: var(--secondary-blue);
+}
+.clearImagesBtn {
+  background: #6c757d;
+}
 
-.addImageBtn:hover, .pasteBtn:hover, .clearImagesBtn:hover {
+.addImageBtn:hover,
+.pasteBtn:hover,
+.clearImagesBtn:hover {
   transform: translateY(-2px);
   opacity: 0.98;
 }
@@ -246,7 +258,9 @@
   cursor: pointer;
 }
 
-.removeImageBtn:hover { opacity: 0.95 }
+.removeImageBtn:hover {
+  opacity: 0.95;
+}
 
 .error {
   color: #dc2626;
@@ -263,9 +277,17 @@
 }
 
 @media (max-width: 600px) {
-  .imageButtons { flex-direction: column; align-items: stretch; }
-  .imageButtons button { width: 100%; }
-  .formActions { flex-direction: column-reverse; gap: 10px; }
+  .imageButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .imageButtons button {
+    width: 100%;
+  }
+  .formActions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
 }
 
 .typeSelector {
@@ -331,7 +353,7 @@
 .newsCard {
   background: white;
   border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   transition: all 0.3s ease;
   display: flex;
@@ -340,7 +362,7 @@
 
 .newsCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 35px rgba(0,0,0,0.12);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
 }
 
 .cardImage {
@@ -360,7 +382,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
 }
 
 .typeIcon {
@@ -368,7 +390,7 @@
   top: 15px;
   right: 15px;
   font-size: 2rem;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 .cardContent {
@@ -492,7 +514,11 @@
 }
 
 .saveButton {
-  background: linear-gradient(45deg, var(--primary-green), var(--secondary-blue));
+  background: linear-gradient(
+    45deg,
+    var(--primary-green),
+    var(--secondary-blue)
+  );
   color: white;
 }
 
@@ -502,13 +528,14 @@
   margin-top: 40px;
 }
 
-.cancelButton:hover, .backButton:hover {
+.cancelButton:hover,
+.backButton:hover {
   background: #5a6268;
 }
 
 .saveButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(95,39,205,0.3);
+  box-shadow: 0 5px 15px rgba(95, 39, 205, 0.3);
 }
 
 /* Responsive */

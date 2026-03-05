@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server'
-import clientPromise from '@/lib/mongodb'
+import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
 
 export async function GET() {
   try {
-    const client = await clientPromise
-    const db = client.db('zhyrafyk')
-    const contacts = await db.collection('contacts').findOne({})
+    const client = await clientPromise;
+    const db = client.db("zhyrafyk");
+    const contacts = await db.collection("contacts").findOne({});
 
     if (!contacts) {
       return NextResponse.json({
@@ -16,17 +16,17 @@ export async function GET() {
         socialMedia: {
           facebook: "https://facebook.com/zhyrafyk",
           instagram: "https://instagram.com/zhyrafyk_family",
-          telegram: "https://t.me/zhyrafyk_bot"
-        }
-      })
+          telegram: "https://t.me/zhyrafyk_bot",
+        },
+      });
     }
 
-    return NextResponse.json(contacts)
+    return NextResponse.json(contacts);
   } catch (error) {
-    console.error('Database error:', error)
+    console.error("Database error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch contacts' },
-      { status: 500 }
-    )
+      { error: "Failed to fetch contacts" },
+      { status: 500 },
+    );
   }
 }

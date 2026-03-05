@@ -8,7 +8,7 @@
   --text-dark: #2c3e50;
   --text-light: #7f8c8d;
   --white: #ffffff;
-  --shadow: 0 4px 20px rgba(0,0,0,0.1);
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   --border-radius: 15px;
 }
 
@@ -22,7 +22,7 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: "Comic Sans MS", cursive, sans-serif;
   color: var(--text-dark);
   line-height: 1.6;
   /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
@@ -32,12 +32,12 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  }
+}
 
-  @media (max-width: 768px) {
-    body {
-      margin-top: 26%;
-    }
+@media (max-width: 768px) {
+  body {
+    margin-top: 26%;
+  }
 }
 
 .container {
@@ -59,7 +59,11 @@ textarea,
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   color: white;
   padding: 15px 30px;
   border: none;
@@ -76,11 +80,15 @@ textarea,
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
 }
 
 .btn-secondary {
-  background: linear-gradient(45deg, var(--secondary-blue), var(--primary-green));
+  background: linear-gradient(
+    45deg,
+    var(--secondary-blue),
+    var(--primary-green)
+  );
   color: white;
   padding: 12px 25px;
   border: none;
@@ -107,7 +115,7 @@ textarea,
 
 .card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .floating-animation {
@@ -115,8 +123,13 @@ textarea,
 }
 
 @keyframes floating {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .bounce-animation {
@@ -124,8 +137,13 @@ textarea,
 }
 
 @keyframes bounce {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
 }
 
 .fade-in {

@@ -33,14 +33,18 @@
 }
 
 .title:after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 150px;
   height: 4px;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   border-radius: 2px;
 }
 
@@ -69,20 +73,24 @@
   font-weight: 600;
   color: var(--text-dark);
   font-size: 1.1rem;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .tabButton:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
 }
 
 .tabButton.active {
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   color: white;
   border-color: var(--primary-orange);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(255,107,53,0.4);
+  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
 }
 
 .tabIcon {
@@ -119,13 +127,17 @@
 }
 
 .contactCard:before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 4px;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   transition: left 0.3s ease;
 }
 
@@ -135,7 +147,7 @@
 
 .contactCard:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
 .contactHeader {
@@ -156,14 +168,18 @@
 .contactIcon {
   font-size: 1.8rem;
   padding: 10px;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   border-radius: 50%;
   width: 50px;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
 }
 
 .contactInfo {
@@ -240,19 +256,23 @@
   background: white;
   border-color: var(--primary-orange);
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .socialIcon {
   font-size: 2rem;
   width: 60px;
   height: 60px;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(255,107,53,0.3);
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
 }
 
 .socialLink div {
@@ -284,7 +304,11 @@
 
 .mapPlaceholder {
   height: 100%;
-  background: linear-gradient(135deg, var(--light-yellow) 0%, var(--light-pink) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--light-yellow) 0%,
+    var(--light-pink) 100%
+  );
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -312,7 +336,11 @@
 }
 
 .mapButton {
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   color: white;
   border: none;
   padding: 12px 25px;
@@ -320,29 +348,29 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .mapButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
   .title {
     font-size: 2.5rem;
   }
-  
+
   .subtitle {
     font-size: 1.1rem;
   }
-  
+
   .tabNavigation {
     flex-direction: column;
     align-items: center;
     gap: 15px;
   }
-  
+
   .tabButton {
     padding: 15px 30px;
     font-size: 1rem;
@@ -350,41 +378,41 @@
     max-width: 300px;
     justify-content: center;
   }
-  
+
   .newsGrid {
     grid-template-columns: 1fr;
     gap: 25px;
   }
-  
+
   .contactsGrid {
     grid-template-columns: 1fr;
     gap: 25px;
   }
-  
+
   .contactCard {
     padding: 25px;
   }
-  
+
   .contactTitle {
     font-size: 1.3rem;
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .socialLink {
     padding: 15px;
   }
-  
+
   .socialIcon {
     width: 50px;
     height: 50px;
     font-size: 1.5rem;
   }
-  
+
   .mapPlaceholder {
     padding: 20px;
   }
-  
+
   .mapIcon {
     font-size: 3rem;
   }

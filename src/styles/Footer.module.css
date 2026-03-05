@@ -20,7 +20,7 @@
 }
 
 .footerSection h3:after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -5px;
   left: 0;
@@ -66,9 +66,9 @@
 }
 
 .socialLink svg {
-    width: 22px;
-    height: 22px;
-    color: #391aeb;
+  width: 22px;
+  height: 22px;
+  color: #391aeb;
 }
 
 .socialLink:hover {
@@ -109,18 +109,24 @@
 }
 
 .skeleton::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -150%;
   height: 100%;
   width: 150%;
-  background: linear-gradient(to right, transparent 0%, #4a627a 50%, transparent 100%);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    #4a627a 50%,
+    transparent 100%
+  );
   animation: shimmer 2s infinite;
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
   }
   50% {
@@ -139,7 +145,7 @@
     grid-template-columns: 1fr;
     gap: 30px;
   }
-  
+
   .socialLinks {
     justify-content: center;
   }

@@ -16,7 +16,7 @@
   background: white;
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.6s ease;
 }
 
@@ -53,7 +53,11 @@
   font-size: 2rem;
   color: var(--primary-orange);
   margin: 0;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -115,12 +119,16 @@
   outline: none;
   border-color: var(--primary-orange);
   background: white;
-  box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
 .loginButton {
   width: 100%;
-  background: linear-gradient(45deg, var(--primary-orange), var(--primary-yellow));
+  background: linear-gradient(
+    45deg,
+    var(--primary-orange),
+    var(--primary-yellow)
+  );
   color: white;
   border: none;
   padding: 15px;
@@ -137,7 +145,7 @@
 
 .loginButton:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255,107,53,0.3);
+  box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
 }
 
 .loginButton:disabled {

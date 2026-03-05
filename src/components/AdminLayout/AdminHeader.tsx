@@ -1,13 +1,16 @@
-'use client'
-import React from 'react'
-import styles from '@/styles/admin/AdminHeader.module.css'
+"use client";
+import React from "react";
+import styles from "@/styles/admin/AdminHeader.module.css";
 
 interface AdminHeaderProps {
   onMenuToggle: () => void;
   onLogout: () => void;
 }
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, onLogout }) => {
+const AdminHeader: React.FC<AdminHeaderProps> = ({
+  onMenuToggle,
+  onLogout,
+}) => {
   return (
     <header className={styles.adminHeader}>
       <div className={styles.headerLeft}>
@@ -41,7 +44,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({ onMenuToggle, onLogout }) => 
         </div>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default AdminHeader
+export default AdminHeader;

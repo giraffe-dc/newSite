@@ -1,8 +1,8 @@
-'use client'
-import React from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import styles from '@/styles/admin/AdminSidebar.module.css'
+"use client";
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import styles from "@/styles/admin/AdminSidebar.module.css";
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -10,31 +10,31 @@ interface AdminSidebarProps {
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const menuItems = [
-      { href: '/admin', icon: '🏠', label: 'Головна', exact: true },
-      { href: '/admin/home', icon: '🏠', label: 'Контент головної' },
-      { href: '/admin/features', icon: '✨', label: 'Особливості' },
-      { href: '/admin/prices', icon: '💰', label: 'Ціни' },
-      { href: '/admin/news', icon: '📰', label: 'Новини' },
-      { href: '/admin/contacts', icon: '📞', label: 'Контакти' },
-      { href: '/admin/survey', icon: '📊', label: 'Опитування' },
-      { href: '/admin/orders', icon: '🧾', label: 'Замовлення' },
-      { href: '/admin/offers', icon: '🏷️', label: 'Спецпропозиції' },
-      { href: '/admin/cafe', icon: '☕', label: 'Кафе' },
-  ]
+    { href: "/admin", icon: "🏠", label: "Головна", exact: true },
+    { href: "/admin/home", icon: "🏠", label: "Контент головної" },
+    { href: "/admin/features", icon: "✨", label: "Особливості" },
+    { href: "/admin/prices", icon: "💰", label: "Ціни" },
+    { href: "/admin/news", icon: "📰", label: "Новини" },
+    { href: "/admin/contacts", icon: "📞", label: "Контакти" },
+    { href: "/admin/survey", icon: "📊", label: "Опитування" },
+    { href: "/admin/orders", icon: "🧾", label: "Замовлення" },
+    { href: "/admin/offers", icon: "🏷️", label: "Спецпропозиції" },
+    { href: "/admin/cafe", icon: "☕", label: "Кафе" },
+  ];
 
   const isActive = (href: string, exact = false) => {
     if (exact) {
-      return pathname === href
+      return pathname === href;
     }
-    return pathname.startsWith(href)
-  }
+    return pathname.startsWith(href);
+  };
 
   return (
     <>
-      <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
+      <div className={`${styles.sidebar} ${isOpen ? styles.open : ""}`}>
         <div className={styles.sidebarHeader}>
           <div className={styles.logo}>
             <span className={styles.logoIcon}>🦒</span>
@@ -52,7 +52,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                 <Link
                   href={item.href}
                   className={`${styles.menuLink} ${
-                    isActive(item.href, item.exact) ? styles.active : ''
+                    isActive(item.href, item.exact) ? styles.active : ""
                   }`}
                   onClick={() => onToggle()}
                 >
@@ -74,7 +74,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
 
       {isOpen && <div className={styles.overlay} onClick={onToggle} />}
     </>
-  )
-}
+  );
+};
 
-export default AdminSidebar
+export default AdminSidebar;

@@ -1,13 +1,13 @@
-'use client'
-import React from 'react'
-import styles from '@/styles/RuleModal.module.css'
+"use client";
+import React from "react";
+import styles from "@/styles/RuleModal.module.css";
 
 interface RuleModalProps {
   rule: {
-    title: string
-    fullDescription: string[]
-  }
-  onClose: () => void
+    title: string;
+    fullDescription: string[];
+  };
+  onClose: () => void;
 }
 
 const RuleModal: React.FC<RuleModalProps> = ({ rule, onClose }) => {
@@ -29,7 +29,7 @@ const RuleModal: React.FC<RuleModalProps> = ({ rule, onClose }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RuleModal
+export default RuleModal;

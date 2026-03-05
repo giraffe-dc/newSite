@@ -1,8 +1,8 @@
 // src/app/admin/home/page.tsx
-'use client'
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import styles from '@/styles/admin/AdminHome.module.css'
+"use client";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import styles from "@/styles/admin/AdminHome.module.css";
 
 interface HomeData {
   title: string;
@@ -16,90 +16,94 @@ interface HomeData {
 
 const AdminHomePage = () => {
   const [homeData, setHomeData] = useState<HomeData>({
-    title: '',
-    description: '',
-    features: [''],
-    images: [''],
-    workingHours: '',
-    address: '',
-    phone: ''
-  })
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [message, setMessage] = useState('')
-  const router = useRouter()
+    title: "",
+    description: "",
+    features: [""],
+    images: [""],
+    workingHours: "",
+    address: "",
+    phone: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    fetchHomeData()
-  }, [])
+    fetchHomeData();
+  }, []);
 
   const fetchHomeData = async () => {
     try {
-      const response = await fetch('/api/data/home')
+      const response = await fetch("/api/data/home");
       if (response.ok) {
-        const data = await response.json()
-        setHomeData(data)
+        const data = await response.json();
+        setHomeData(data);
       }
     } catch (error) {
-      console.error('Error fetching home data:', error)
-      setMessage('Помилка завантаження даних')
+      console.error("Error fetching home data:", error);
+      setMessage("Помилка завантаження даних");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setMessage('')
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
 
     try {
-      const response = await fetch('/api/admin/home', {
-        method: 'PUT',
+      const response = await fetch("/api/admin/home", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(homeData),
-        credentials: 'include'
-      })
+        credentials: "include",
+      });
 
       if (response.ok) {
-        setMessage('Дані успішно оновлено!')
-        setTimeout(() => setMessage(''), 3000)
+        setMessage("Дані успішно оновлено!");
+        setTimeout(() => setMessage(""), 3000);
       } else {
-        setMessage('Помилка збереження даних')
+        setMessage("Помилка збереження даних");
       }
     } catch (error) {
-      setMessage('Помилка підключення до сервера')
+      setMessage("Помилка підключення до сервера");
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   const handleInputChange = (field: keyof HomeData, value: string) => {
-    setHomeData(prev => ({ ...prev, [field]: value }))
-  }
+    setHomeData((prev) => ({ ...prev, [field]: value }));
+  };
 
-  const handleArrayChange = (field: 'features' | 'images', index: number, value: string) => {
-    setHomeData(prev => ({
+  const handleArrayChange = (
+    field: "features" | "images",
+    index: number,
+    value: string,
+  ) => {
+    setHomeData((prev) => ({
       ...prev,
-      [field]: prev[field].map((item, i) => i === index ? value : item)
-    }))
-  }
+      [field]: prev[field].map((item, i) => (i === index ? value : item)),
+    }));
+  };
 
-  const addArrayItem = (field: 'features' | 'images') => {
-    setHomeData(prev => ({
+  const addArrayItem = (field: "features" | "images") => {
+    setHomeData((prev) => ({
       ...prev,
-      [field]: [...prev[field], '']
-    }))
-  }
+      [field]: [...prev[field], ""],
+    }));
+  };
 
-  const removeArrayItem = (field: 'features' | 'images', index: number) => {
-    setHomeData(prev => ({
+  const removeArrayItem = (field: "features" | "images", index: number) => {
+    setHomeData((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index)
-    }))
-  }
+      [field]: prev[field].filter((_, i) => i !== index),
+    }));
+  };
 
   if (loading) {
     return (
@@ -107,7 +111,7 @@ const AdminHomePage = () => {
         <div className={styles.loadingSpinner}>🏠</div>
         <p>Завантаження...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -123,9 +127,11 @@ const AdminHomePage = () => {
       </div>
 
       {message && (
-        <div className={`${styles.message} ${message.includes('успішно') ? styles.success : styles.error}`}>
+        <div
+          className={`${styles.message} ${message.includes("успішно") ? styles.success : styles.error}`}
+        >
           <span className={styles.messageIcon}>
-            {message.includes('успішно') ? '✅' : '❌'}
+            {message.includes("успішно") ? "✅" : "❌"}
           </span>
           {message}
         </div>
@@ -145,7 +151,7 @@ const AdminHomePage = () => {
               <input
                 type="text"
                 value={homeData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                onChange={(e) => handleInputChange("title", e.target.value)}
                 className={styles.input}
                 placeholder="Назва розважального центру"
                 required
@@ -156,7 +162,9 @@ const AdminHomePage = () => {
               <label className={styles.inputLabel}>Опис</label>
               <textarea
                 value={homeData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 className={styles.textarea}
                 placeholder="Короткий опис центру"
                 rows={4}
@@ -177,7 +185,9 @@ const AdminHomePage = () => {
               <input
                 type="text"
                 value={homeData.workingHours}
-                onChange={(e) => handleInputChange('workingHours', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("workingHours", e.target.value)
+                }
                 className={styles.input}
                 placeholder="Пн-Нд: 10:00 - 21:00"
                 required
@@ -189,7 +199,7 @@ const AdminHomePage = () => {
               <input
                 type="text"
                 value={homeData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
+                onChange={(e) => handleInputChange("address", e.target.value)}
                 className={styles.input}
                 placeholder="вул. Дитяча, 15, м. Вінниця"
                 required
@@ -201,7 +211,7 @@ const AdminHomePage = () => {
               <input
                 type="tel"
                 value={homeData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
                 className={styles.input}
                 placeholder="+38 (093) 123-45-67"
                 required
@@ -221,13 +231,15 @@ const AdminHomePage = () => {
                 <input
                   type="text"
                   value={feature}
-                  onChange={(e) => handleArrayChange('features', index, e.target.value)}
+                  onChange={(e) =>
+                    handleArrayChange("features", index, e.target.value)
+                  }
                   className={styles.input}
                   placeholder="🎈 Назва особливості"
                 />
                 <button
                   type="button"
-                  onClick={() => removeArrayItem('features', index)}
+                  onClick={() => removeArrayItem("features", index)}
                   className={styles.removeButton}
                   disabled={homeData.features.length === 1}
                 >
@@ -238,7 +250,7 @@ const AdminHomePage = () => {
 
             <button
               type="button"
-              onClick={() => addArrayItem('features')}
+              onClick={() => addArrayItem("features")}
               className={styles.addButton}
             >
               ➕ Додати особливість
@@ -257,13 +269,15 @@ const AdminHomePage = () => {
                 <input
                   type="url"
                   value={image}
-                  onChange={(e) => handleArrayChange('images', index, e.target.value)}
+                  onChange={(e) =>
+                    handleArrayChange("images", index, e.target.value)
+                  }
                   className={styles.input}
                   placeholder="https://example.com/image.jpg"
                 />
                 <button
                   type="button"
-                  onClick={() => removeArrayItem('images', index)}
+                  onClick={() => removeArrayItem("images", index)}
                   className={styles.removeButton}
                   disabled={homeData.images.length === 1}
                 >
@@ -274,7 +288,7 @@ const AdminHomePage = () => {
 
             <button
               type="button"
-              onClick={() => addArrayItem('images')}
+              onClick={() => addArrayItem("images")}
               className={styles.addButton}
             >
               ➕ Додати зображення
@@ -285,32 +299,26 @@ const AdminHomePage = () => {
         <div className={styles.formActions}>
           <button
             type="button"
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push("/admin")}
             className={styles.cancelButton}
           >
             ⬅️ Назад
           </button>
-          
-          <button
-            type="submit"
-            disabled={saving}
-            className={styles.saveButton}
-          >
+
+          <button type="submit" disabled={saving} className={styles.saveButton}>
             {saving ? (
               <>
                 <span className={styles.spinner}>⏳</span>
                 Збереження...
               </>
             ) : (
-              <>
-                💾 Зберегти зміни
-              </>
+              <>💾 Зберегти зміни</>
             )}
           </button>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default AdminHomePage
+export default AdminHomePage;
