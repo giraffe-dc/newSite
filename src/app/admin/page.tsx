@@ -245,12 +245,12 @@ const AdminDashboard = () => {
       <div className={styles.quickActions}>
         <h2 className={styles.sectionTitle}>Швидкі дії</h2>
         <div className={styles.actionsGrid}>
-          <button className={styles.actionButton}>➕ Додати новину</button>
-          <button className={styles.actionButton}>💰 Оновити ціни</button>
-          <button className={styles.actionButton}>
+          <Link href="/admin/news" className={styles.actionButton}>➕ Додати новину</Link>
+          <Link href="/admin/prices" className={styles.actionButton}>💰 Оновити ціни</Link>
+          <Link href="/admin/orders" className={styles.actionButton}>
             📧 Переглянути повідомлення
-          </button>
-          <button className={styles.actionButton}>📊 Експорт звітів</button>
+          </Link>
+          <button className={styles.actionButton} onClick={() => window.print()}>📊 Експорт звітів</button>
         </div>
       </div>
     </div>

@@ -62,6 +62,8 @@ const colorMap: { [key: string]: string } = {
   Рейтинги: styles.colorPrimary,
 };
 
+import { FadeIn } from "./ui/FadeIn";
+
 const HomePageClient: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
   const [open, setOpen] = useState(false);
 
@@ -83,31 +85,31 @@ const HomePageClient: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
 
       <section className={styles.aboutSection}>
         <div className={styles.containerInner}>
-          <div className={styles.textCenter}>
-            <h2 className={styles.sectionTitle}>Чому обирають Жирафик?</h2>
-            <p className={styles.sectionDescription}>
-              Ми створили унікальне місце, де кожна дитина та батьки можуть
-              відчути справжню радість
-            </p>
-          </div>
+          <FadeIn direction="up">
+            <div className={styles.textCenter}>
+              <h2 className={styles.sectionTitle}>Чому обирають Жирафик?</h2>
+              <p className={styles.sectionDescription}>
+                Ми створили унікальне місце, де кожна дитина та батьки можуть
+                відчути справжню радість
+              </p>
+            </div>
+          </FadeIn>
 
           <div className={styles.featuresGrid}>
             {features.map((feature, index) => (
-              <Card
-                key={index}
-                className={`${styles.card} ${styles.cardAnimation}`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <CardContent className={styles.cardContent}>
-                  <div className={`${styles.iconWrapper} ${feature.color}`}>
-                    <feature.icon className={styles.icon} />
-                  </div>
-                  <h3 className={styles.cardTitle}>{feature.title}</h3>
-                  <p className={styles.cardDescription}>
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
+              <FadeIn key={index} delay={index * 0.1} direction="up">
+                <Card className={`${styles.card} ${styles.cardAnimation}`}>
+                  <CardContent className={styles.cardContent}>
+                    <div className={`${styles.iconWrapper} ${feature.color}`}>
+                      <feature.icon className={styles.icon} />
+                    </div>
+                    <h3 className={styles.cardTitle}>{feature.title}</h3>
+                    <p className={styles.cardDescription}>
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              </FadeIn>
             ))}
           </div>
         </div>
@@ -115,33 +117,35 @@ const HomePageClient: React.FC<{ homeData: HomeData }> = ({ homeData }) => {
 
       <section className={styles.ctaSection}>
         <div className={styles.ctaOverlay} />
-        <div className={`${styles.containerInner} ${styles.ctaContent}`}>
-          <h2 className={styles.ctaTitle}>Готові до незабутніх вражень?</h2>
-          <p className={styles.ctaDescription}>
-            Забронюйте свій візит вже зараз і отримайте знижку 10% на перше
-            відвідування
-          </p>
-          <div className={styles.ctaButtons}>
-            <Button
-              variant="hero"
-              size="xl"
-              className={styles.primaryButton}
-              onClick={() => setOpen(true)}
-            >
-              Забронювати зараз
-            </Button>
-            <Link href="/prices">
+        <FadeIn direction="none" className={styles.containerInner}>
+          <div className={styles.ctaContent}>
+            <h2 className={styles.ctaTitle}>Готові до незабутніх вражень?</h2>
+            <p className={styles.ctaDescription}>
+              Забронюйте свій візит вже зараз і отримайте знижку 10% на перше
+              відвідування
+            </p>
+            <div className={styles.ctaButtons}>
               <Button
-                variant="playful"
+                variant="hero"
                 size="xl"
-                className={styles.outlineButton}
+                className={styles.primaryButton}
+                onClick={() => setOpen(true)}
               >
-                Подивитися ціни
+                Забронювати зараз
               </Button>
-            </Link>
+              <Link href="/prices">
+                <Button
+                  variant="playful"
+                  size="xl"
+                  className={styles.outlineButton}
+                >
+                  Подивитися ціни
+                </Button>
+              </Link>
+            </div>
           </div>
-          <BookingModal open={open} onClose={() => setOpen(false)} />
-        </div>
+        </FadeIn>
+        <BookingModal open={open} onClose={() => setOpen(false)} />
       </section>
     </div>
   );

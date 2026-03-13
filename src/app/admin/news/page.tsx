@@ -37,7 +37,7 @@ const AdminNewsPage = () => {
     images: [],
     survey: undefined,
   });
-  console.log(formData);
+  // console.log(formData);
   useEffect(() => {
     fetchNews();
   }, []);
@@ -185,9 +185,8 @@ const AdminNewsPage = () => {
 
       {message && (
         <div
-          className={`${styles.message} ${
-            message.includes("!") ? styles.success : styles.error
-          }`}
+          className={`${styles.message} ${message.includes("!") ? styles.success : styles.error
+            }`}
         >
           <span className={styles.messageIcon}>
             {message.includes("!") ? "✅" : "❌"}

@@ -3,11 +3,17 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/styles/admin/AdminCafe.module.css";
 import { CafeItem } from "@/types";
+import CafeItemModal from "@/components/admin/CafeItemModal";
+import { Edit2, Trash2, Plus, ArrowLeft } from "lucide-react";
+import { FadeIn } from "@/components/ui/FadeIn";
 
 const AdminCafePage = () => {
   const [cafeItems, setCafeItems] = useState<CafeItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<CafeItem | undefined>(
+    undefined,
+  );
   const [message, setMessage] = useState("");
   const router = useRouter();
 
@@ -30,59 +36,42 @@ const AdminCafePage = () => {
     }
   };
 
-  const handleInputChange = (
-    index: number,
-    field: keyof Omit<CafeItem, "_id">,
-    value: string | number,
-  ) => {
-    const newCafeItems = [...cafeItems];
-    // @ts-ignore
-    newCafeItems[index][field] = value;
-    setCafeItems(newCafeItems);
+  const handleEdit = (item: CafeItem) => {
+    setEditingItem(item);
+    setIsModalOpen(true);
   };
 
-  const handleAddCafeItem = () => {
-    setCafeItems([
-      ...cafeItems,
-      { name: "", description: "", price: 0, category: "", image: "" },
-    ]);
+  const handleAddNew = () => {
+    setEditingItem(undefined);
+    setIsModalOpen(true);
   };
 
-  const handleRemoveCafeItem = async (index: number) => {
-    const itemToRemove = cafeItems[index];
-    if (itemToRemove._id) {
-      try {
-        const response = await fetch("/api/admin/cafe", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ _id: itemToRemove._id }),
-          credentials: "include",
-        });
-        if (!response.ok) {
-          setMessage("Помилка видалення");
-          return;
-        }
-      } catch (error) {
-        setMessage("Помилка підключення до сервера");
-        return;
+  const handleRemoveCafeItem = async (id: string) => {
+    if (!confirm("Ви впевнені, що хочете видалити цю позицію?")) return;
+
+    try {
+      const response = await fetch("/api/admin/cafe", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: id }),
+        credentials: "include",
+      });
+      if (response.ok) {
+        setCafeItems(cafeItems.filter((item) => item._id !== id));
+        setMessage("Позицію видалено");
+        setTimeout(() => setMessage(""), 3000);
+      } else {
+        setMessage("Помилка видалення");
       }
+    } catch (error) {
+      setMessage("Помилка підключення до сервера");
     }
-    const newCafeItems = cafeItems.filter((_, i) => i !== index);
-    setCafeItems(newCafeItems);
   };
 
-  const handleSave = async (index: number) => {
-    setSaving(true);
-    setMessage("");
-    const cafeItem = cafeItems[index];
-    const method = cafeItem._id ? "PUT" : "POST";
-
-    const body = {
-      ...cafeItem,
-      _id: cafeItem._id,
-    };
+  const handleSave = async (item: CafeItem) => {
+    const method = item._id ? "PUT" : "POST";
 
     try {
       const response = await fetch("/api/admin/cafe", {
@@ -90,26 +79,20 @@ const AdminCafePage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify(item),
         credentials: "include",
       });
 
       if (response.ok) {
-        setMessage("Дані успішно оновлено!");
-        if (method === "POST") {
-          const newId = await response.json();
-          const newCafeItems = [...cafeItems];
-          newCafeItems[index]._id = newId;
-          setCafeItems(newCafeItems);
-        }
+        setMessage("Дані успішно збережено!");
+        setIsModalOpen(false);
+        fetchCafeItems();
         setTimeout(() => setMessage(""), 3000);
       } else {
         setMessage("Помилка збереження даних");
       }
     } catch (error) {
       setMessage("Помилка підключення до сервера");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -136,113 +119,69 @@ const AdminCafePage = () => {
 
       {message && (
         <div
-          className={`${styles.message} ${message.includes("успішно") ? styles.success : styles.error}`}
+          className={`${styles.message} ${message.includes("успішно") || message.includes("видалено") ? styles.success : styles.error}`}
         >
           <span className={styles.messageIcon}>
-            {message.includes("успішно") ? "✅" : "❌"}
+            {message.includes("успішно") || message.includes("видалено")
+              ? "✅"
+              : "❌"}
           </span>
           {message}
         </div>
       )}
 
-      <div className={styles.cafeGrid}>
-        {cafeItems.map((item, index) => (
-          <div key={index} className={styles.cafeCard}>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Назва</label>
-              <input
-                type="text"
-                value={item.name}
-                onChange={(e) =>
-                  handleInputChange(index, "name", e.target.value)
-                }
-                className={styles.input}
-                placeholder="Назва позиції"
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Опис</label>
-              <textarea
-                value={item.description}
-                onChange={(e) =>
-                  handleInputChange(index, "description", e.target.value)
-                }
-                className={styles.textarea}
-                placeholder="Опис позиції"
-                rows={3}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Ціна</label>
-              <input
-                type="number"
-                value={item.price}
-                onChange={(e) =>
-                  handleInputChange(
-                    index,
-                    "price",
-                    parseInt(e.target.value, 10),
-                  )
-                }
-                className={styles.input}
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Категорія</label>
-              <input
-                type="text"
-                value={item.category}
-                onChange={(e) =>
-                  handleInputChange(index, "category", e.target.value)
-                }
-                className={styles.input}
-                placeholder="Наприклад: Напої, Десерти"
-              />
-            </div>
-            <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
-                Посилання на зображення
-              </label>
-              <input
-                type="text"
-                value={item.image}
-                onChange={(e) =>
-                  handleInputChange(index, "image", e.target.value)
-                }
-                className={styles.input}
-                placeholder="/images/latte.jpg"
-              />
-            </div>
-            <div className={styles.cardActions}>
-              <button
-                onClick={() => handleRemoveCafeItem(index)}
-                className={styles.removeButton}
-              >
-                ❌ Видалити
-              </button>
-              <button
-                onClick={() => handleSave(index)}
-                className={styles.saveButton}
-                disabled={saving}
-              >
-                {saving ? "⏳" : "💾"} Зберегти
-              </button>
-            </div>
-          </div>
-        ))}
-        <button onClick={handleAddCafeItem} className={styles.addButton}>
-          ➕ Додати позицію
+      <div className={styles.actionsBar}>
+        <button onClick={handleAddNew} className={styles.addButton}>
+          <Plus size={20} /> Додати позицію
         </button>
       </div>
+
+      <div className={styles.cafeGrid}>
+        {cafeItems.map((item, index) => (
+          <FadeIn key={item._id || index} delay={index * 0.05} direction="up">
+            <div className={styles.cafeCard}>
+              <div className={styles.cardInfo}>
+                <h3 className={styles.itemName}>{item.name}</h3>
+                <span className={styles.categoryBadge}>{item.category}</span>
+                <p className={styles.itemPrice}>{item.price} грн</p>
+              </div>
+              <div className={styles.cardActions}>
+                <button
+                  onClick={() => handleEdit(item)}
+                  className={styles.editButton}
+                  title="Редагувати"
+                >
+                  <Edit2 size={18} />
+                </button>
+                <button
+                  onClick={() => handleRemoveCafeItem(item._id!)}
+                  className={styles.removeButton}
+                  title="Видалити"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+          </FadeIn>
+        ))}
+      </div>
+
       <div className={styles.formActions}>
         <button
           type="button"
           onClick={() => router.push("/admin")}
-          className={styles.cancelButton}
+          className={styles.backButton}
         >
-          ⬅️ Назад
+          <ArrowLeft size={18} /> Назад до панелі
         </button>
       </div>
+
+      <CafeItemModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        item={editingItem}
+      />
     </div>
   );
 };

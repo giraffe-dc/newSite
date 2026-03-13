@@ -2,6 +2,18 @@
 import React, { useState, useEffect } from "react";
 import styles from "@/styles/Cafe.module.css";
 import { CafeItem } from "@/types";
+import {
+  extractGoogleDriveFileId,
+  getGoogleDriveImageUrl,
+} from "@/lib/googleDrive";
+
+// Resolve any URL to a displayable src (handles Google Drive links)
+function resolveImageSrc(url?: string): string {
+  if (!url) return "/images/placeholder.jpg";
+  const id = extractGoogleDriveFileId(url);
+  if (id) return getGoogleDriveImageUrl(id);
+  return url;
+}
 
 const CafePage = () => {
   const [menuItems, setMenuItems] = useState<CafeItem[]>([]);
@@ -47,7 +59,7 @@ const CafePage = () => {
         {menuItems.map((item) => (
           <div key={item._id} className={styles.menuCard}>
             <img
-              src={item.image || "/images/placeholder.jpg"}
+              src={resolveImageSrc(item.image)}
               alt={item.name}
               className={styles.cardImage}
             />

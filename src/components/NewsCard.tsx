@@ -7,6 +7,7 @@ import {
   getGoogleDriveImageUrl,
 } from "@/lib/googleDrive";
 
+import Link from "next/link";
 import { Survey } from "@/types";
 
 interface NewsCardProps {
@@ -19,6 +20,9 @@ interface NewsCardProps {
   survey?: Survey;
   id?: string;
 }
+
+import { FadeIn } from "./ui/FadeIn";
+
 
 const NewsCard: React.FC<NewsCardProps> = ({
   title,
@@ -62,12 +66,11 @@ const NewsCard: React.FC<NewsCardProps> = ({
   };
 
   return (
-    <>
+    <FadeIn delay={index * 0.1} direction="up">
       <article
-        className={`${styles.newsCard} card fade-in`}
+        className={styles.newsCard}
         style={
           {
-            animationDelay: `${index * 0.15}s`,
             "--type-color": getTypeColor(type),
           } as React.CSSProperties
         }
@@ -107,22 +110,6 @@ const NewsCard: React.FC<NewsCardProps> = ({
                 {survey.question}
               </div>
               <div className={styles.surveyPreviewMeta}>
-                {/* {(() => {
-                                    const count =
-                                        (survey.options &&
-                                            survey.options.length) ||
-                                        (survey.fields &&
-                                            survey.fields.length) ||
-                                        0
-                                    const label = survey.options
-                                        ? 'варіантів'
-                                        : 'полів'
-                                    return (
-                                        <span>
-                                            📊 {count} {label}
-                                        </span>
-                                    )
-                                })()} */}
                 {survey.endDate && (
                   <span>⏳ до {formatDate(survey.endDate)}</span>
                 )}
@@ -145,17 +132,16 @@ const NewsCard: React.FC<NewsCardProps> = ({
                 </span>
               )}
             </div>
-            <button
+            <Link
+              href={`/news/${id}`}
               className={styles.readMoreButton}
-              onClick={() => setIsModalOpen(true)}
             >
               Читати далі
               <span className={styles.buttonIcon}>→</span>
-            </button>
+            </Link>
           </div>
         </div>
       </article>
-      {/* Modal with detailed content and slider */}
       <NewsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -167,7 +153,7 @@ const NewsCard: React.FC<NewsCardProps> = ({
         survey={survey}
         newsId={id}
       />
-    </>
+    </FadeIn>
   );
 };
 
