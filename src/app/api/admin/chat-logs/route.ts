@@ -25,6 +25,8 @@ export async function GET(req: Request) {
 
     // Auth — simple API key check
     const key = searchParams.get('key')
+    console.log(key)
+    console.log(API_KEY)
     if (!key || key !== API_KEY) {
         return unauthorized()
     }
