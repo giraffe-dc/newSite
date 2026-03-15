@@ -32,6 +32,11 @@ export function middleware(request: NextRequest) {
 
   // Захищаємо адмін-маршрути
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+    // Exclude /api/admin/chat-logs because it uses a different auth mechanism (API key parameter)
+    if (pathname === "/api/admin/chat-logs") {
+      return NextResponse.next();
+    }
+
     const token = request.cookies.get("admin_token")?.value;
 
     if (!token || !decodeJwtPayload(token)) {

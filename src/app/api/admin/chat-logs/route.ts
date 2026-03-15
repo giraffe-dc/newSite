@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import clientPromise from '@/lib/mongodb'
 
-const API_KEY = process.env.NOTIFICATIONS_API_KEY
+export const dynamic = 'force-dynamic'
+
+
 
 function unauthorized() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -25,8 +27,8 @@ export async function GET(req: Request) {
 
     // Auth — simple API key check
     const key = searchParams.get('key')
-    console.log(key)
-    console.log(API_KEY)
+    const API_KEY = process.env.NOTIFICATIONS_API_KEY
+
     if (!key || key !== API_KEY) {
         return unauthorized()
     }
@@ -76,6 +78,7 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url)
 
     const key = searchParams.get('key')
+    const API_KEY = process.env.NOTIFICATIONS_API_KEY
     if (!key || key !== API_KEY) {
         return unauthorized()
     }
