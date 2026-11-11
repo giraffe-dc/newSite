@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import { getDb } from "@/lib/mongodb";
 
 export async function GET(req: Request) {
   try {
@@ -13,8 +13,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const client = await clientPromise;
-    const db = client.db();
+    const db = await getDb();
 
     // Get the news item with survey results
     const news = await db.collection("news").findOne(

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 import { sendTelegramMessage } from "@/lib/utils";
 import type { Order } from "@/types";
@@ -97,8 +98,14 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Замовлення — приватні дані: лише адмін-кука з валідним JWT.
+    const token = request.cookies.get("admin_token")?.value;
+    if (!token || !verifyToken(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
     const orders = await db

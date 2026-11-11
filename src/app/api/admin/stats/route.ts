@@ -1,9 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 import { StatsService } from "@/lib/services/StatsService";
 
 export async function GET(request: NextRequest) {
   try {
-    // Middleware already handles authentication
+    // Перевіряємо JWT тут, а не лише в middleware (він не валідує підпис).
+    const token = request.cookies.get("admin_token")?.value;
+    if (!token || !verifyToken(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const stats = await StatsService.getDashboardStats();
     return NextResponse.json(stats);
   } catch (error) {

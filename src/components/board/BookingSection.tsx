@@ -36,9 +36,6 @@ export default function BookingSection({
                 <a href={`tel:${CONTACTS.tel}`}>{CONTACTS.phone}</a>
               </div>
               <div>
-                <b>Viber / Telegram:</b> {CONTACTS.messenger}
-              </div>
-              <div>
                 <b>Пошта:</b>{" "}
                 <a href={`mailto:${CONTACTS.email}`}>{CONTACTS.email}</a>
               </div>

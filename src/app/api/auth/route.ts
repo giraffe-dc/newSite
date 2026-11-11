@@ -1,16 +1,23 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verifyPassword, generateToken } from "@/lib/auth";
-import bcrypt from "bcryptjs";
+import { type NextRequest, NextResponse } from "next/server";
+import { generateToken, verifyPassword } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
     const { username, password } = await request.json();
 
-    // Check credentials
+    // Без змінних середовища вхід заборонено (fallback-паролів немає).
     const adminUsername = process.env.ADMIN_USERNAME;
-    const adminPasswordHash =
-      process.env.ADMIN_PASSWORD_HASH || (await bcrypt.hash("giraFfe2025", 12));
-    // console.log(process.env.ADMIN_PASSWORD_HASH)
+    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+    if (!adminUsername || !adminPasswordHash) {
+      console.error(
+        "Auth is not configured: set ADMIN_USERNAME and ADMIN_PASSWORD_HASH",
+      );
+      return NextResponse.json(
+        { error: "Authentication is not configured" },
+        { status: 500 },
+      );
+    }
+
     if (username !== adminUsername) {
       return NextResponse.json(
         { error: "Invalid credentials" },

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
-import { SurveyVoteData } from "@/types";
+import { getDb } from "@/lib/mongodb";
 import { sendTelegramMessage } from "@/lib/utils";
+import type { SurveyVoteData } from "@/types";
 
 export async function POST(req: Request) {
   try {
@@ -11,8 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid vote data" }, { status: 400 });
     }
 
-    const client = await clientPromise;
-    const db = client.db();
+    const db = await getDb();
 
     // Get the news item to verify survey exists and isn't expired
     const news = await db.collection("news").findOne({

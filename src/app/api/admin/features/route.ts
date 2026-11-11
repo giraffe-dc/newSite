@@ -1,10 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const token = request.cookies.get("admin_token")?.value;
+    if (!token || !verifyToken(token)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
     const features = await db.collection("features").find({}).toArray();

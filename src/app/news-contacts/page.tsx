@@ -135,9 +135,6 @@ export default function NewsContactsPage() {
               </a>
             </p>
             <p>
-              <b>Viber / Telegram:</b> {CONTACTS.messenger}
-            </p>
-            <p>
               <b>Пошта:</b>{" "}
               <a href={`mailto:${contacts?.email || CONTACTS.email}`}>
                 {contacts?.email || CONTACTS.email}

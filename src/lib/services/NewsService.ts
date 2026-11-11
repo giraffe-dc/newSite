@@ -1,24 +1,29 @@
-import dbConnect from "../db";
-import News, { INews } from "../models/News";
+import type { INews } from "../models/News";
 
 export class NewsService {
   static async getAll() {
     const clientPromise = (await import("../mongodb")).default;
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
-    return await db.collection("news").find({}).sort({ date: -1 }).toArray() as any;
+    return (await db
+      .collection("news")
+      .find({})
+      .sort({ date: -1 })
+      .toArray()) as any;
   }
 
   static async getById(id: string) {
     const clientPromise = (await import("../mongodb")).default;
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
-    
+
     // Import ObjectId to query by it if needed
     const { ObjectId } = await import("mongodb");
-    
+
     try {
-      const news = await db.collection("news").findOne({ _id: new ObjectId(id) });
+      const news = await db
+        .collection("news")
+        .findOne({ _id: new ObjectId(id) });
       return news;
     } catch (e) {
       // Fallback for non-ObjectId strings
@@ -39,11 +44,13 @@ export class NewsService {
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
     const { ObjectId } = await import("mongodb");
-    const result = await db.collection("news").findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: data },
-      { returnDocument: "after" }
-    );
+    const result = await db
+      .collection("news")
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: data },
+        { returnDocument: "after" },
+      );
     return result;
   }
 
