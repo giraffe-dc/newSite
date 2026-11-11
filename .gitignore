@@ -41,3 +41,13 @@ yarn-error.log*
 next-env.d.ts
 *.txt
 .codebuddy
+
+# internal planning docs (not for public repository)
+/docs/
+
+# local tooling artifacts
+/.agents/
+/.kilo/
+/.playwright-mcp/
+/.workbuddy-ai/
+/SERVER_CONFIG.md

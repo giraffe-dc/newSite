@@ -1,303 +1,168 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import NewsCard from "@/components/NewsCard";
-import styles from "@/styles/NewsContacts.module.css";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { CONTACTS } from "@/components/board/content";
 
 interface NewsItem {
   _id?: string;
   title: string;
   content: string;
   date: string;
-  type: "news" | "event";
-  images: string[];
-  survey?: any;
+  type?: "news" | "event";
+  survey?: unknown;
 }
 
-interface ContactInfo {
-  phone: string;
-  email: string;
-  address: string;
-  workingHours: string;
-  socialMedia: {
-    facebook?: string;
-    instagram?: string;
-    telegram?: string;
-  };
+interface PublicContacts {
+  phone?: string;
+  email?: string;
+  workingHours?: string;
+  whatsapp?: string;
+  telegram?: string;
 }
 
-const NewsContactsPage = () => {
+function formatDate(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : date.toLocaleDateString("uk-UA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+}
+
+export default function NewsContactsPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
-  const [contacts, setContacts] = useState<ContactInfo | null>(null);
+  const [contacts, setContacts] = useState<PublicContacts | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"news" | "contacts">("news");
+  const [tab, setTab] = useState<"news" | "contacts">("news");
 
   useEffect(() => {
-    fetchData();
+    let alive = true;
+    Promise.all([
+      fetch("/api/data/news")
+        .then((res) => (res.ok ? res.json() : []))
+        .catch(() => []),
+      fetch("/api/data/contacts")
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+    ]).then(([newsData, contactsData]) => {
+      if (!alive) return;
+      setNews(Array.isArray(newsData) ? newsData : []);
+      setContacts(contactsData && !contactsData.error ? contactsData : null);
+      setLoading(false);
+    });
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const [newsResponse, contactsResponse] = await Promise.all([
-        fetch("/api/data/news"),
-        fetch("/api/data/contacts"),
-      ]);
-
-      let newsData: NewsItem[] = [];
-      let contactsData: ContactInfo;
-
-      if (newsResponse.ok) {
-        newsData = await newsResponse.json();
-      } else {
-        // Fallback news data
-        newsData = [
-          {
-            title: "Новий атракціон у Жирафику!",
-            content:
-              "Зустрічайте новий захоплюючий атракціон для дітей від 5 років - 'Космічна пригода'. Відправтеся у подорож до зірок!",
-            date: "2024-12-15",
-            type: "news",
-            images: ["/giraffe-mascot.png"],
-          },
-          {
-            title: "Знижки на дні народження у грудні",
-            content:
-              "Святкуйте день народження вашої дитини з 20% знижкою! Акція діє до кінця грудня для всіх пакетів.",
-            date: "2024-12-10",
-            type: "event",
-            images: [],
-          },
-          {
-            title: "Новорічні свята у Жирафику",
-            content:
-              "Приєднуйтеся до новорічних святкувань! Дід Мороз, подарунки, ігри та багато іншого чекають на ваших малюків.",
-            date: "2024-12-20",
-            type: "event",
-            images: [
-              "https://i.pinimg.com/1200x/57/b9/c4/57b9c47d9bf7e28312561fb444f6ea58.jpg",
-            ],
-          },
-          {
-            title: "Оновлене дитяче меню",
-            content:
-              "Наше кафе представляє оновлене дитяче меню з корисними та смачними стравами, приготованими з любов'ю.",
-            date: "2024-12-05",
-            type: "news",
-            images: [],
-          },
-        ];
-      }
-
-      if (contactsResponse.ok) {
-        contactsData = await contactsResponse.json();
-      } else {
-        // Fallback contacts data
-        contactsData = {
-          phone: "+38 (093) 123-45-67",
-          email: "info@zhyrafyk.com.ua",
-          address: "вул. Дитяча, 15, м. Вінниця, Вінницька область, 21000",
-          workingHours: "Пн-Нд: 10:00 - 21:00",
-          socialMedia: {
-            facebook: "https://facebook.com/zhyrafyk",
-            instagram: "https://instagram.com/zhyrafyk_family",
-            telegram: "https://t.me/zhyrafyk_bot",
-          },
-        };
-      }
-
-      setNews(newsData);
-      setContacts(contactsData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.loadingSpinner}>📰</div>
-        <p>Завантаження...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className={styles.newsContactsPage}>
-      <div className="container">
-        {/* Header */}
-        <section className={styles.header}>
-          <h1 className={styles.title}>Новини та Контакти</h1>
-          <p className={styles.subtitle}>
-            Залишайтеся в курсі наших новин та знайдіть нас
+    <div className="m2-inner">
+      <div className="m2-wrap">
+        <div className="m2-inner__head">
+          <h1 className="m2-inner__title">Новини та контакти</h1>
+          <p className="m2-inner__lede">
+            Записи про виїзди й зміни програм, а також зв'язок із командою. Чат
+            і опитування на сайті лишаються працювати.
           </p>
-        </section>
+        </div>
 
-        {/* Tab Navigation */}
-        <section className={styles.tabNavigation}>
+        <div className="m2-inline" style={{ marginBottom: 36 }}>
           <button
-            className={`${styles.tabButton} ${
-              activeTab === "news" ? styles.active : ""
-            }`}
-            onClick={() => setActiveTab("news")}
+            className={`m2-btn m2-btn--sm${tab === "news" ? "" : " m2-btn--ghost"}`}
+            type="button"
+            aria-pressed={tab === "news"}
+            onClick={() => setTab("news")}
           >
-            <span className={styles.tabIcon}>📰</span>
-            Новини та Події
+            Новини
           </button>
           <button
-            className={`${styles.tabButton} ${
-              activeTab === "contacts" ? styles.active : ""
-            }`}
-            onClick={() => setActiveTab("contacts")}
+            className={`m2-btn m2-btn--sm${tab === "contacts" ? "" : " m2-btn--ghost"}`}
+            type="button"
+            aria-pressed={tab === "contacts"}
+            onClick={() => setTab("contacts")}
           >
-            <span className={styles.tabIcon}>📞</span>
             Контакти
           </button>
-        </section>
+        </div>
 
-        {/* News Section */}
-        {activeTab === "news" && (
-          <section className={styles.newsSection}>
-            <div className={styles.newsGrid}>
+        {tab === "news" &&
+          (loading ? (
+            <p className="m2-inner__lede">Завантажуємо записи…</p>
+          ) : news.length ? (
+            <div className="m2-faq">
               {news.map((item, index) => (
-                <NewsCard
-                  key={item._id || index}
-                  id={item._id}
-                  title={item.title}
-                  content={item.content}
-                  date={item.date}
-                  type={item.type}
-                  images={item.images}
-                  index={index}
-                  survey={item.survey}
-                />
+                <details
+                  className="m2-qa"
+                  key={item._id ?? index}
+                  open={index === 0}
+                >
+                  <summary>
+                    {item.title}
+                    <span style={{ fontSize: 13, fontWeight: 400 }}>
+                      {formatDate(item.date)}
+                    </span>
+                  </summary>
+                  <p>
+                    {item.content}
+                    {item._id && (
+                      <>
+                        <br />
+                        <Link className="m2-back" href={`/news/${item._id}`}>
+                          Читати повністю
+                        </Link>
+                      </>
+                    )}
+                  </p>
+                </details>
               ))}
             </div>
-          </section>
-        )}
-
-        {/* Contacts Section */}
-        {activeTab === "contacts" && contacts && (
-          <section className={styles.contactsSection}>
-            <div className={styles.contactsGrid}>
-              {/* Contact Info */}
-              <div className={`${styles.contactCard} card`}>
-                <div className={styles.contactHeader}>
-                  <h3 className={styles.contactTitle}>
-                    <span className={styles.contactIcon}>📞</span>
-                    Зв'яжіться з нами
-                  </h3>
-                </div>
-                <div className={`${styles.contactInfo} selectable-text`}>
-                  <div className={styles.contactItem}>
-                    <span className={styles.contactItemIcon}>📞</span>
-                    <div>
-                      <strong>Телефон:</strong>
-                      <a href={`tel:${contacts.phone.replace(/\s/g, "")}`}>
-                        {contacts.phone}
-                      </a>
-                    </div>
-                  </div>
-                  <div className={styles.contactItem}>
-                    <span className={styles.contactItemIcon}>✉️</span>
-                    <div>
-                      <strong>Email:</strong>
-                      <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
-                    </div>
-                  </div>
-                  <div className={styles.contactItem}>
-                    <span className={styles.contactItemIcon}>📍</span>
-                    <div>
-                      <strong>Адреса:</strong>
-                      <span>{contacts.address}</span>
-                    </div>
-                  </div>
-                  <div className={styles.contactItem}>
-                    <span className={styles.contactItemIcon}>🕒</span>
-                    <div>
-                      <strong>Режим роботи:</strong>
-                      <span>{contacts.workingHours}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Social Media */}
-              <div className={`${styles.contactCard} card`}>
-                <div className={styles.contactHeader}>
-                  <h3 className={styles.contactTitle}>
-                    <span className={styles.contactIcon}>🌐</span>
-                    Соціальні мережі
-                  </h3>
-                </div>
-                <div className={styles.socialMedia}>
-                  {contacts.socialMedia.facebook && (
-                    <a
-                      href={contacts.socialMedia.facebook}
-                      className={styles.socialLink}
-                      target="_blank"
-                    >
-                      <span className={styles.socialIcon}>📘</span>
-                      <div>
-                        <strong>Facebook</strong>
-                        <p>Слідкуйте за новинами</p>
-                      </div>
-                    </a>
-                  )}
-                  {contacts.socialMedia.instagram && (
-                    <a
-                      href={contacts.socialMedia.instagram}
-                      className={styles.socialLink}
-                      target="_blank"
-                    >
-                      <span className={styles.socialIcon}>📷</span>
-                      <div>
-                        <strong>Instagram</strong>
-                        <p>Фото та відео з наших свят</p>
-                      </div>
-                    </a>
-                  )}
-                  {contacts.socialMedia.telegram && (
-                    <a
-                      href={contacts.socialMedia.telegram}
-                      className={styles.socialLink}
-                      target="_blank"
-                    >
-                      <span className={styles.socialIcon}>✈️</span>
-                      <div>
-                        <strong>Telegram</strong>
-                        <p>Швидке бронювання</p>
-                      </div>
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Map Placeholder */}
-              <div className={`${styles.contactCard} ${styles.mapCard} card`}>
-                <div className={styles.contactHeader}>
-                  <h3 className={styles.contactTitle}>
-                    <span className={styles.contactIcon}>🗺️</span>
-                    Як нас знайти
-                  </h3>
-                </div>
-                <div className={styles.mapContainer}>
-                  <div className={styles.mapPlaceholder}>
-                    <div className={styles.mapIcon}>📍</div>
-                    <p>Інтерактивна карта</p>
-                    <p className={styles.mapAddress}>{contacts.address}</p>
-                    <button className={styles.mapButton}>
-                      Відкрити в Google Maps
-                    </button>
-                  </div>
-                </div>
-              </div>
+          ) : (
+            <div className="m2-notecard">
+              <b>Поки порожньо.</b> Новин і звітів про виїзди ще немає — після
+              підключення адмінки записи з'являться тут автоматично.
             </div>
-          </section>
+          ))}
+
+        {tab === "contacts" && (
+          <div className="m2-notecard">
+            <p>
+              <b>Телефон:</b>{" "}
+              <a href={`tel:${CONTACTS.tel}`}>
+                {contacts?.phone || CONTACTS.phone}
+              </a>
+            </p>
+            <p>
+              <b>Viber / Telegram:</b> {CONTACTS.messenger}
+            </p>
+            <p>
+              <b>Пошта:</b>{" "}
+              <a href={`mailto:${contacts?.email || CONTACTS.email}`}>
+                {contacts?.email || CONTACTS.email}
+              </a>
+            </p>
+            <p>
+              <b>Коли на зв'язку:</b> {contacts?.workingHours || CONTACTS.hours}
+            </p>
+            <p>
+              <b>Куди виїжджаємо:</b> по всьому місту та області до 50 км без
+              доплати, далі — 15 грн/км. Свято може пройти вдома, у школі,
+              садку, ТРЦ, кафе або на вуличному майданчику.
+            </p>
+            <p>
+              Чат на сайті — для питань про дату, адресу й програму; опитування
+              — для вражень після свята.
+            </p>
+            <div className="m2-inline" style={{ marginTop: 12 }}>
+              <Link className="m2-btn" href="/#book">
+                Забронювати дату
+              </Link>
+            </div>
+          </div>
         )}
       </div>
     </div>
   );
-};
-
-export default NewsContactsPage;
+}

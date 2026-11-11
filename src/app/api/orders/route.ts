@@ -1,15 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { Order } from "@/types";
 import { sendTelegramMessage } from "@/lib/utils";
+import type { Order } from "@/types";
 
 function formatOrderForTelegram(order: Order) {
   const lines: string[] = [];
-  lines.push("<b>Нове замовлення</b> 🎉");
-  lines.push(`Ім'я: <b>${order.customerName}</b>`); // safe enough for Telegram HTML
+  lines.push("<b>Нова заявка на виїзд</b>");
+  lines.push(`Ім'я: <b>${order.customerName}</b>`);
   lines.push(`Телефон: <b>${order.phone}</b>`);
-  if (order.date) lines.push(`Дата: <b>${order.date}</b>`);
+  if (order.whatsapp) lines.push(`WhatsApp: <b>${order.whatsapp}</b>`);
+  if (order.date) lines.push(`Дата події: <b>${order.date}</b>`);
   if (order.time) lines.push(`Час: <b>${order.time}</b>`);
+  if (order.eventAddress)
+    lines.push(`Адреса проведення: <b>${order.eventAddress}</b>`);
+  if (order.eventType) lines.push(`Тип свята: <b>${order.eventType}</b>`);
+  if (order.childrenCount)
+    lines.push(`Кількість дітей: <b>${order.childrenCount}</b>`);
+  if (order.packageName) lines.push(`Пакет: <b>${order.packageName}</b>`);
   if (order.items?.length) {
     lines.push("Послуги:");
     order.items.forEach((it, idx) => {
@@ -40,15 +47,21 @@ export async function POST(request: NextRequest) {
     const doc: Order = {
       customerName: body.customerName,
       phone: body.phone,
+      whatsapp: body.whatsapp,
       date: body.date,
       time: body.time,
+      eventAddress: body.eventAddress,
+      eventType: body.eventType,
+      childrenCount: body.childrenCount,
       notes: body.notes,
       items: body.items,
+      packageId: body.packageId,
+      packageName: body.packageName,
       status: "new",
       createdAt: nowIso,
     };
 
-    const result = await db.collection("orders").insertOne(doc as any);
+    const result = await db.collection<Order>("orders").insertOne(doc);
     const orderId = result.insertedId.toString();
 
     // send Telegram notification (best-effort)
@@ -58,12 +71,12 @@ export async function POST(request: NextRequest) {
     // send External notification (best-effort)
     const baseUrl = process.env.NOTIFICATIONS_BASE_URL;
     if (baseUrl) {
-      const res = await fetch(`${baseUrl}/api/notifications/incoming`, {
+      await fetch(`${baseUrl}/api/notifications/incoming`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           apiKey: process.env.NOTIFICATIONS_API_KEY,
-          title: "Нове замовлення",
+          title: "Нова заявка на виїзд",
           message: `Замовлення #${orderId} від ${doc.customerName}`,
           type: "success",
           source: "website",

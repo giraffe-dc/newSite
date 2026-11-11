@@ -1,34 +1,61 @@
-import React from "react";
-import Header from "@/components/Header";
-import ChatWidget from "@/components/chat/ChatWidget";
-import Footer from "@/components/Footer";
-import { StatisticsCollector } from "@/components/StatisticsCollector";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata } from "next";
+import { Rubik, Rubik_Mono_One } from "next/font/google";
+import type React from "react";
+import ChatWidget from "@/components/chat/ChatWidget";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import { StatisticsCollector } from "@/components/StatisticsCollector";
 import "./globals.css";
+import "@/styles/global.css";
 
-export const metadata = {
-  title: "Жирафик - Сімейний розважальний центр у Вінниці",
-  description:
-    "Найкращий сімейний розважальний центр 'Жирафик'. Святкування днів народження, ігрові зони, кафе та розваги для всієї родини у Вінниці.",
-  keywords: ["Жирафик", "дитячий центр", "Вінниця", "день народження", "дитячі розваги", "сімейний відпочинок"],
+const rubik = Rubik({
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--font-rubik",
+});
+
+const mono = Rubik_Mono_One({
+  subsets: ["latin", "cyrillic"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-mono",
+});
+
+const title =
+  "Жирафик — свято приїжджає додому | Виїзні аніматори, ростові ляльки, VR та PS4";
+const description =
+  "Аніматори, ростові ляльки, VR-клас і PlayStation 4 з виїздом додому, у клас або на майданчик. Бронювання онлайн за 2 хвилини.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  keywords: [
+    "Жирафик",
+    "виїзні свята",
+    "аніматори на виїзд",
+    "ростові ляльки",
+    "VR на виїзд",
+    "PlayStation 4",
+    "день народження",
+    "бронювання свята",
+  ],
+  icons: { icon: "/brand/favicon.png" },
   openGraph: {
-    title: "Жирафик - Сімейний розважальний центр",
-    description: "Ідеальне місце для дитячих свят та сімейного дозвілля.",
-    url: "https://zhyrafyk.com.ua",
+    title,
+    description,
+    url: "https://giraffe-teplyk.vercel.app",
     siteName: "Жирафик",
     locale: "uk_UA",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Жирафик - Сімейний розважальний центр",
-    description: "Найкращі розваги для ваших дітей у Вінниці.",
+    title,
+    description,
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -37,15 +64,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="uk">
+    <html lang="uk" className={`${rubik.variable} ${mono.variable}`}>
       <body>
-        <SpeedInsights />
-        <StatisticsCollector />
-        <Header />
-        <main>{children}</main>
-        <ChatWidget />
-        <Analytics />
-        <Footer />
+        <div className="m2-page">
+          <a className="m2-skip" href="#main">
+            Перейти до вмісту
+          </a>
+          <SpeedInsights />
+          <StatisticsCollector />
+          <Header />
+          <main id="main">{children}</main>
+          <Footer />
+          <ChatWidget />
+          <Analytics />
+        </div>
       </body>
     </html>
   );

@@ -1,0 +1,101 @@
+/* Жирафик — макет №2 «Табло маршруту».
+   Єдине джерело кольорів, шрифтів і розмірів. Палітра перенесена з mac2.html.
+   Другий блок — аліаси сумісності: старі CSS-модулі (адмінка, новини, чат,
+   модалки) продовжуть працювати, але тепер у зелено-глинястій гамі. */
+
+:root {
+  --green: #1e5b3f;
+  --green-deep: #123b28;
+  --clay: #c4622d;
+  --clay-deep: #9c4a20;
+  --ochre: #e8a33d;
+  --paper: #fbf7ee;
+  --paper-2: #f6f1e3;
+  --ink: #22302a;
+  --line: #e3dcc9;
+  --white: #ffffff;
+  --muted-on-paper: #5a6b60;
+  --muted-on-night: #cfd8cf;
+
+  /* Імена, якими користувалися компоненти варіанту А та модулі новин. */
+  --night: var(--green-deep);
+  --gold: var(--ochre);
+  --gold-deep: var(--clay);
+  --spot: var(--clay);
+  --line-dark: #3c5a49;
+  --rail: 0px;
+  --gutter: 24px;
+  --max: 1080px;
+
+  --font-display: var(--font-rubik), system-ui, sans-serif;
+  --font-text: var(--font-rubik), system-ui, sans-serif;
+  --font-board: var(--font-mono), var(--font-rubik), monospace;
+
+  /* --- Сумісність зі старими CSS-модулями ------------------------------ */
+  --stage-midnight: var(--green-deep);
+  --foil-gold: var(--ochre);
+  --ringmaster-red: var(--clay);
+  --muted: var(--paper-2);
+  --muted-bg: var(--paper-2);
+  --muted-foreground: var(--muted-on-paper);
+  --shadow: none;
+  --shadow-glow: none;
+  --shadow-primary: 3px 3px 0 var(--ink);
+  --shadow-secondary: none;
+  --border-radius: 12px;
+  --radius: 12px;
+
+  --primary-orange: var(--clay);
+  --primary-orange-dark: var(--clay-deep);
+  --primary-yellow: var(--ochre);
+  --primary-green: var(--green);
+  --secondary-blue: var(--green-deep);
+  --light-pink: var(--paper-2);
+  --light-yellow: var(--paper-2);
+  --light-bg: var(--paper);
+  --text-dark: var(--ink);
+  --text-light: var(--muted-on-paper);
+
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--white);
+  --card-foreground: var(--ink);
+  --card-color: var(--white);
+  --popover: var(--white);
+  --popover-foreground: var(--ink);
+  --primary: var(--green);
+  --primary-foreground: var(--white);
+  --primary-text: var(--ink);
+  --secondary: var(--ochre);
+  --secondary-foreground: var(--ink);
+  --secondary-text: var(--muted-on-paper);
+  --accent: var(--clay);
+  --accent-foreground: var(--white);
+  --destructive: #b03a2e;
+  --destructive-foreground: var(--white);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--clay);
+
+  --blue: var(--green);
+  --blue-foreground: var(--white);
+  --pink: var(--clay);
+  --pink-foreground: var(--white);
+
+  --magic-purple: var(--green);
+  --magic-purple-light: var(--green);
+  --magic-purple-soft: var(--paper-2);
+  --magic-gold: var(--ochre);
+  --magic-night: var(--green-deep);
+  --magic-cream: var(--paper);
+  --gradient-primary: var(--green);
+  --gradient-secondary: var(--clay);
+  --gradient-hero: var(--green-deep);
+  --gradient-background: var(--paper);
+  --gradient-card: var(--white);
+
+  --category-color: var(--clay);
+  --type-color: var(--green);
+  --transition-smooth: 0.12s ease;
+  --transition-bounce: 0.12s ease;
+}

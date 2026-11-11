@@ -6,23 +6,31 @@ import styles from "@/styles/admin/AdminHome.module.css";
 
 interface HomeData {
   title: string;
+  subtitle: string;
   description: string;
   features: string[];
   images: string[];
   workingHours: string;
   address: string;
   phone: string;
+  serviceArea: string;
+  whatsapp?: string;
+  telegram?: string;
 }
 
 const AdminHomePage = () => {
   const [homeData, setHomeData] = useState<HomeData>({
     title: "",
+    subtitle: "",
     description: "",
     features: [""],
     images: [""],
     workingHours: "",
     address: "",
     phone: "",
+    serviceArea: "",
+    whatsapp: "",
+    telegram: "",
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -153,8 +161,19 @@ const AdminHomePage = () => {
                 value={homeData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
                 className={styles.input}
-                placeholder="Назва розважального центру"
+                placeholder="Назва магістра свят"
                 required
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Підзаголовок</label>
+              <input
+                type="text"
+                value={homeData.subtitle}
+                onChange={(e) => handleInputChange("subtitle", e.target.value)}
+                className={styles.input}
+                placeholder="Привеземо свято до вас"
               />
             </div>
 
@@ -215,6 +234,45 @@ const AdminHomePage = () => {
                 className={styles.input}
                 placeholder="+38 (093) 123-45-67"
                 required
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Зона обслуговування</label>
+              <input
+                type="text"
+                value={homeData.serviceArea}
+                onChange={(e) =>
+                  handleInputChange("serviceArea", e.target.value)
+                }
+                className={styles.input}
+                placeholder="Вінниця та область"
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>WhatsApp</label>
+              <input
+                type="url"
+                value={homeData.whatsapp || ""}
+                onChange={(e) =>
+                  handleInputChange("whatsapp", e.target.value)
+                }
+                className={styles.input}
+                placeholder="https://wa.me/380931234567"
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Telegram</label>
+              <input
+                type="url"
+                value={homeData.telegram || ""}
+                onChange={(e) =>
+                  handleInputChange("telegram", e.target.value)
+                }
+                className={styles.input}
+                placeholder="https://t.me/zhyrafyk_bot"
               />
             </div>
           </div>

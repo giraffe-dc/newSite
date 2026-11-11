@@ -1,17 +1,13 @@
-import React from "react";
-import { Metadata, ResolvingMetadata } from "next";
-import { NewsService } from "@/lib/services/NewsService";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import NewsPageClient from "@/components/NewsPageClient";
+import { NewsService } from "@/lib/services/NewsService";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const news = await NewsService.getById(id);
 

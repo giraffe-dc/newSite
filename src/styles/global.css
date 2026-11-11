@@ -1,0 +1,13 @@
+/* Тонкий шар сумісності для другорядних сторінок, які ще користуються
+   старими CSS-модулями. Усі кольори й шрифти беруться з tokens.css,
+   підключеного через src/app/globals.css. Нових змінних тут не заводимо. */
+
+.body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+}
+
+.border {
+  border-color: var(--line);
+}

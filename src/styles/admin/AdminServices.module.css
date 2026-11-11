@@ -1,0 +1,318 @@
+.adminServicesPage {
+  padding: 2rem 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pageSubtitle {
+  color: #64748b;
+  margin: 0;
+}
+
+.actionsBar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.addButton,
+.backButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addButton {
+  background: #10b981;
+  color: white;
+}
+
+.addButton:hover {
+  background: #059669;
+}
+
+.backButton {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.backButton:hover {
+  background: #e2e8f0;
+}
+
+.message {
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
+
+.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.messageIcon {
+  font-size: 1.25rem;
+}
+
+.addForm {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.addForm h2 {
+  margin: 0 0 1.5rem 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fieldGroup.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.fieldGroup label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.fieldGroup input,
+.fieldGroup select,
+.fieldGroup textarea {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.fieldGroup input:focus,
+.fieldGroup select:focus,
+.fieldGroup textarea:focus {
+  outline: none;
+  border-color: #10b981;
+  ring: 2px;
+}
+
+.formActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.saveButton {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: #059669;
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.servicesList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}
+
+.serviceCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.serviceCard:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.serviceIcon {
+  font-size: 2rem;
+}
+
+.serviceInfo h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1e293b;
+}
+
+.categoryBadge {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #10b981;
+  font-weight: 700;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.statusBadge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.statusBadge {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.cardDescription {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.cardMeta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.cardActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toggleButton,
+.deleteButton {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.toggleButton {
+  background: #f1f5f9;
+  color: #475569;
+  flex: 1;
+}
+
+.toggleButton:hover {
+  background: #e2e8f0;
+}
+
+.deleteButton {
+  background: #fecaca;
+  color: #991b1b;
+}
+
+.deleteButton:hover {
+  background: #fca5a5;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.loadingSpinner {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .adminServicesPage {
+    padding: 1rem;
+  }
+
+  .actionsBar {
+    flex-direction: column;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .servicesList {
+    grid-template-columns: 1fr;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+}

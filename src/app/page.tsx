@@ -1,26 +1,14 @@
-import React from "react";
-import HomePageClient from "@/components/HomePageClient";
-import { headers } from "next/headers";
+import Home from "@/components/board/Home";
 
-async function getHomeData() {
-  const heads = headers();
-  const host = (await heads).get("host");
-  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
-  const res = await fetch(`${protocol}://${host}/api/data/home`, {
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    throw new Error("Failed to fetch data");
-  }
-
-  return res.json();
+/** Головна сторінка — композиція варіанта Б (docs/home-rework-demo-b.html).
+ *  Дані: components/board/content.ts
+ *  Секції: Hero → Сценарій дня → Підбір випадку → Гарантії → Відгуки →
+ *          Перевірка дати → Бронювання (без дублювання сторінок).
+ *
+ *  Метадані тут не експортуються свідомо: title/description/keywords/OG/Twitter
+ *  на всіх сторінках задає src/app/layout.tsx, щоб головна не розходилася з
+ *  соціальними картками. Власні title/description мають лише вкладені сторінки.
+ */
+export default function HomePage() {
+  return <Home />;
 }
-
-const Home = async () => {
-  const homeData = await getHomeData();
-
-  return <HomePageClient homeData={homeData} />;
-};
-
-export default Home;

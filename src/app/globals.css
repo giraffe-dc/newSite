@@ -1,49 +1,100 @@
-:root {
-  --primary-orange: #ff6b35;
-  --primary-yellow: #f7b731;
-  --primary-green: #5f27cd;
-  --secondary-blue: #00a8ff;
-  --light-pink: #ffb8e6;
-  --light-yellow: #fff3cd;
-  --text-dark: #2c3e50;
-  --text-light: #7f8c8d;
-  --white: #ffffff;
-  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  --border-radius: 15px;
-}
+@import "../styles/tokens.css";
+@import "../styles/board.css";
 
-* {
-  margin: 0;
-  padding: 0;
+/* Базовий шар макета №2. Старі Inter / Baloo 2 / user-select:none
+   і градієнти прибрано: текст можна виділяти, хедер — sticky. */
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  font-family: "Comic Sans MS", cursive, sans-serif;
-  color: var(--text-dark);
-  line-height: 1.6;
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  min-height: 100vh;
-  margin-top: 3%;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+html {
+  scroll-behavior: smooth;
+  max-width: 100%;
 }
 
-@media (max-width: 768px) {
-  body {
-    margin-top: 26%;
-  }
+body {
+  margin: 0;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-text);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  user-select: text;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--ink);
+  text-transform: none;
+}
+
+p,
+ul,
+ol,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--clay);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+::selection {
+  background: var(--ochre);
+  color: var(--green-deep);
+}
+
+[id] {
+  scroll-margin-top: 88px;
 }
 
 .container {
-  max-width: 1200px;
+  max-width: var(--max);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--gutter);
 }
 
 .selectable-text,
@@ -52,109 +103,67 @@ input[type="email"],
 input[type="tel"],
 textarea,
 [contenteditable="true"] {
-  user-select: text !important;
-  -webkit-user-select: text !important;
-  -moz-user-select: text !important;
-  -ms-user-select: text !important;
+  user-select: text;
 }
 
+/* Базові елементи для другорядних сторінок зі старими CSS-модулями. */
 .btn-primary {
-  background: linear-gradient(
-    45deg,
-    var(--primary-orange),
-    var(--primary-yellow)
-  );
-  color: white;
-  padding: 15px 30px;
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 16px;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  background: var(--clay);
+  color: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 3px 3px 0 var(--ink);
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow);
-  text-decoration: none;
-  display: inline-block;
   text-align: center;
 }
 
 .btn-primary:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  background: var(--green);
 }
 
 .btn-secondary {
-  background: linear-gradient(
-    45deg,
-    var(--secondary-blue),
-    var(--primary-green)
-  );
-  color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: var(--border-radius);
-  font-size: 14px;
-  font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  background: var(--white);
+  color: var(--green-deep);
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-block;
+  text-align: center;
 }
 
 .btn-secondary:hover {
-  transform: scale(1.05);
+  background: var(--paper-2);
 }
 
 .card {
   background: var(--white);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  transition: all 0.3s ease;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-}
-
-.floating-animation {
-  animation: floating 3s ease-in-out infinite;
-}
-
-@keyframes floating {
-  0%,
-  100% {
-    transform: translateY(0px);
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
-  50% {
-    transform: translateY(-10px);
+
+  .m2-flip {
+    animation: none;
   }
-}
 
-.bounce-animation {
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-.fade-in {
-  opacity: 0;
-  transform: translateY(50px);
-  animation: fadeIn 1s ease forwards;
-}
-
-@keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .m2-btn {
+    transition: none;
   }
 }

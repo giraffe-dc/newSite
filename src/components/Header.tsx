@@ -1,74 +1,47 @@
-"use client";
-import React, { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import logo from "@/assets/logoG.png";
-import styles from "../styles/Header.module.css";
+import { CONTACTS, NAV } from "@/components/board/content";
 
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+export default function Header() {
   return (
-    <header className={styles.header}>
-      <div className="container">
-        <div className={styles.headerContent}>
-          <Link href="/" className={styles.logo}>
-            <div
-              className={styles.logoIcon}
-              style={{ backgroundImage: `url(${logo.src})` }}
-            ></div>
-            {/* <span className={styles.logoText}>Жирафик</span> */}
-          </Link>
+    <header className="m2-head">
+      <div className="m2-wrap m2-head__in">
+        <Link className="m2-brand" href="/" aria-label="Жирафик — на головну">
+          <Image
+            src="/brand/logo.png"
+            alt="Логотип «Жирафик»"
+            width={52}
+            height={52}
+            priority
+          />
+          <b>ЖИРАФИК</b>
+        </Link>
 
-          <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ""}`}>
-            <Link
-              href="/"
-              className={styles.navLink}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Головна
+        <nav className="m2-nav" aria-label="Основна навігація">
+          {NAV.map((item) => (
+            <Link key={item.href} href={item.href}>
+              {item.label}
             </Link>
-            <Link
-              href="/prices"
-              className={styles.navLink}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Наші ціни
-            </Link>
-            <Link
-              href="/rules"
-              className={styles.navLink}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Правила
-            </Link>
-            <Link
-              href="/cafe"
-              className={styles.navLink}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Кафе
-            </Link>
-            <Link
-              href="/news-contacts"
-              className={styles.navLink}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Новини та контакти
-            </Link>
-          </nav>
+          ))}
+        </nav>
 
-          <button
-            className={styles.menuToggle}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
+        <Link className="m2-btn m2-head__cta" href="/#book">
+          Забронювати дату
+        </Link>
+
+        <details className="m2-mnav">
+          <summary>Меню</summary>
+          <div className="m2-mnav__panel">
+            {NAV.map((item) => (
+              <Link key={item.href} href={item.href}>
+                {item.label}
+              </Link>
+            ))}
+            <Link href="/news-contacts">Новини</Link>
+            <a href={`tel:${CONTACTS.tel}`}>{CONTACTS.phone}</a>
+          </div>
+        </details>
       </div>
     </header>
   );
-};
-
-export default Header;
+}

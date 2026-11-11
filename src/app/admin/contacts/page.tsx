@@ -8,6 +8,9 @@ interface ContactInfo {
   email: string;
   address: string;
   workingHours: string;
+  serviceArea: string;
+  whatsapp?: string;
+  telegram?: string;
   socialMedia: {
     facebook?: string;
     instagram?: string;
@@ -21,6 +24,9 @@ const AdminContactsPage = () => {
     email: "",
     address: "",
     workingHours: "",
+    serviceArea: "",
+    whatsapp: "",
+    telegram: "",
     socialMedia: {
       facebook: "",
       instagram: "",
@@ -201,6 +207,54 @@ const AdminContactsPage = () => {
                 required
               />
             </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                <span className={styles.labelIcon}>🌐</span>
+                Зона обслуговування
+              </label>
+              <input
+                type="text"
+                value={contacts.serviceArea}
+                onChange={(e) =>
+                  handleInputChange("serviceArea", e.target.value)
+                }
+                className={styles.input}
+                placeholder="Вінниця та область"
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                <span className={styles.labelIcon}>💬</span>
+                WhatsApp
+              </label>
+              <input
+                type="url"
+                value={contacts.whatsapp || ""}
+                onChange={(e) =>
+                  handleInputChange("whatsapp", e.target.value)
+                }
+                className={styles.input}
+                placeholder="https://wa.me/380931234567"
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                <span className={styles.labelIcon}>✈️</span>
+                Telegram (пряме повідомлення)
+              </label>
+              <input
+                type="url"
+                value={contacts.telegram || ""}
+                onChange={(e) =>
+                  handleInputChange("telegram", e.target.value)
+                }
+                className={styles.input}
+                placeholder="https://t.me/zhyrafyk_bot"
+              />
+            </div>
           </div>
 
           {/* Social Media */}
@@ -277,6 +331,10 @@ const AdminContactsPage = () => {
                   <strong>📞 Телефон:</strong> {contacts.phone || "Не вказано"}
                 </p>
                 <p>
+                  <strong>🌐 Зона обслуговування:</strong>{" "}
+                  {contacts.serviceArea || "Не вказано"}
+                </p>
+                <p>
                   <strong>✉️ Email:</strong> {contacts.email || "Не вказано"}
                 </p>
                 <p>
@@ -286,6 +344,22 @@ const AdminContactsPage = () => {
                   <strong>🕒 Режим роботи:</strong>{" "}
                   {contacts.workingHours || "Не вказано"}
                 </p>
+                {contacts.whatsapp && (
+                  <p>
+                    <strong>💬 WhatsApp:</strong>
+                    <a href={contacts.whatsapp} target="_blank" rel="noopener noreferrer">
+                      Посилання
+                    </a>
+                  </p>
+                )}
+                {contacts.telegram && (
+                  <p>
+                    <strong>✈️ Telegram:</strong>
+                    <a href={contacts.telegram} target="_blank" rel="noopener noreferrer">
+                      Посилання
+                    </a>
+                  </p>
+                )}
               </div>
             </div>
 

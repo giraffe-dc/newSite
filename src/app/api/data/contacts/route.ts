@@ -8,16 +8,16 @@ export async function GET() {
     const contacts = await db.collection("contacts").findOne({});
 
     if (!contacts) {
+      // Демо-контакти макета №2. Після підключення адмінки їх замінять
+      // реальними значеннями з колекції contacts.
       return NextResponse.json({
-        phone: "+38 (093) 123-45-67",
-        email: "info@zhyrafyk.com.ua",
-        address: "вул. Дитяча, 15, м. Вінниця, Вінницька область, 21000",
-        workingHours: "Пн-Нд: 10:00 - 21:00",
-        socialMedia: {
-          facebook: "https://facebook.com/zhyrafyk",
-          instagram: "https://instagram.com/zhyrafyk_family",
-          telegram: "https://t.me/zhyrafyk_bot",
-        },
+        phone: "+38 (000) 000-00-00",
+        email: "hello@girafik.example",
+        workingHours: "Щодня з 9:00 до 21:00",
+        serviceArea: "Місто й область до 50 км без доплати, далі 15 грн/км",
+        whatsapp: "",
+        telegram: "",
+        socialMedia: {},
       });
     }
 
