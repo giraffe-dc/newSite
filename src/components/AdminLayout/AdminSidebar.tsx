@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type React from "react";
 import styles from "@/styles/admin/AdminSidebar.module.css";
 
 interface AdminSidebarProps {
@@ -14,10 +14,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
 
   const menuItems = [
     { href: "/admin", icon: "🏠", label: "Головна", exact: true },
-    { href: "/admin/home", icon: "🏠", label: "Контент головної" },
+    { href: "/admin/content", icon: "📝", label: "Контент" },
     { href: "/admin/services", icon: "🎭", label: "Послуги" },
     { href: "/admin/packages", icon: "🎁", label: "Пакети свят" },
     { href: "/admin/orders", icon: "🧾", label: "Замовлення" },
+    { href: "/admin/news", icon: "📰", label: "Новини" },
+    { href: "/admin/prices", icon: "💰", label: "Ціни" },
     { href: "/admin/contacts", icon: "📞", label: "Контакти" },
     { href: "/admin/survey", icon: "📊", label: "Опитування" },
     { href: "/admin/offers", icon: "🏷️", label: "Спецпропозиції" },
@@ -38,7 +40,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
             <span className={styles.logoIcon}>🦒</span>
             <span className={styles.logoText}>Жирафик</span>
           </div>
-          <button className={styles.closeButton} onClick={onToggle}>
+          <button
+            type="button"
+            className={styles.closeButton}
+            onClick={onToggle}
+          >
             ×
           </button>
         </div>
@@ -70,7 +76,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
         </div>
       </div>
 
-      {isOpen && <div className={styles.overlay} onClick={onToggle} />}
+      {isOpen && (
+        <button
+          type="button"
+          className={styles.overlay}
+          aria-label="Закрити меню"
+          onClick={onToggle}
+        />
+      )}
     </>
   );
 };

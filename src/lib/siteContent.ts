@@ -6,70 +6,21 @@
    Читання ніколи не валить сторінку: БД недоступна, документа немає або
    форма зламана → дефолти з content.ts + console.error (див. план, 6.2). */
 
-import {
-  BOARD,
-  BOOK,
-  CALC_NOTE,
-  CASES,
-  CONTACTS,
-  COVER,
-  COVER_NOTE,
-  FAQ,
-  HERO,
-  HOME_REVIEW_INDEXES,
-  HOME_SERVICE_EXTRA,
-  HOME_SERVICE_OPTIONS,
-  PACKAGE_ADDONS,
-  PACKAGES,
-  PROMISES,
-  REVIEWS,
-  SERVICE_OPTIONS,
-  SERVICES,
-  STEPS,
-  TIMELINE,
-  TRUST,
-} from "@/components/board/content";
+import { HOME_SERVICE_EXTRA } from "@/components/board/content";
 import { getDb } from "@/lib/mongodb";
+import {
+  SECTION_DEFAULTS,
+  SECTION_KEYS,
+  type SectionKey,
+} from "@/lib/sectionDefaults";
 
 export const CONTENT_COLLECTION = "site_content";
 
-/** Порядок і перелік секцій — мапа 2.1 плану підключення до БД. */
-const SECTION_KEYS = [
-  "contacts",
-  "hero",
-  "board",
-  "timeline",
-  "cases",
-  "promises",
-  "reviews",
-  "steps",
-  "cover",
-  "book",
-  "faq",
-  "services",
-  "packages",
-  "calculator",
-] as const;
-
-export type SectionKey = (typeof SECTION_KEYS)[number];
-
-/** Дефолти секцій: `content.ts` → документи колекції `site_content`. */
-export const SECTION_DEFAULTS = {
-  contacts: { contacts: CONTACTS },
-  hero: { hero: HERO },
-  board: { board: BOARD },
-  timeline: { timeline: TIMELINE },
-  cases: { cases: CASES, homeServiceOptions: HOME_SERVICE_OPTIONS },
-  promises: { promises: PROMISES, trust: TRUST },
-  reviews: { reviews: REVIEWS, homeReviewIndexes: HOME_REVIEW_INDEXES },
-  steps: { steps: STEPS },
-  cover: { cover: COVER, coverNote: COVER_NOTE },
-  book: { book: BOOK },
-  faq: { faq: FAQ },
-  services: { services: SERVICES },
-  packages: { packages: PACKAGES, packageAddons: PACKAGE_ADDONS },
-  calculator: { serviceOptions: SERVICE_OPTIONS, calcNote: CALC_NOTE },
-} satisfies Record<SectionKey, object>;
+/* Ключі, порядок і дефолти живуть у чистому модулі sectionDefaults.ts
+   (його імпортує й клієнтська адмінка /admin/content). Тут — ре-експорт
+   для серверних викликів (API-роути). */
+export { SECTION_DEFAULTS, SECTION_KEYS };
+export type { SectionKey };
 
 /**
  * Знімає `as const`-літерали з дефолтів: для форм і стану в адмінці потрібні
