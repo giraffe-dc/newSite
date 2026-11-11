@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import Link from "next/link";
 import CoverSection from "@/components/board/CoverSection";
+import { getSection } from "@/lib/siteContent";
 
 export const metadata: Metadata = {
   title: "Де можна провести святи — Жирафик, виїзні свята",
@@ -8,7 +9,10 @@ export const metadata: Metadata = {
     "Куди приїжджаємо: квартири, приватні будинки, школи, дитячі майданчики та кафе. Дізнайтеся більше про зони діяльності.",
 };
 
-export default function CoverPage() {
+export const revalidate = 3600;
+
+export default async function CoverPage() {
+  const cover = await getSection("cover");
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -20,7 +24,11 @@ export default function CoverPage() {
           </p>
         </div>
 
-        <CoverSection heading={false} />
+        <CoverSection
+          heading={false}
+          cover={cover.cover}
+          coverNote={cover.coverNote}
+        />
 
         <div className="m2-inline" style={{ marginTop: 40 }}>
           <Link className="m2-btn" href="/book">

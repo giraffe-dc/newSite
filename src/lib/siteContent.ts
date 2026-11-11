@@ -82,7 +82,7 @@ type Widen<T> = T extends string
     : T extends boolean
       ? boolean
       : T extends readonly unknown[]
-        ? Widen<T[number]>[]
+        ? readonly Widen<T[number]>[]
         : T extends object
           ? { -readonly [K in keyof T]: Widen<T[K]> }
           : T;
@@ -108,8 +108,11 @@ export function isSectionKey(key: string): key is SectionKey {
 export function matchesShape(value: unknown, shape: unknown): boolean {
   if (Array.isArray(shape)) {
     if (!Array.isArray(value)) return false;
+    if (shape.length === 0) return true;
+    // Списки-дефолти ніколи не порожні: порожній масив ламає сторінки,
+    // що беруть перший елемент (cases[0] тощо).
     return (
-      shape.length === 0 || value.every((item) => matchesShape(item, shape[0]))
+      value.length > 0 && value.every((item) => matchesShape(item, shape[0]))
     );
   }
   if (typeof shape === "object" && shape !== null) {

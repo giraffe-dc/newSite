@@ -1,3 +1,4 @@
+import type { SectionData } from "@/lib/siteContent";
 import BookingForm from "./BookingForm";
 import { BOOK, CONTACTS } from "./content";
 import { longDateLabel } from "./dates";
@@ -7,11 +8,15 @@ export default function BookingSection({
   service,
   options,
   tint = false,
+  book = BOOK,
+  contacts = CONTACTS,
 }: {
   date?: string;
   service?: string;
   options?: readonly string[];
   tint?: boolean;
+  book?: SectionData<"book">["book"];
+  contacts?: SectionData<"contacts">["contacts"];
 }) {
   return (
     <section
@@ -22,29 +27,34 @@ export default function BookingSection({
       <div className="m2-wrap">
         <div className="m2-book">
           <div>
-            <h2 id="book-title">{BOOK.title}</h2>
+            <h2 id="book-title">{book.title}</h2>
             {date && (
               <div className="m2-slot">
                 Обрана дата: <b>{longDateLabel(date)}</b> · відповідаємо за
                 годину
               </div>
             )}
-            <p className="m2-book__side">{BOOK.side}</p>
+            <p className="m2-book__side">{book.side}</p>
             <div className="m2-contacts">
               <div>
                 <b>Телефон:</b>{" "}
-                <a href={`tel:${CONTACTS.tel}`}>{CONTACTS.phone}</a>
+                <a href={`tel:${contacts.tel}`}>{contacts.phone}</a>
               </div>
               <div>
                 <b>Пошта:</b>{" "}
-                <a href={`mailto:${CONTACTS.email}`}>{CONTACTS.email}</a>
+                <a href={`mailto:${contacts.email}`}>{contacts.email}</a>
               </div>
               <div>
-                <b>Години:</b> {CONTACTS.hours}
+                <b>Години:</b> {contacts.hours}
               </div>
             </div>
           </div>
-          <BookingForm date={date} service={service} options={options} />
+          <BookingForm
+            date={date}
+            service={service}
+            options={options}
+            book={book}
+          />
         </div>
       </div>
     </section>

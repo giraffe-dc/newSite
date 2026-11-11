@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import FaqList from "@/components/board/FaqList";
+import { getSection } from "@/lib/siteContent";
 
 export const metadata: Metadata = {
   title: "FAQ — Жирафик, виїзні свята",
@@ -8,7 +9,10 @@ export const metadata: Metadata = {
     "Відповіді на найпоширеніші питання про бронювання, оплату, зону діяльності та формати свят.",
 };
 
-export default function FAQPage() {
+export const revalidate = 3600;
+
+export default async function FAQPage() {
+  const faq = await getSection("faq");
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -20,7 +24,7 @@ export default function FAQPage() {
           </p>
         </div>
 
-        <FaqList />
+        <FaqList faq={faq.faq} />
 
         <div className="m2-inline" style={{ marginTop: 40 }}>
           <Link className="m2-btn" href="/book">

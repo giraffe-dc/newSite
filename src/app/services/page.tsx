@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import FaqList from "@/components/board/FaqList";
 import ServicesGrid from "@/components/board/ServicesGrid";
+import { getSection } from "@/lib/siteContent";
 
 export const metadata: Metadata = {
   title: "Що ми привозимо — Жирафик, виїзні свята",
@@ -9,7 +10,13 @@ export const metadata: Metadata = {
     "Аніматори, ростові ляльки, VR-клас і PlayStation 4 з виїздом додому, до школи чи на майданчик. Ціни й готові пакети.",
 };
 
-export default function ServicesPage() {
+export const revalidate = 3600;
+
+export default async function ServicesPage() {
+  const [services, faq] = await Promise.all([
+    getSection("services"),
+    getSection("faq"),
+  ]);
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -22,7 +29,7 @@ export default function ServicesPage() {
           </p>
         </div>
 
-        <ServicesGrid />
+        <ServicesGrid services={services.services} />
 
         <div className="m2-inline" style={{ marginTop: 32 }}>
           <Link className="m2-btn" href="/#book">
@@ -45,7 +52,7 @@ export default function ServicesPage() {
         >
           Питаєте — відповідаємо
         </h2>
-        <FaqList />
+        <FaqList faq={faq.faq} />
       </div>
     </div>
   );

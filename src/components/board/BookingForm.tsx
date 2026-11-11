@@ -1,6 +1,7 @@
 "use client";
 
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import type { SectionData } from "@/lib/siteContent";
 import { BOOK, SERVICE_OPTIONS } from "./content";
 
 interface Props {
@@ -10,6 +11,8 @@ interface Props {
   service?: string;
   /** Опції селекта: головна передає свої, сторінка /book — стандартні. */
   options?: readonly string[];
+  /** Тексти секції «Бронювання» (з БД або дефолти з content.ts). */
+  book?: SectionData<"book">["book"];
 }
 
 /** Демонстраційна форма з mac2.html: успіх показуємо на клієнті, без запиту
@@ -18,6 +21,7 @@ export default function BookingForm({
   date,
   service,
   options = SERVICE_OPTIONS,
+  book = BOOK,
 }: Props) {
   const [sent, setSent] = useState(false);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -44,8 +48,8 @@ export default function BookingForm({
   if (sent) {
     return (
       <output className="m2-form__success" aria-live="polite">
-        <h3>{BOOK.successTitle}</h3>
-        <p>{BOOK.successText}</p>
+        <h3>{book.successTitle}</h3>
+        <p>{book.successText}</p>
         <p style={{ marginTop: 16 }}>
           <button
             className="m2-btn m2-btn--ghost m2-btn--sm"
@@ -124,7 +128,7 @@ export default function BookingForm({
       <button className="m2-btn m2-btn--green" type="submit">
         Забронювати дату
       </button>
-      <p className="m2-form__note">{BOOK.note}</p>
+      <p className="m2-form__note">{book.note}</p>
     </form>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ReviewsGrid from "@/components/board/ReviewsGrid";
+import { getSection } from "@/lib/siteContent";
 
 export const metadata: Metadata = {
   title: "Відгуки — Жирафик, виїзні свята",
@@ -8,7 +9,10 @@ export const metadata: Metadata = {
     "Відгуки про виїзні свята: день народження вдома, випускний у дитсадку, привітання в офісі. Кожне свято — реальна локація.",
 };
 
-export default function ReviewsPage() {
+export const revalidate = 3600;
+
+export default async function ReviewsPage() {
+  const reviews = await getSection("reviews");
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -20,7 +24,7 @@ export default function ReviewsPage() {
           </p>
         </div>
 
-        <ReviewsGrid />
+        <ReviewsGrid reviews={reviews.reviews} />
 
         <div className="m2-notecard" style={{ marginTop: 36 }}>
           <b>Про ці записи.</b> Тексти перенесено з демо-макета №2. Після

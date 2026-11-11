@@ -1,5 +1,6 @@
 "use client";
 
+import type { SectionData } from "@/lib/siteContent";
 import { CASES } from "./content";
 
 /** Підбір випадку: клік по картці → готовий сценарій + ціна, а формат
@@ -7,11 +8,13 @@ import { CASES } from "./content";
 export default function CasePicker({
   service,
   onPick,
+  cases = CASES,
 }: {
   service: string;
   onPick: (service: string) => void;
+  cases?: SectionData<"cases">["cases"];
 }) {
-  const active = CASES.find((c) => c.service === service) ?? CASES[0];
+  const active = cases.find((c) => c.service === service) ?? cases[0];
 
   return (
     <section
@@ -32,7 +35,7 @@ export default function CasePicker({
         </div>
 
         <fieldset className="m2-cases" aria-label="Оберіть випадок свята">
-          {CASES.map((c) => (
+          {cases.map((c) => (
             <button
               key={c.id}
               type="button"

@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import type { SectionData } from "@/lib/siteContent";
 import { CALC_NOTE, SERVICES } from "./content";
 
 /** Орієнтовний кошторис із базових цін mac2. Сума не претендує на
  *  остаточну ціну: пакетні знижки й дорогу рахує команда після заявки. */
-export default function Calculator() {
+export default function Calculator({
+  services = SERVICES,
+  calcNote = CALC_NOTE,
+}: {
+  services?: SectionData<"services">["services"];
+  calcNote?: string;
+}) {
   const [picked, setPicked] = useState<string[]>([]);
 
   function toggle(id: string) {
@@ -14,9 +21,9 @@ export default function Calculator() {
     );
   }
 
-  const total = SERVICES.filter((service) =>
-    picked.includes(service.id),
-  ).reduce((sum, service) => sum + service.calcValue, 0);
+  const total = services
+    .filter((service) => picked.includes(service.id))
+    .reduce((sum, service) => sum + service.calcValue, 0);
 
   return (
     <div className="m2-calc">
@@ -27,7 +34,7 @@ export default function Calculator() {
           з макета, а не остаточний рахунок.
         </p>
         <div className="m2-calc__list">
-          {SERVICES.map((service) => (
+          {services.map((service) => (
             <label className="m2-calc__item" key={service.id}>
               <span>
                 <input
@@ -48,7 +55,7 @@ export default function Calculator() {
       <aside className="m2-calc__total" aria-live="polite">
         <span>Орієнтовна сума</span>
         <b>{total.toLocaleString("uk-UA")} грн</b>
-        <p>{CALC_NOTE}</p>
+        <p>{calcNote}</p>
         <a className="m2-btn" href="/#book" style={{ marginTop: 18 }}>
           Забронювати дату
         </a>

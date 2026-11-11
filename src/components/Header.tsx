@@ -1,8 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CONTACTS, NAV } from "@/components/board/content";
+import type { SectionData } from "@/lib/siteContent";
 
-export default function Header() {
+export default function Header({
+  contacts = CONTACTS,
+}: {
+  contacts?: SectionData<"contacts">["contacts"];
+}) {
   return (
     <header className="m2-head">
       <div className="m2-wrap m2-head__in">
@@ -38,7 +43,7 @@ export default function Header() {
               </Link>
             ))}
             <Link href="/news-contacts">Новини</Link>
-            <a href={`tel:${CONTACTS.tel}`}>{CONTACTS.phone}</a>
+            <a href={`tel:${contacts.tel}`}>{contacts.phone}</a>
           </div>
         </details>
       </div>

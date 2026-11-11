@@ -25,6 +25,12 @@ if (process.env.NODE_ENV === "development") {
   clientPromise = client.connect();
 }
 
+/* `connect()` відхиляється ще до першого `await`: модуль імпортується на
+   старті сервера, а getDb() викликається пізніше. Присвоюємо обробник
+   одразу — без нього Node кидає unhandledRejection. Для викликачів getDb()
+   promise лишається тим самим (rejected → ловиться у siteContent). */
+clientPromise.catch(() => {});
+
 export default clientPromise;
 
 /** Назва бази сайту — єдина точка правди (раніше була розкидана хардкодом). */

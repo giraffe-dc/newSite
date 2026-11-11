@@ -3,6 +3,7 @@ import Link from "next/link";
 import CoverSection from "@/components/board/CoverSection";
 import FaqSection from "@/components/board/FaqSection";
 import StepsSection from "@/components/board/StepsSection";
+import { getSection } from "@/lib/siteContent";
 
 export const metadata: Metadata = {
   title: "Як ми працюємо — Жирафик, виїзні свята",
@@ -10,7 +11,14 @@ export const metadata: Metadata = {
     "Від заявки до свята: чотири кроки, куди приїжджаємо, що потрібно підготувати на місці та як відбувається оплата.",
 };
 
-export default function AboutPage() {
+export const revalidate = 3600;
+
+export default async function AboutPage() {
+  const [steps, cover, faq] = await Promise.all([
+    getSection("steps"),
+    getSection("cover"),
+    getSection("faq"),
+  ]);
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -43,9 +51,9 @@ export default function AboutPage() {
         </div>
       </div>
 
-      <StepsSection />
-      <CoverSection />
-      <FaqSection />
+      <StepsSection steps={steps.steps} />
+      <CoverSection cover={cover.cover} coverNote={cover.coverNote} />
+      <FaqSection faq={faq.faq} />
     </div>
   );
 }

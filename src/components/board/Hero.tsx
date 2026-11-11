@@ -1,28 +1,35 @@
 import Link from "next/link";
+import type { SectionData } from "@/lib/siteContent";
 import Board from "./Board";
 import { BOOK_HREF, CONTACTS, HERO } from "./content";
 
-export default function Hero() {
+export default function Hero({
+  hero = HERO,
+  contacts = CONTACTS,
+}: {
+  hero?: SectionData<"hero">["hero"];
+  contacts?: SectionData<"contacts">["contacts"];
+}) {
   return (
     <section className="m2-hero" id="top" aria-labelledby="hero-title">
       <div className="m2-wrap m2-hero__grid">
         <div>
           <h1 id="hero-title">
-            {HERO.titleLead}
-            <span>{HERO.titleAccent}</span>
-            {HERO.titleTail}
+            {hero.titleLead}
+            <span>{hero.titleAccent}</span>
+            {hero.titleTail}
           </h1>
-          <p className="m2-hero__lead">{HERO.lead}</p>
+          <p className="m2-hero__lead">{hero.lead}</p>
           <div className="m2-hero__actions">
             <Link className="m2-btn" href={BOOK_HREF}>
-              {HERO.cta}
+              {hero.cta}
             </Link>
-            <a className="m2-hero__tel" href={`tel:${CONTACTS.tel}`}>
-              {CONTACTS.phone}
+            <a className="m2-hero__tel" href={`tel:${contacts.tel}`}>
+              {contacts.phone}
             </a>
           </div>
           <div className="m2-hero__micro">
-            {HERO.micro.map((item) => (
+            {hero.micro.map((item) => (
               <span key={item.bold}>
                 {item.before}
                 <b>{item.bold}</b>

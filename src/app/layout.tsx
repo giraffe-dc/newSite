@@ -7,6 +7,7 @@ import ChatWidget from "@/components/chat/ChatWidget";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { StatisticsCollector } from "@/components/StatisticsCollector";
+import { getSection } from "@/lib/siteContent";
 import "./globals.css";
 import "@/styles/global.css";
 
@@ -58,11 +59,14 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Контакти — з site_content (БД), з fallback на content.ts при помилці.
+  const { contacts } = await getSection("contacts");
+
   return (
     <html lang="uk" className={`${rubik.variable} ${mono.variable}`}>
       <body>
@@ -72,9 +76,9 @@ export default function RootLayout({
           </a>
           <SpeedInsights />
           <StatisticsCollector />
-          <Header />
+          <Header contacts={contacts} />
           <main id="main">{children}</main>
-          <Footer />
+          <Footer contacts={contacts} />
           <ChatWidget />
           <Analytics />
         </div>

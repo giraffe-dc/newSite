@@ -1,11 +1,18 @@
 import Link from "next/link";
+import type { SectionData } from "@/lib/siteContent";
 import { BOOK_HREF, PACKAGE_ADDONS, PACKAGES } from "./content";
 
-export default function PackagesGrid() {
+export default function PackagesGrid({
+  packages = PACKAGES,
+  packageAddons = PACKAGE_ADDONS,
+}: {
+  packages?: SectionData<"packages">["packages"];
+  packageAddons?: string;
+}) {
   return (
     <>
       <div className="m2-packages">
-        {PACKAGES.map((pkg) => (
+        {packages.map((pkg) => (
           <article
             className={`m2-pkg${pkg.hit ? " m2-pkg--hit" : ""}`}
             key={pkg.id}
@@ -37,7 +44,7 @@ export default function PackagesGrid() {
       </div>
       <p className="m2-addons">
         <b>Плюс до будь-якого пакета:</b>{" "}
-        {PACKAGE_ADDONS.split(": ").slice(1).join(": ")}
+        {packageAddons.split(": ").slice(1).join(": ")}
       </p>
     </>
   );

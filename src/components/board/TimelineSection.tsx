@@ -1,8 +1,13 @@
 import Link from "next/link";
+import type { SectionData } from "@/lib/siteContent";
 import { TIMELINE } from "./content";
 
 /** Сценарій дня — унікальний блок головної: маршрут свята по хвилинах. */
-export default function TimelineSection() {
+export default function TimelineSection({
+  timeline = TIMELINE,
+}: {
+  timeline?: SectionData<"timeline">["timeline"];
+}) {
   return (
     <section className="m2-sec" id="rail" aria-labelledby="rail-title">
       <div className="m2-wrap">
@@ -15,7 +20,7 @@ export default function TimelineSection() {
           </p>
         </div>
         <ol className="m2-rail">
-          {TIMELINE.map((step) => (
+          {timeline.map((step) => (
             <li
               key={step.title}
               className={

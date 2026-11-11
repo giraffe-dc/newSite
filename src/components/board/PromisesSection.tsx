@@ -1,7 +1,14 @@
+import type { SectionData } from "@/lib/siteContent";
 import { PROMISES, TRUST } from "./content";
 
 /** Три гарантії + цифри довіри — унікальний блок головної. */
-export default function PromisesSection() {
+export default function PromisesSection({
+  promises = PROMISES,
+  trust = TRUST,
+}: {
+  promises?: SectionData<"promises">["promises"];
+  trust?: SectionData<"promises">["trust"];
+}) {
   return (
     <section className="m2-sec" id="promises" aria-labelledby="promises-title">
       <div className="m2-wrap">
@@ -13,7 +20,7 @@ export default function PromisesSection() {
           </p>
         </div>
         <div className="m2-promises">
-          {PROMISES.map((promise) => (
+          {promises.map((promise) => (
             <article className="m2-promise" key={promise.title}>
               <div className="m2-promise__ico" aria-hidden="true">
                 {promise.ico}
@@ -24,7 +31,7 @@ export default function PromisesSection() {
           ))}
         </div>
         <div className="m2-trust">
-          {TRUST.map((item) => (
+          {trust.map((item) => (
             <span key={item.label}>
               <b>{item.value}</b> {item.label}
             </span>

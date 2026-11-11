@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { CONTACTS } from "@/components/board/content";
+import type { SectionData } from "@/lib/siteContent";
 
 const LINKS = [
   { href: "/services", label: "Послуги" },
@@ -11,7 +12,11 @@ const LINKS = [
   { href: "/news-contacts", label: "Новини й контакти" },
 ];
 
-export default function Footer() {
+export default function Footer({
+  contacts = CONTACTS,
+}: {
+  contacts?: SectionData<"contacts">["contacts"];
+}) {
   return (
     <footer className="m2-foot">
       <div className="m2-wrap m2-foot__in">
@@ -23,7 +28,7 @@ export default function Footer() {
             height={44}
           />
           <span>
-            Мобільний магістр свята «Жирафик» 
+            Мобільний магістр свята «Жирафик»
             <br />© 2026. Свято приїжджає до Вас
           </span>
         </div>
@@ -34,8 +39,8 @@ export default function Footer() {
             </Link>
           ))}
         </nav>
-        <a className="m2-foot__tel" href={`tel:${CONTACTS.tel}`}>
-          {CONTACTS.phone}
+        <a className="m2-foot__tel" href={`tel:${contacts.tel}`}>
+          {contacts.phone}
         </a>
       </div>
     </footer>

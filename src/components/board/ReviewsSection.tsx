@@ -1,10 +1,20 @@
 import Link from "next/link";
+import type { SectionData } from "@/lib/siteContent";
 import { HOME_REVIEW_INDEXES, REVIEWS } from "./content";
 import ReviewCard from "./ReviewCard";
 
 /** Два відгуки на головній + посилання на всі відгуки. */
-export default function ReviewsSection() {
-  const shown = HOME_REVIEW_INDEXES.map((index) => REVIEWS[index]);
+export default function ReviewsSection({
+  reviews = REVIEWS,
+  homeReviewIndexes = HOME_REVIEW_INDEXES,
+}: {
+  reviews?: SectionData<"reviews">["reviews"];
+  homeReviewIndexes?: readonly number[];
+}) {
+  /* Індекси можуть вказувати поза межі списку (дані з БД) — відфільтровуємо. */
+  const shown = homeReviewIndexes
+    .map((index) => reviews[index])
+    .filter(Boolean);
 
   return (
     <section

@@ -1,10 +1,15 @@
 import Link from "next/link";
+import type { SectionData } from "@/lib/siteContent";
 import { BOOK_HREF, SERVICES } from "./content";
 
-export default function ServicesGrid() {
+export default function ServicesGrid({
+  services = SERVICES,
+}: {
+  services?: SectionData<"services">["services"];
+}) {
   return (
     <div className="m2-tickets">
-      {SERVICES.map((service) => (
+      {services.map((service) => (
         <article className="m2-ticket" key={service.id}>
           <div className="m2-ticket__top">
             <span className="m2-ticket__emoji" aria-hidden="true">

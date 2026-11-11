@@ -1,6 +1,7 @@
-import type { REVIEWS } from "./content";
+import type { SectionData } from "@/lib/siteContent";
 
-type Review = (typeof REVIEWS)[number];
+/** Редагований тип відгуку (з БД приходять звичайні string, не літерали). */
+type Review = SectionData<"reviews">["reviews"][number];
 
 /** Одна листівка-відгук — спільна для сітки відгуків і секції на головній. */
 export default function ReviewCard({ review }: { review: Review }) {

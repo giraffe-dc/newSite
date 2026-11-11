@@ -1,9 +1,14 @@
+import type { SectionData } from "@/lib/siteContent";
 import { COVER, COVER_NOTE } from "./content";
 
 export default function CoverSection({
   heading = true,
+  cover = COVER,
+  coverNote = COVER_NOTE,
 }: {
   heading?: boolean;
+  cover?: SectionData<"cover">["cover"];
+  coverNote?: SectionData<"cover">["coverNote"];
 }) {
   return (
     <section
@@ -20,15 +25,15 @@ export default function CoverSection({
             </div>
           )}
           <ul className="m2-cover__list">
-            {COVER.map((item) => (
+            {cover.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </div>
         <div className="m2-note">
-          <strong>{COVER_NOTE.title}</strong>
+          <strong>{coverNote.title}</strong>
           <br />
-          {COVER_NOTE.text}
+          {coverNote.text}
         </div>
       </div>
     </section>
