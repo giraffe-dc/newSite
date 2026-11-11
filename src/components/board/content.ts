@@ -423,10 +423,13 @@ export const CASES: HolidayCase[] = [
   },
 ];
 
+/** Остання опція селекта «Формат» — не залежить від списку випадків. */
+export const HOME_SERVICE_EXTRA = "Ще не визначився";
+
 /** Опції селекта «Формат» на головній: випадки + «ще не визначився». */
 export const HOME_SERVICE_OPTIONS: readonly string[] = [
   ...CASES.map((c) => c.service),
-  "Ще не визначився",
+  HOME_SERVICE_EXTRA,
 ];
 
 export interface PromiseItem {
