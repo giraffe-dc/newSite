@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminOffers.module.css";
 
 interface Offer {
@@ -26,7 +27,7 @@ export default function AdminOffersPage() {
   const [recommended, setRecommended] = useState(false);
   const [icon, setIcon] = useState("🎁");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/offers", {
@@ -37,11 +38,11 @@ export default function AdminOffersPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const createOffer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,8 +110,11 @@ export default function AdminOffersPage() {
         <form onSubmit={createOffer}>
           <div className={styles.formGrid}>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Заголовок</label>
+              <label className={styles.inputLabel} htmlFor="offer-title">
+                Заголовок
+              </label>
               <input
+                id="offer-title"
                 className={styles.input}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -118,8 +122,11 @@ export default function AdminOffersPage() {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Опис</label>
+              <label className={styles.inputLabel} htmlFor="offer-description">
+                Опис
+              </label>
               <input
+                id="offer-description"
                 className={styles.input}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -127,16 +134,22 @@ export default function AdminOffersPage() {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Активна</label>
+              <label className={styles.inputLabel} htmlFor="offer-active">
+                Активна
+              </label>
               <input
+                id="offer-active"
                 type="checkbox"
                 checked={active}
                 onChange={(e) => setActive(e.target.checked)}
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Початок дії</label>
+              <label className={styles.inputLabel} htmlFor="offer-start-date">
+                Початок дії
+              </label>
               <input
+                id="offer-start-date"
                 className={styles.input}
                 type="date"
                 value={startDate}
@@ -144,8 +157,11 @@ export default function AdminOffersPage() {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Кінець дії</label>
+              <label className={styles.inputLabel} htmlFor="offer-end-date">
+                Кінець дії
+              </label>
               <input
+                id="offer-end-date"
                 className={styles.input}
                 type="date"
                 value={endDate}
@@ -153,8 +169,11 @@ export default function AdminOffersPage() {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Пріоритет</label>
+              <label className={styles.inputLabel} htmlFor="offer-priority">
+                Пріоритет
+              </label>
               <input
+                id="offer-priority"
                 className={styles.input}
                 type="number"
                 value={priority}
@@ -162,16 +181,22 @@ export default function AdminOffersPage() {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Рекомендована</label>
+              <label className={styles.inputLabel} htmlFor="offer-recommended">
+                Рекомендована
+              </label>
               <input
+                id="offer-recommended"
                 type="checkbox"
                 checked={recommended}
                 onChange={(e) => setRecommended(e.target.checked)}
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Іконка (емодзі)</label>
+              <label className={styles.inputLabel} htmlFor="offer-icon">
+                Іконка (емодзі)
+              </label>
               <input
+                id="offer-icon"
                 className={styles.input}
                 value={icon}
                 onChange={(e) => setIcon(e.target.value)}
@@ -211,9 +236,11 @@ export default function AdminOffersPage() {
               </div>
               <div className={styles.cardActions}>
                 <button
+                  type="button"
                   className={styles.saveButton}
-                  onClick={() =>
-                    updateOffer(o._id!, {
+                  onClick={() => {
+                    if (!o._id) return;
+                    updateOffer(o._id, {
                       title: prompt("Новий заголовок", o.title) || o.title,
                       description:
                         prompt("Новий опис", o.description) || o.description,
@@ -225,14 +252,17 @@ export default function AdminOffersPage() {
                           (o.priority ?? 0),
                       ),
                       icon: prompt("Іконка (емодзі)", o.icon || "🎁") || o.icon,
-                    })
-                  }
+                    });
+                  }}
                 >
                   ✏️ Редагувати
                 </button>
                 <button
+                  type="button"
                   className={styles.removeButton}
-                  onClick={() => deleteOffer(o._id!)}
+                  onClick={() => {
+                    if (o._id) deleteOffer(o._id);
+                  }}
                 >
                   🗑️ Видалити
                 </button>

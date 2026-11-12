@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import type React from "react";
 import styles from "@/styles/admin/AdminHeader.module.css";
 
 interface AdminHeaderProps {
@@ -14,7 +14,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   return (
     <header className={styles.adminHeader}>
       <div className={styles.headerLeft}>
-        <button className={styles.menuToggle} onClick={onMenuToggle}>
+        <button
+          type="button"
+          className={styles.menuToggle}
+          onClick={onMenuToggle}
+        >
           <span></span>
           <span></span>
           <span></span>
@@ -24,10 +28,18 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
       <div className={styles.headerRight}>
         <div className={styles.headerActions}>
-          <button className={styles.actionButton} title="Сповіщення">
+          <button
+            type="button"
+            className={styles.actionButton}
+            title="Сповіщення"
+          >
             🔔
           </button>
-          <button className={styles.actionButton} title="Повідомлення">
+          <button
+            type="button"
+            className={styles.actionButton}
+            title="Повідомлення"
+          >
             💬
           </button>
         </div>
@@ -37,7 +49,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             <span className={styles.userAvatar}>👤</span>
             <span className={styles.userName}>Адмін</span>
           </div>
-          <button className={styles.logoutButton} onClick={onLogout}>
+          <button
+            type="button"
+            className={styles.logoutButton}
+            onClick={onLogout}
+          >
             <span className={styles.logoutIcon}>🚪</span>
             Вийти
           </button>

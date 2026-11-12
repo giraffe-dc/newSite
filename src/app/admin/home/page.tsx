@@ -1,7 +1,8 @@
 // src/app/admin/home/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminHome.module.css";
 
 interface HomeData {
@@ -37,11 +38,7 @@ const AdminHomePage = () => {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    fetchHomeData();
-  }, []);
-
-  const fetchHomeData = async () => {
+  const fetchHomeData = useCallback(async () => {
     try {
       const response = await fetch("/api/data/home");
       if (response.ok) {
@@ -54,7 +51,11 @@ const AdminHomePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchHomeData();
+  }, [fetchHomeData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +78,7 @@ const AdminHomePage = () => {
       } else {
         setMessage("Помилка збереження даних");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка підключення до сервера");
     } finally {
       setSaving(false);
@@ -155,8 +156,11 @@ const AdminHomePage = () => {
             </h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Заголовок сайту</label>
+              <label className={styles.inputLabel} htmlFor="home-title">
+                Заголовок сайту
+              </label>
               <input
+                id="home-title"
                 type="text"
                 value={homeData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
@@ -167,8 +171,11 @@ const AdminHomePage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Підзаголовок</label>
+              <label className={styles.inputLabel} htmlFor="home-subtitle">
+                Підзаголовок
+              </label>
               <input
+                id="home-subtitle"
                 type="text"
                 value={homeData.subtitle}
                 onChange={(e) => handleInputChange("subtitle", e.target.value)}
@@ -178,8 +185,11 @@ const AdminHomePage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Опис</label>
+              <label className={styles.inputLabel} htmlFor="home-description">
+                Опис
+              </label>
               <textarea
+                id="home-description"
                 value={homeData.description}
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
@@ -200,8 +210,11 @@ const AdminHomePage = () => {
             </h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Режим роботи</label>
+              <label className={styles.inputLabel} htmlFor="home-working-hours">
+                Режим роботи
+              </label>
               <input
+                id="home-working-hours"
                 type="text"
                 value={homeData.workingHours}
                 onChange={(e) =>
@@ -214,8 +227,11 @@ const AdminHomePage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Адреса</label>
+              <label className={styles.inputLabel} htmlFor="home-address">
+                Адреса
+              </label>
               <input
+                id="home-address"
                 type="text"
                 value={homeData.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
@@ -226,8 +242,11 @@ const AdminHomePage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Телефон</label>
+              <label className={styles.inputLabel} htmlFor="home-phone">
+                Телефон
+              </label>
               <input
+                id="home-phone"
                 type="tel"
                 value={homeData.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
@@ -238,8 +257,11 @@ const AdminHomePage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Зона обслуговування</label>
+              <label className={styles.inputLabel} htmlFor="home-service-area">
+                Зона обслуговування
+              </label>
               <input
+                id="home-service-area"
                 type="text"
                 value={homeData.serviceArea}
                 onChange={(e) =>
@@ -251,26 +273,28 @@ const AdminHomePage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>WhatsApp</label>
+              <label className={styles.inputLabel} htmlFor="home-whatsapp">
+                WhatsApp
+              </label>
               <input
+                id="home-whatsapp"
                 type="url"
                 value={homeData.whatsapp || ""}
-                onChange={(e) =>
-                  handleInputChange("whatsapp", e.target.value)
-                }
+                onChange={(e) => handleInputChange("whatsapp", e.target.value)}
                 className={styles.input}
                 placeholder="https://wa.me/380931234567"
               />
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Telegram</label>
+              <label className={styles.inputLabel} htmlFor="home-telegram">
+                Telegram
+              </label>
               <input
+                id="home-telegram"
                 type="url"
                 value={homeData.telegram || ""}
-                onChange={(e) =>
-                  handleInputChange("telegram", e.target.value)
-                }
+                onChange={(e) => handleInputChange("telegram", e.target.value)}
                 className={styles.input}
                 placeholder="https://t.me/zhyrafyk_bot"
               />
@@ -285,6 +309,7 @@ const AdminHomePage = () => {
             </h2>
 
             {homeData.features.map((feature, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: прості рядки без id, редагування на місці за індексом
               <div key={index} className={styles.arrayInputGroup}>
                 <input
                   type="text"
@@ -323,6 +348,7 @@ const AdminHomePage = () => {
             </h2>
 
             {homeData.images.map((image, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: прості рядки без id, редагування на місці за індексом
               <div key={index} className={styles.arrayInputGroup}>
                 <input
                   type="url"
@@ -370,7 +396,7 @@ const AdminHomePage = () => {
                 Збереження...
               </>
             ) : (
-              <>💾 Зберегти зміни</>
+              "💾 Зберегти зміни"
             )}
           </button>
         </div>

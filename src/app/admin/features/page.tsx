@@ -1,7 +1,7 @@
 // src/app/admin/features/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminFeatures.module.css";
 
 interface Feature {
@@ -17,11 +17,7 @@ const AdminFeaturesPage = () => {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    fetchFeatures();
-  }, []);
-
-  const fetchFeatures = async () => {
+  const fetchFeatures = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/features");
       if (response.ok) {
@@ -34,7 +30,11 @@ const AdminFeaturesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchFeatures();
+  }, [fetchFeatures]);
 
   const handleInputChange = (
     index: number,
@@ -66,7 +66,7 @@ const AdminFeaturesPage = () => {
           setMessage("Помилка видалення");
           return;
         }
-      } catch (error) {
+      } catch (_error) {
         setMessage("Помилка підключення до сервера");
         return;
       }
@@ -109,7 +109,7 @@ const AdminFeaturesPage = () => {
       } else {
         setMessage("Помилка збереження даних");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка підключення до сервера");
     } finally {
       setSaving(false);
@@ -151,10 +151,17 @@ const AdminFeaturesPage = () => {
 
       <div className={styles.featuresGrid}>
         {features.map((feature, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: список редагується на місці, нові елементи не мають стабільного _id
           <div key={index} className={styles.featureCard}>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Заголовок</label>
+              <label
+                className={styles.inputLabel}
+                htmlFor={`feature-title-${index}`}
+              >
+                Заголовок
+              </label>
               <input
+                id={`feature-title-${index}`}
                 type="text"
                 value={feature.title}
                 onChange={(e) =>
@@ -165,8 +172,14 @@ const AdminFeaturesPage = () => {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Опис</label>
+              <label
+                className={styles.inputLabel}
+                htmlFor={`feature-description-${index}`}
+              >
+                Опис
+              </label>
               <textarea
+                id={`feature-description-${index}`}
                 value={feature.description}
                 onChange={(e) =>
                   handleInputChange(index, "description", e.target.value)
@@ -178,12 +191,14 @@ const AdminFeaturesPage = () => {
             </div>
             <div className={styles.cardActions}>
               <button
+                type="button"
                 onClick={() => handleRemoveFeature(index)}
                 className={styles.removeButton}
               >
                 ❌ Видалити
               </button>
               <button
+                type="button"
                 onClick={() => handleSave(index)}
                 className={styles.saveButton}
                 disabled={saving}
@@ -193,7 +208,11 @@ const AdminFeaturesPage = () => {
             </div>
           </div>
         ))}
-        <button onClick={handleAddFeature} className={styles.addButton}>
+        <button
+          type="button"
+          onClick={handleAddFeature}
+          className={styles.addButton}
+        >
           ➕ Додати особливість
         </button>
       </div>

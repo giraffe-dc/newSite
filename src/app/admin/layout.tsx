@@ -1,8 +1,9 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import AdminSidebar from "@/components/AdminLayout/AdminSidebar";
+import { usePathname, useRouter } from "next/navigation";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import AdminHeader from "@/components/AdminLayout/AdminHeader";
+import AdminSidebar from "@/components/AdminLayout/AdminSidebar";
 import styles from "@/styles/admin/AdminLayout.module.css";
 
 interface AdminLayoutProps {
@@ -15,11 +16,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await fetch("/api/auth/verify", {
         credentials: "include",
@@ -33,13 +30,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           router.push("/admin/login");
         }
       }
-    } catch (error) {
+    } catch (_error) {
       setIsAuthenticated(false);
       if (pathname !== "/admin/login") {
         router.push("/admin/login");
       }
     }
-  };
+  }, [pathname, router]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   const handleLogout = async () => {
     try {

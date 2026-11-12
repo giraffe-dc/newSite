@@ -1,19 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import styles from "@/styles/admin/AdminDashboard.module.css";
+import type React from "react";
+import { useEffect, useState } from "react";
 import {
-  LineChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
 } from "recharts";
+import styles from "@/styles/admin/AdminDashboard.module.css";
 
 interface StatsData {
   totalPageViews: number;
@@ -48,8 +49,8 @@ const AdminDashboard = () => {
           const orders = await ordersRes.json();
           setOrdersCount(Array.isArray(orders) ? orders.length : 0);
         }
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
       } finally {
         setLoading(false);
       }
@@ -221,9 +222,9 @@ const AdminDashboard = () => {
       )}
 
       <div className={styles.dashboardGrid}>
-        {dashboardCards.map((card, index) => (
+        {dashboardCards.map((card) => (
           <Link
-            key={index}
+            key={card.href}
             href={card.href}
             className={styles.dashboardCard}
             style={
@@ -245,12 +246,22 @@ const AdminDashboard = () => {
       <div className={styles.quickActions}>
         <h2 className={styles.sectionTitle}>Швидкі дії</h2>
         <div className={styles.actionsGrid}>
-          <Link href="/admin/news" className={styles.actionButton}>➕ Додати новину</Link>
-          <Link href="/admin/prices" className={styles.actionButton}>💰 Оновити ціни</Link>
+          <Link href="/admin/news" className={styles.actionButton}>
+            ➕ Додати новину
+          </Link>
+          <Link href="/admin/prices" className={styles.actionButton}>
+            💰 Оновити ціни
+          </Link>
           <Link href="/admin/orders" className={styles.actionButton}>
             📧 Переглянути повідомлення
           </Link>
-          <button className={styles.actionButton} onClick={() => window.print()}>📊 Експорт звітів</button>
+          <button
+            type="button"
+            className={styles.actionButton}
+            onClick={() => window.print()}
+          >
+            📊 Експорт звітів
+          </button>
         </div>
       </div>
     </div>

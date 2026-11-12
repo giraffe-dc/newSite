@@ -1,9 +1,13 @@
 "use client";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
+import {
+  extractGoogleDriveFileId,
+  getGoogleDriveImageUrl,
+} from "@/lib/googleDrive";
 import styles from "@/styles/NewsSlider.module.css";
-import { extractGoogleDriveFileId, getGoogleDriveImageUrl } from "@/lib/googleDrive";
 
 interface NewsSliderProps {
   images: string[];
@@ -44,13 +48,18 @@ const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
 
   const paginate = (newDirection: number) => {
     setDirection(newDirection);
-    setCurrentIndex((prevIndex) => (prevIndex + newDirection + processedImages.length) % processedImages.length);
+    setCurrentIndex(
+      (prevIndex) =>
+        (prevIndex + newDirection + processedImages.length) %
+        processedImages.length,
+    );
   };
 
   return (
     <div className={styles.sliderContainer}>
       <div className={styles.mainWrapper}>
         <AnimatePresence initial={false} custom={direction}>
+          {/* biome-ignore lint/performance/noImgElement: slide size is CSS-driven and motion.img is required by framer-motion; next/image conversion isn't trivial */}
           <motion.img
             key={currentIndex}
             src={processedImages[currentIndex]}
@@ -66,7 +75,7 @@ const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={1}
-            onDragEnd={(e, { offset, velocity }) => {
+            onDragEnd={(_e, { offset, velocity }) => {
               const swipe = swipePower(offset.x, velocity.x);
 
               if (swipe < -swipeConfidenceThreshold) {
@@ -82,10 +91,18 @@ const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
 
         {processedImages.length > 1 && (
           <>
-            <button className={styles.navButtonPrev} onClick={() => paginate(-1)}>
+            <button
+              type="button"
+              className={styles.navButtonPrev}
+              onClick={() => paginate(-1)}
+            >
               <ChevronLeft size={24} />
             </button>
-            <button className={styles.navButtonNext} onClick={() => paginate(1)}>
+            <button
+              type="button"
+              className={styles.navButtonNext}
+              onClick={() => paginate(1)}
+            >
               <ChevronRight size={24} />
             </button>
           </>
@@ -96,13 +113,16 @@ const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
         <div className={styles.thumbnailList}>
           {processedImages.map((img, index) => (
             <button
+              // biome-ignore lint/suspicious/noArrayIndexKey: images have no id; the list is static so index keys are safe here
               key={index}
+              type="button"
               className={`${styles.thumbnailItem} ${index === currentIndex ? styles.thumbnailActive : ""}`}
               onClick={() => {
                 setDirection(index > currentIndex ? 1 : -1);
                 setCurrentIndex(index);
               }}
             >
+              {/* biome-ignore lint/performance/noImgElement: thumbnail size is fixed by CSS module and sources are dynamic external URLs; next/image sizing isn't trivial */}
               <img src={img} alt={`Thumbnail ${index}`} />
             </button>
           ))}

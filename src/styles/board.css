@@ -237,6 +237,7 @@
   justify-content: center;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: специфічність б'є порядок каскаду; .m2-hero h1 span стосується іншого піддерева */
 .m2-hero__micro span {
   background: rgb(255 255 255 / 10%);
   border: 1px solid rgb(255 255 255 / 22%);
@@ -815,6 +816,7 @@
   margin-top: 10px;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: специфічність б'є порядок каскаду — колір [aria-pressed] не перекривається загальним правилом */
 .m2-case__when {
   display: block;
   font-size: 14px;
@@ -945,6 +947,7 @@
   margin-top: 26px;
 }
 
+/* biome-ignore lint/style/noDescendingSpecificity: специфічність б'є порядок каскаду; .m2-hero h1 span стосується іншого піддерева */
 .m2-trust span {
   background: var(--green-deep);
   color: var(--muted-on-night);

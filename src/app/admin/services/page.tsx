@@ -1,7 +1,7 @@
 // src/app/admin/services/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminServices.module.css";
 
 interface ServiceItem {
@@ -46,14 +46,12 @@ const AdminServicesPage = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newService, setNewService] = useState<ServiceItem>(newServiceInitialState);
+  const [newService, setNewService] = useState<ServiceItem>(
+    newServiceInitialState,
+  );
   const router = useRouter();
 
-  useEffect(() => {
-    fetchServices();
-  }, []);
-
-  const fetchServices = async () => {
+  const fetchServices = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/data/services");
@@ -67,9 +65,13 @@ const AdminServicesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleInputChange = (
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
+
+  const _handleInputChange = (
     index: number,
     field: keyof ServiceItem,
     value: string,
@@ -101,14 +103,14 @@ const AdminServicesPage = () => {
         setMessage("Статус оновлено");
         setTimeout(() => setMessage(""), 3000);
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка оновлення статусу");
     } finally {
       setSaving(false);
     }
   };
 
-  const handleUpdateService = async (item: ServiceItem) => {
+  const _handleUpdateService = async (item: ServiceItem) => {
     setSaving(true);
     try {
       const res = await fetch(`/api/admin/services/${item._id}`, {
@@ -123,7 +125,7 @@ const AdminServicesPage = () => {
       } else {
         setMessage("Помилка оновлення послуги");
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка з'єднання");
     } finally {
       setSaving(false);
@@ -148,7 +150,7 @@ const AdminServicesPage = () => {
       } else {
         setMessage("Помилка створення послуги");
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка з'єднання");
     } finally {
       setSaving(false);
@@ -170,7 +172,7 @@ const AdminServicesPage = () => {
       } else {
         setMessage("Помилка видалення послуги");
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка з'єднання");
     } finally {
       setSaving(false);
@@ -226,20 +228,20 @@ const AdminServicesPage = () => {
           <h2>Нова послуга</h2>
           <div className={styles.formGrid}>
             <div className={styles.fieldGroup}>
-              <label>Назва послуги</label>
+              <label htmlFor="svc-name">Назва послуги</label>
               <input
+                id="svc-name"
                 type="text"
                 value={newService.name}
-                onChange={(e) =>
-                  handleNewServiceChange("name", e.target.value)
-                }
+                onChange={(e) => handleNewServiceChange("name", e.target.value)}
                 placeholder="Наприклад, Аніматор на виїзд"
                 required
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>Категорія</label>
+              <label htmlFor="svc-category">Категорія</label>
               <select
+                id="svc-category"
                 value={newService.category}
                 onChange={(e) =>
                   handleNewServiceChange("category", e.target.value)
@@ -253,8 +255,9 @@ const AdminServicesPage = () => {
               </select>
             </div>
             <div className={styles.fieldGroup}>
-              <label>Короткий опис</label>
+              <label htmlFor="svc-short">Короткий опис</label>
               <input
+                id="svc-short"
                 type="text"
                 value={newService.shortDescription}
                 onChange={(e) =>
@@ -264,8 +267,9 @@ const AdminServicesPage = () => {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>Ціна від</label>
+              <label htmlFor="svc-price">Ціна від</label>
               <input
+                id="svc-price"
                 type="text"
                 value={newService.priceFrom}
                 onChange={(e) =>
@@ -275,8 +279,9 @@ const AdminServicesPage = () => {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>Тривалість</label>
+              <label htmlFor="svc-duration">Тривалість</label>
               <input
+                id="svc-duration"
                 type="text"
                 value={newService.duration}
                 onChange={(e) =>
@@ -286,20 +291,20 @@ const AdminServicesPage = () => {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>Іконка (емодзі)</label>
+              <label htmlFor="svc-icon">Іконка (емодзі)</label>
               <input
+                id="svc-icon"
                 type="text"
                 value={newService.icon}
-                onChange={(e) =>
-                  handleNewServiceChange("icon", e.target.value)
-                }
+                onChange={(e) => handleNewServiceChange("icon", e.target.value)}
                 placeholder="🎭"
                 maxLength={2}
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>Повний опис</label>
+              <label htmlFor="svc-desc">Повний опис</label>
               <textarea
+                id="svc-desc"
                 value={newService.description}
                 onChange={(e) =>
                   handleNewServiceChange("description", e.target.value)
@@ -331,16 +336,15 @@ const AdminServicesPage = () => {
                 <div className={styles.serviceInfo}>
                   <h3>{item.name}</h3>
                   <span className={styles.categoryBadge}>
-                    {categoryOptions.find((c) => c.value === item.category)?.label || item.category}
+                    {categoryOptions.find((c) => c.value === item.category)
+                      ?.label || item.category}
                   </span>
                 </div>
                 <div className={styles.statusBadge}>
                   {item.active ? "Активна" : "Неактивна"}
                 </div>
               </div>
-              <p className={styles.cardDescription}>
-                {item.shortDescription}
-              </p>
+              <p className={styles.cardDescription}>{item.shortDescription}</p>
               <div className={styles.cardMeta}>
                 <span className={styles.metaItem}>💰 {item.priceFrom}</span>
                 {item.duration && (
@@ -349,6 +353,7 @@ const AdminServicesPage = () => {
               </div>
               <div className={styles.cardActions}>
                 <button
+                  type="button"
                   onClick={() => handleToggleActive(item)}
                   disabled={saving}
                   className={styles.toggleButton}
@@ -356,6 +361,7 @@ const AdminServicesPage = () => {
                   {item.active ? "Сховати" : "Показати"}
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDeleteService(item._id || "")}
                   disabled={saving}
                   className={styles.deleteButton}

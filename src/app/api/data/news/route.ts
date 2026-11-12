@@ -45,7 +45,7 @@ export async function GET() {
     }
 
     // Normalize documents: ensure every item has `images: string[]`
-    const normalized = news.map((item: any) => {
+    const normalized = news.map((item) => {
       // If older documents used `image` field (single), convert to `images` array
       if (item.images && Array.isArray(item.images)) {
         return item;

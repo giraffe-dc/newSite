@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminContacts.module.css";
 
 interface ContactInfo {
@@ -38,11 +39,7 @@ const AdminContactsPage = () => {
   const [message, setMessage] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    fetchContacts();
-  }, []);
-
-  const fetchContacts = async () => {
+  const fetchContacts = useCallback(async () => {
     try {
       const response = await fetch("/api/data/contacts");
       if (response.ok) {
@@ -55,7 +52,11 @@ const AdminContactsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchContacts();
+  }, [fetchContacts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,7 +79,7 @@ const AdminContactsPage = () => {
       } else {
         setMessage("Помилка збереження контактів");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка підключення до сервера");
     } finally {
       setSaving(false);
@@ -147,11 +148,12 @@ const AdminContactsPage = () => {
             </h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-phone">
                 <span className={styles.labelIcon}>📞</span>
                 Телефон
               </label>
               <input
+                id="contacts-phone"
                 type="tel"
                 value={contacts.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
@@ -162,11 +164,12 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-email">
                 <span className={styles.labelIcon}>✉️</span>
                 Email
               </label>
               <input
+                id="contacts-email"
                 type="email"
                 value={contacts.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
@@ -177,11 +180,12 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-address">
                 <span className={styles.labelIcon}>📍</span>
                 Адреса
               </label>
               <textarea
+                id="contacts-address"
                 value={contacts.address}
                 onChange={(e) => handleInputChange("address", e.target.value)}
                 className={styles.textarea}
@@ -192,11 +196,15 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label
+                className={styles.inputLabel}
+                htmlFor="contacts-working-hours"
+              >
                 <span className={styles.labelIcon}>🕒</span>
                 Режим роботи
               </label>
               <input
+                id="contacts-working-hours"
                 type="text"
                 value={contacts.workingHours}
                 onChange={(e) =>
@@ -209,11 +217,15 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label
+                className={styles.inputLabel}
+                htmlFor="contacts-service-area"
+              >
                 <span className={styles.labelIcon}>🌐</span>
                 Зона обслуговування
               </label>
               <input
+                id="contacts-service-area"
                 type="text"
                 value={contacts.serviceArea}
                 onChange={(e) =>
@@ -225,32 +237,30 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-whatsapp">
                 <span className={styles.labelIcon}>💬</span>
                 WhatsApp
               </label>
               <input
+                id="contacts-whatsapp"
                 type="url"
                 value={contacts.whatsapp || ""}
-                onChange={(e) =>
-                  handleInputChange("whatsapp", e.target.value)
-                }
+                onChange={(e) => handleInputChange("whatsapp", e.target.value)}
                 className={styles.input}
                 placeholder="https://wa.me/380931234567"
               />
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-telegram">
                 <span className={styles.labelIcon}>✈️</span>
                 Telegram (пряме повідомлення)
               </label>
               <input
+                id="contacts-telegram"
                 type="url"
                 value={contacts.telegram || ""}
-                onChange={(e) =>
-                  handleInputChange("telegram", e.target.value)
-                }
+                onChange={(e) => handleInputChange("telegram", e.target.value)}
                 className={styles.input}
                 placeholder="https://t.me/zhyrafyk_bot"
               />
@@ -265,11 +275,12 @@ const AdminContactsPage = () => {
             </h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-facebook">
                 <span className={styles.labelIcon}>📘</span>
                 Facebook
               </label>
               <input
+                id="contacts-facebook"
                 type="url"
                 value={contacts.socialMedia.facebook || ""}
                 onChange={(e) =>
@@ -281,11 +292,12 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label className={styles.inputLabel} htmlFor="contacts-instagram">
                 <span className={styles.labelIcon}>📷</span>
                 Instagram
               </label>
               <input
+                id="contacts-instagram"
                 type="url"
                 value={contacts.socialMedia.instagram || ""}
                 onChange={(e) =>
@@ -297,11 +309,15 @@ const AdminContactsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label
+                className={styles.inputLabel}
+                htmlFor="contacts-social-telegram"
+              >
                 <span className={styles.labelIcon}>✈️</span>
                 Telegram
               </label>
               <input
+                id="contacts-social-telegram"
                 type="url"
                 value={contacts.socialMedia.telegram || ""}
                 onChange={(e) =>
@@ -347,7 +363,11 @@ const AdminContactsPage = () => {
                 {contacts.whatsapp && (
                   <p>
                     <strong>💬 WhatsApp:</strong>
-                    <a href={contacts.whatsapp} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={contacts.whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Посилання
                     </a>
                   </p>
@@ -355,7 +375,11 @@ const AdminContactsPage = () => {
                 {contacts.telegram && (
                   <p>
                     <strong>✈️ Telegram:</strong>
-                    <a href={contacts.telegram} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={contacts.telegram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Посилання
                     </a>
                   </p>
@@ -411,7 +435,7 @@ const AdminContactsPage = () => {
                 Збереження...
               </>
             ) : (
-              <>💾 Зберегти контакти</>
+              "💾 Зберегти контакти"
             )}
           </button>
         </div>

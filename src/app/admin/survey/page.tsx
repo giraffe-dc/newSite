@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import styles from "@/styles/admin/AdminSurveyResponses.module.css";
 
@@ -25,11 +25,7 @@ export default function Survey() {
     ...new Set(responses.map((r) => ({ id: r.newsId, title: r.newsTitle }))),
   ].filter((v, i, a) => a.findIndex((t) => t.id === v.id) === i);
 
-  useEffect(() => {
-    fetchResponses();
-  }, []);
-
-  const fetchResponses = async (newsId?: string) => {
+  const fetchResponses = useCallback(async (newsId?: string) => {
     try {
       setLoading(true);
       const url = `/api/admin/survey/responses${
@@ -50,7 +46,11 @@ export default function Survey() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchResponses();
+  }, [fetchResponses]);
 
   const handleNewsFilter = (newsId: string) => {
     setSelectedNewsId(newsId);
@@ -73,12 +73,10 @@ export default function Survey() {
       Новина: response.newsTitle,
       Питання: response.surveyQuestion,
       "Дата відповіді": formatDate(response.createdAt),
-      ...response.surveyFields.reduce(
-        (acc, field) => ({
-          ...acc,
-          [field.label]: response.answers[field.id] || "—",
-        }),
-        {},
+      ...Object.fromEntries(
+        response.surveyFields.map(
+          (field) => [field.label, response.answers[field.id] || "—"] as const,
+        ),
       ),
     }));
 
@@ -107,7 +105,11 @@ export default function Survey() {
     return (
       <div className={styles.error}>
         <p>{error}</p>
-        <button onClick={() => fetchResponses()} className={styles.retryButton}>
+        <button
+          type="button"
+          onClick={() => fetchResponses()}
+          className={styles.retryButton}
+        >
           Спробувати знову
         </button>
       </div>
@@ -120,6 +122,7 @@ export default function Survey() {
         <div className={styles.titleContainer}>
           <h1 className={styles.title}>Відповіді на опитування</h1>
           <button
+            type="button"
             onClick={handleExportToExcel}
             className={styles.exportButton}
             disabled={responses.length === 0}

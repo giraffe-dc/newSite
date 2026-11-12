@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest) {
     const db = client.db("zhyrafyk");
 
     // Явно видаляємо _id, щоб уникнути помилки
-    delete (priceData as { _id?: any })._id;
+    delete (priceData as { _id?: unknown })._id;
 
     await db
       .collection("prices")

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import styles from "@/styles/admin/AdminNews.module.css";
-import { Survey, SurveyField } from "@/types";
+import type { Survey, SurveyField } from "@/types";
 
 interface SurveyFormProps {
   survey?: Survey;
@@ -17,7 +18,7 @@ export const SurveyForm: React.FC<SurveyFormProps> = ({
   onValidityChange,
   onRemove,
 }) => {
-  const [question, setQuestion] = useState(survey?.question || "");
+  const [question, _setQuestion] = useState(survey?.question || "");
   const [fields, setFields] = useState<SurveyField[]>(
     survey?.fields || [{ id: "1", label: "" }],
   );
@@ -83,7 +84,7 @@ export const SurveyForm: React.FC<SurveyFormProps> = ({
 
       <div className={styles.surveyContent}>
         <div className={styles.optionsSection}>
-          <label className={styles.inputLabel}>Поля форми опитування</label>
+          <span className={styles.inputLabel}>Поля форми опитування</span>
           {fields.map((field) => (
             <div key={field.id} className={styles.optionItem}>
               <input
@@ -113,10 +114,11 @@ export const SurveyForm: React.FC<SurveyFormProps> = ({
 
         <div className={styles.surveySettings}>
           <div className={styles.inputGroup}>
-            <label className={styles.inputLabel}>
+            <label className={styles.inputLabel} htmlFor="survey-end-date">
               Дата закінчення опитування
             </label>
             <input
+              id="survey-end-date"
               type="date"
               value={endDate}
               onChange={(e) => {

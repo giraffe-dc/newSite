@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "@/styles/SurveyVote.module.css";
+import type { Survey, SurveyField } from "@/types";
 
 interface Props {
-  survey?: any;
+  survey?: Survey;
   newsId?: string;
 }
 
 function SurveyFreeForm({ survey, newsId }: Props) {
-  const fields = (survey && survey.fields) || [];
+  const fields: SurveyField[] = survey?.fields || [];
   const initial: Record<string, string> = {};
-  fields.forEach((f: any) => {
+  fields.forEach((f) => {
     initial[f.id] = "";
   });
 
@@ -43,7 +44,7 @@ function SurveyFreeForm({ survey, newsId }: Props) {
         const err = await res.json();
         setMessage(err.error || "Помилка");
       }
-    } catch (err) {
+    } catch (_err) {
       setMessage("Помилка відправки");
     } finally {
       setSubmitting(false);
@@ -59,16 +60,22 @@ function SurveyFreeForm({ survey, newsId }: Props) {
           <div className={styles.endDate}>
             {new Date(survey.endDate) < new Date()
               ? "⌛ Опитування завершено"
-              : "⏳ до " + new Date(survey.endDate).toLocaleDateString()}
+              : `⏳ до ${new Date(survey.endDate).toLocaleDateString()}`}
           </div>
         )}
       </div>
 
       <div className={styles.options}>
-        {fields.map((f: any) => (
+        {fields.map((f) => (
           <div key={f.id} className={styles.optionItem}>
-            <label className={styles.optionText}>{f.label}</label>
+            <label
+              className={styles.optionText}
+              htmlFor={`survey-field-${f.id}`}
+            >
+              {f.label}
+            </label>
             <input
+              id={`survey-field-${f.id}`}
               type="text"
               value={values[f.id] || ""}
               onChange={(e) => handleChange(f.id, e.target.value)}
@@ -83,6 +90,7 @@ function SurveyFreeForm({ survey, newsId }: Props) {
         {survey?.endDate && new Date(survey.endDate) > new Date()
           ? !submit && (
               <button
+                type="button"
                 className={styles.voteButton}
                 onClick={handleSubmit}
                 disabled={submitting}

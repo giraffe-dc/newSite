@@ -1,7 +1,8 @@
+import type { Document } from "mongodb";
+import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { sendTelegramMessageSurvey } from "@/lib/utils";
-import { ObjectId } from "mongodb";
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
 
     console.log("Received newsId:", newsId, typeof newsId);
 
-    let news;
+    let news: Document | null = null;
     try {
       console.log("Looking up by ObjectId:", newsId);
       const objId = new ObjectId(newsId);
@@ -38,8 +39,7 @@ export async function POST(req: Request) {
     );
     // Accept both choice-based (options) and free-form (fields) surveys
     const hasSurvey = !!(
-      news &&
-      news.survey &&
+      news?.survey &&
       (Array.isArray(news.survey.fields) || Array.isArray(news.survey.options))
     );
 

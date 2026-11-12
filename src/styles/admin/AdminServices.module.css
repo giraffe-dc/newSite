@@ -130,7 +130,6 @@
 .fieldGroup textarea:focus {
   outline: none;
   border-color: #10b981;
-  ring: 2px;
 }
 
 .formActions {

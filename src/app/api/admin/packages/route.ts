@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,7 +37,7 @@ export async function PUT(request: NextRequest) {
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
 
-    delete (packageData as { _id?: any })._id;
+    delete (packageData as { _id?: unknown })._id;
 
     await db
       .collection("packages")

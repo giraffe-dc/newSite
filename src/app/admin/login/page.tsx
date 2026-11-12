@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
 import styles from "@/styles/admin/AdminLogin.module.css";
 
 const AdminLoginPage = () => {
@@ -32,7 +33,7 @@ const AdminLoginPage = () => {
         const data = await response.json();
         setError(data.error || "Помилка входу");
       }
-    } catch (error) {
+    } catch (_error) {
       setError("Помилка підключення до сервера");
     } finally {
       setLoading(false);
@@ -110,7 +111,7 @@ const AdminLoginPage = () => {
                   Вхід...
                 </>
               ) : (
-                <>🚀 Увійти</>
+                "🚀 Увійти"
               )}
             </button>
           </form>

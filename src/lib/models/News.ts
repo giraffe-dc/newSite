@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { type Document, Schema } from "mongoose";
 
 export interface INews extends Document {
   title: string;
@@ -61,4 +61,5 @@ const NewsSchema: Schema = new Schema(
   { timestamps: true },
 );
 
-export default mongoose.models.News || mongoose.model<INews>("News", NewsSchema, "news");
+export default mongoose.models.News ||
+  mongoose.model<INews>("News", NewsSchema, "news");

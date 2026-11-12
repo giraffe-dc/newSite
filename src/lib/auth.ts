@@ -10,14 +10,24 @@ export async function hashPassword(password: string) {
   return bcrypt.hash(password, 12);
 }
 
-export function generateToken(payload: any) {
-  return jwt.sign(payload, process.env.NEXTAUTH_SECRET!, { expiresIn: "1h" });
+function getJwtSecret(): string {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    // Previously `process.env.NEXTAUTH_SECRET!`; both sign/verify fail without a
+    // secret, so throwing here keeps the same observable behaviour.
+    throw new Error("NEXTAUTH_SECRET is not defined");
+  }
+  return secret;
+}
+
+export function generateToken(payload: object) {
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: "1h" });
 }
 
 export function verifyToken(token: string) {
   try {
-    return jwt.verify(token, process.env.NEXTAUTH_SECRET!);
-  } catch (error) {
+    return jwt.verify(token, getJwtSecret());
+  } catch (_error) {
     return null;
   }
 }

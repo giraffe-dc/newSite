@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 
 // GET all categories
 export async function GET(request: NextRequest) {

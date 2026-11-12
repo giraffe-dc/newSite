@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { ObjectId } from "mongodb";
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,7 +42,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Явно видаляємо _id, щоб уникнути помилки
-    delete (newsData as { _id?: any })._id;
+    delete (newsData as { _id?: unknown })._id;
 
     const client = await clientPromise;
     const db = client.db("zhyrafyk");

@@ -1,5 +1,5 @@
-export class StatsService {
-  static async getDashboardStats() {
+export const StatsService = {
+  async getDashboardStats() {
     const clientPromise = (await import("../mongodb")).default;
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
@@ -85,5 +85,5 @@ export class StatsService {
       bookingsTotal,
       bookingsPerDay,
     };
-  }
-}
+  },
+};

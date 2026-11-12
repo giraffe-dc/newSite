@@ -5,7 +5,6 @@ import type { SectionData } from "@/lib/siteContent";
 import BookingSection from "./BookingSection";
 import CasePicker from "./CasePicker";
 import { DATE_SLOTS } from "./content";
-import DateChecker from "./DateChecker";
 import Hero from "./Hero";
 import PromisesSection from "./PromisesSection";
 import ReviewsSection from "./ReviewsSection";
@@ -42,7 +41,7 @@ export default function Home({
   book,
   contacts,
 }: HomeProps) {
-  const [date, setDate] = useState<string>(DATE_SLOTS[1].iso);
+  const [date, _setDate] = useState<string>(DATE_SLOTS[1].iso);
   const [service, setService] = useState<string>(
     cases[0]?.service ?? homeServiceOptions[0] ?? "",
   );
@@ -54,7 +53,7 @@ export default function Home({
       <CasePicker cases={cases} service={service} onPick={setService} />
       <PromisesSection promises={promises} trust={trust} />
       <ReviewsSection reviews={reviews} homeReviewIndexes={homeReviewIndexes} />
-      <DateChecker date={date} onPick={setDate} />
+      {/* <DateChecker date={date} onPick={setDate} /> */}
       <BookingSection
         date={date}
         service={service}

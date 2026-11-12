@@ -1,7 +1,6 @@
 import type { SectionData } from "@/lib/siteContent";
 import BookingForm from "./BookingForm";
 import { BOOK, CONTACTS } from "./content";
-import { longDateLabel } from "./dates";
 
 export default function BookingSection({
   date,
@@ -28,12 +27,12 @@ export default function BookingSection({
         <div className="m2-book">
           <div>
             <h2 id="book-title">{book.title}</h2>
-            {date && (
+            {/* {date && (
               <div className="m2-slot">
                 Обрана дата: <b>{longDateLabel(date)}</b> · відповідаємо за
                 годину
               </div>
-            )}
+            )} */}
             <p className="m2-book__side">{book.side}</p>
             <div className="m2-contacts">
               <div>

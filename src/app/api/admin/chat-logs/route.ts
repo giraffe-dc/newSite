@@ -1,12 +1,10 @@
-import { NextResponse } from 'next/server'
-import clientPromise from '@/lib/mongodb'
+import { NextResponse } from "next/server";
+import clientPromise from "@/lib/mongodb";
 
-export const dynamic = 'force-dynamic'
-
-
+export const dynamic = "force-dynamic";
 
 function unauthorized() {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
 /**
@@ -23,50 +21,57 @@ function unauthorized() {
  * Example: /api/admin/chat-logs?key=YOUR_KEY&limit=20&from=2025-01-01
  */
 export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url)
+  const { searchParams } = new URL(req.url);
 
-    // Auth — simple API key check
-    const key = searchParams.get('key')
-    const API_KEY = process.env.NOTIFICATIONS_API_KEY
+  // Auth — simple API key check
+  const key = searchParams.get("key");
+  const API_KEY = process.env.NOTIFICATIONS_API_KEY;
 
-    if (!key || key !== API_KEY) {
-        return unauthorized()
+  if (!key || key !== API_KEY) {
+    return unauthorized();
+  }
+
+  const limit = Math.min(Number(searchParams.get("limit")) || 50, 200);
+  const deviceId = searchParams.get("deviceId");
+  const sessionId = searchParams.get("sessionId");
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+
+  try {
+    const client = await clientPromise;
+    const db = client.db("zhyrafyk");
+
+    const filter: {
+      deviceId?: string;
+      sessionId?: string;
+      createdAt?: { $gte?: Date; $lte?: Date };
+    } = {};
+    if (deviceId) filter.deviceId = deviceId;
+    if (sessionId) filter.sessionId = sessionId;
+    if (from || to) {
+      filter.createdAt = {};
+      if (from) filter.createdAt.$gte = new Date(from);
+      if (to) filter.createdAt.$lte = new Date(to);
     }
 
-    const limit = Math.min(Number(searchParams.get('limit')) || 50, 200)
-    const deviceId = searchParams.get('deviceId')
-    const sessionId = searchParams.get('sessionId')
-    const from = searchParams.get('from')
-    const to = searchParams.get('to')
+    const logs = await db
+      .collection("chat_logs")
+      .find(filter)
+      .sort({ updatedAt: -1 })
+      .limit(limit)
+      .toArray();
 
-    try {
-        const client = await clientPromise
-        const db = client.db('zhyrafyk')
-
-        const filter: any = {}
-        if (deviceId) filter.deviceId = deviceId
-        if (sessionId) filter.sessionId = sessionId
-        if (from || to) {
-            filter.createdAt = {}
-            if (from) filter.createdAt.$gte = new Date(from)
-            if (to) filter.createdAt.$lte = new Date(to)
-        }
-
-        const logs = await db
-            .collection('chat_logs')
-            .find(filter)
-            .sort({ updatedAt: -1 })
-            .limit(limit)
-            .toArray()
-
-        return NextResponse.json({
-            total: logs.length,
-            logs,
-        })
-    } catch (error) {
-        console.error('Chat logs error:', error)
-        return NextResponse.json({ error: 'Failed to fetch chat logs' }, { status: 500 })
-    }
+    return NextResponse.json({
+      total: logs.length,
+      logs,
+    });
+  } catch (error) {
+    console.error("Chat logs error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch chat logs" },
+      { status: 500 },
+    );
+  }
 }
 
 /**
@@ -75,30 +80,33 @@ export async function GET(req: Request) {
  * Delete a specific session or all logs (if no sessionId)
  */
 export async function DELETE(req: Request) {
-    const { searchParams } = new URL(req.url)
+  const { searchParams } = new URL(req.url);
 
-    const key = searchParams.get('key')
-    const API_KEY = process.env.NOTIFICATIONS_API_KEY
-    if (!key || key !== API_KEY) {
-        return unauthorized()
+  const key = searchParams.get("key");
+  const API_KEY = process.env.NOTIFICATIONS_API_KEY;
+  if (!key || key !== API_KEY) {
+    return unauthorized();
+  }
+
+  const sessionId = searchParams.get("sessionId");
+
+  try {
+    const client = await clientPromise;
+    const db = client.db("zhyrafyk");
+
+    if (sessionId) {
+      await db.collection("chat_logs").deleteOne({ sessionId });
+      return NextResponse.json({ deleted: sessionId });
     }
 
-    const sessionId = searchParams.get('sessionId')
-
-    try {
-        const client = await clientPromise
-        const db = client.db('zhyrafyk')
-
-        if (sessionId) {
-            await db.collection('chat_logs').deleteOne({ sessionId })
-            return NextResponse.json({ deleted: sessionId })
-        }
-
-        // Delete all logs
-        const result = await db.collection('chat_logs').deleteMany({})
-        return NextResponse.json({ deletedCount: result.deletedCount })
-    } catch (error) {
-        console.error('Delete chat logs error:', error)
-        return NextResponse.json({ error: 'Failed to delete chat logs' }, { status: 500 })
-    }
+    // Delete all logs
+    const result = await db.collection("chat_logs").deleteMany({});
+    return NextResponse.json({ deletedCount: result.deletedCount });
+  } catch (error) {
+    console.error("Delete chat logs error:", error);
+    return NextResponse.json(
+      { error: "Failed to delete chat logs" },
+      { status: 500 },
+    );
+  }
 }

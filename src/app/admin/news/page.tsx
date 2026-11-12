@@ -1,14 +1,16 @@
 // src/app/admin/news/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import styles from "@/styles/admin/AdminNews.module.css";
+import type React from "react";
+import type { FC } from "react";
+import { useCallback, useEffect, useState } from "react";
+import SurveyForm from "@/components/admin/SurveyForm";
 import {
   extractGoogleDriveFileId,
   getGoogleDriveImageUrl,
 } from "@/lib/googleDrive";
-import SurveyForm from "@/components/admin/SurveyForm";
-import type { FC } from "react";
+import styles from "@/styles/admin/AdminNews.module.css";
+
 type SurveyFormProps = {
   survey: Survey;
   onChange: (survey: Survey) => void;
@@ -16,7 +18,8 @@ type SurveyFormProps = {
   onRemove: () => void;
 };
 const SurveyFormTyped = SurveyForm as unknown as FC<SurveyFormProps>;
-import { NewsItem, Survey } from "@/types";
+
+import type { NewsItem, Survey } from "@/types";
 
 const AdminNewsPage = () => {
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -38,11 +41,7 @@ const AdminNewsPage = () => {
     survey: undefined,
   });
   // console.log(formData);
-  useEffect(() => {
-    fetchNews();
-  }, []);
-
-  const fetchNews = async () => {
+  const fetchNews = useCallback(async () => {
     try {
       const response = await fetch("/api/data/news");
       if (response.ok) {
@@ -55,7 +54,11 @@ const AdminNewsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchNews();
+  }, [fetchNews]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +88,7 @@ const AdminNewsPage = () => {
       } else {
         setMessage("Помилка збереження");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка підключення");
     }
   };
@@ -129,7 +132,7 @@ const AdminNewsPage = () => {
       } else {
         setMessage("Помилка видалення");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка підключення");
     }
   };
@@ -175,6 +178,7 @@ const AdminNewsPage = () => {
         </h1>
         <div className={styles.headerActions}>
           <button
+            type="button"
             onClick={() => setShowAddForm(!showAddForm)}
             className={styles.addButton}
           >
@@ -185,8 +189,9 @@ const AdminNewsPage = () => {
 
       {message && (
         <div
-          className={`${styles.message} ${message.includes("!") ? styles.success : styles.error
-            }`}
+          className={`${styles.message} ${
+            message.includes("!") ? styles.success : styles.error
+          }`}
         >
           <span className={styles.messageIcon}>
             {message.includes("!") ? "✅" : "❌"}
@@ -205,8 +210,11 @@ const AdminNewsPage = () => {
           <form onSubmit={handleSubmit} className={styles.newsForm}>
             <div className={styles.formGrid}>
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Заголовок</label>
+                <label className={styles.inputLabel} htmlFor="news-title">
+                  Заголовок
+                </label>
                 <input
+                  id="news-title"
                   type="text"
                   value={formData.title}
                   onChange={(e) =>
@@ -222,7 +230,7 @@ const AdminNewsPage = () => {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Тип</label>
+                <span className={styles.inputLabel}>Тип</span>
                 <div className={styles.typeSelector}>
                   <label className={styles.radioLabel}>
                     <input
@@ -260,8 +268,11 @@ const AdminNewsPage = () => {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Дата</label>
+                <label className={styles.inputLabel} htmlFor="news-date">
+                  Дата
+                </label>
                 <input
+                  id="news-date"
                   type="date"
                   value={formData.date}
                   onChange={(e) =>
@@ -276,9 +287,12 @@ const AdminNewsPage = () => {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Зображення (URL)</label>
+                <label className={styles.inputLabel} htmlFor="news-image-url">
+                  Зображення (URL)
+                </label>
                 <div className={styles.imageEditor}>
                   <input
+                    id="news-image-url"
                     type="url"
                     value={imageInput}
                     onChange={(e) => setImageInput(e.target.value)}
@@ -310,13 +324,13 @@ const AdminNewsPage = () => {
                             } else {
                               invalid.push(c);
                             }
-                          } catch (err) {
+                          } catch (_err) {
                             invalid.push(c);
                           }
                         });
                         if (invalid.length) {
                           setImageError(
-                            "Деякі URL некоректні: " + invalid.join(", "),
+                            `Деякі URL некоректні: ${invalid.join(", ")}`,
                           );
                         } else {
                           setFormData({
@@ -372,7 +386,9 @@ const AdminNewsPage = () => {
                 {formData.images && formData.images.length > 0 && (
                   <div className={styles.imageList}>
                     {formData.images.map((img, idx) => (
+                      // biome-ignore lint/suspicious/noArrayIndexKey: прості рядки URL без id, редагування на місці за індексом
                       <div key={idx} className={styles.imageItem}>
+                        {/* biome-ignore lint/performance/noImgElement: динамічні віддалені URL, розміри керуються CSS; next/image потребує width/height і конфігу remotePatterns */}
                         <img
                           src={resolveImageSrc(img)}
                           alt={`preview-${idx}`}
@@ -411,8 +427,11 @@ const AdminNewsPage = () => {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>Контент</label>
+              <label className={styles.inputLabel} htmlFor="news-content">
+                Контент
+              </label>
               <textarea
+                id="news-content"
                 value={formData.content}
                 onChange={(e) =>
                   setFormData({
@@ -526,6 +545,7 @@ const AdminNewsPage = () => {
               <article key={item._id || index} className={styles.newsCard}>
                 {item.images && item.images.length > 0 && (
                   <div className={styles.cardImage}>
+                    {/* biome-ignore lint/performance/noImgElement: динамічні віддалені URL, верстка картки розрахована на <img> без fixed width/height */}
                     <img
                       src={resolveImageSrc(item.images[0])}
                       alt={item.title}
@@ -565,18 +585,20 @@ const AdminNewsPage = () => {
                   </p>
 
                   <div className={styles.newsMetaRow}>
-                    <span>{(item.images && item.images.length) || 0} фото</span>
+                    <span>{item.images?.length || 0} фото</span>
                   </div>
 
                   <div className={styles.cardActions}>
                     <button
+                      type="button"
                       onClick={() => handleEdit(item)}
                       className={styles.editButton}
                     >
                       ✏️ Редагувати
                     </button>
                     <button
-                      onClick={() => handleDelete(item._id!)}
+                      type="button"
+                      onClick={() => item._id && handleDelete(item._id)}
                       className={styles.deleteButton}
                     >
                       🗑️ Видалити
@@ -599,6 +621,7 @@ const AdminNewsPage = () => {
 
       <div className={styles.formActions}>
         <button
+          type="button"
           onClick={() => router.push("/admin")}
           className={styles.backButton}
         >

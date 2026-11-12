@@ -18,7 +18,7 @@ export async function GET() {
       .sort({ priority: -1, startDate: -1, _id: -1 })
       .toArray();
     return NextResponse.json(offers);
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json(
       { error: "Failed to fetch offers" },
       { status: 500 },

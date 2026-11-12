@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { SectionData } from "@/lib/siteContent";
-import Board from "./Board";
 import { BOOK_HREF, CONTACTS, HERO } from "./content";
 
 export default function Hero({

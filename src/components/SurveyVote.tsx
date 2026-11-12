@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Survey } from "@/types";
+import type React from "react";
+import { useEffect, useState } from "react";
 import styles from "@/styles/SurveyVote.module.css";
+import type { Survey } from "@/types";
 
 interface SurveyVoteProps {
   survey: Survey;
@@ -73,7 +74,7 @@ export const SurveyVote: React.FC<SurveyVoteProps> = ({
           <div className={styles.endDate}>
             {isExpired
               ? "⌛ Опитування завершено"
-              : "⏳ до " + new Date(survey.endDate).toLocaleDateString()}
+              : `⏳ до ${new Date(survey.endDate).toLocaleDateString()}`}
           </div>
         )}
       </div>
@@ -81,6 +82,7 @@ export const SurveyVote: React.FC<SurveyVoteProps> = ({
       <div className={styles.options}>
         {survey.options.map((option) => (
           <button
+            type="button"
             key={option.id}
             className={`${styles.option} ${
               selectedOptions.includes(option.id) ? styles.selected : ""
@@ -110,6 +112,7 @@ export const SurveyVote: React.FC<SurveyVoteProps> = ({
 
       {!hasVoted && !showResults && !isExpired && (
         <button
+          type="button"
           className={styles.voteButton}
           onClick={handleVote}
           disabled={selectedOptions.length === 0}

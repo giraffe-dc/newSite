@@ -1,7 +1,7 @@
 // src/app/admin/packages/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminPackages.module.css";
 
 interface ServicePackage {
@@ -35,15 +35,13 @@ const AdminPackagesPage = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [newPackage, setNewPackage] = useState<ServicePackage>(newPackageInitialState);
+  const [newPackage, setNewPackage] = useState<ServicePackage>(
+    newPackageInitialState,
+  );
   const [newInclude, setNewInclude] = useState("");
   const router = useRouter();
 
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  const fetchPackages = async () => {
+  const fetchPackages = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/data/packages");
@@ -57,9 +55,13 @@ const AdminPackagesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleInputChange = (
+  useEffect(() => {
+    fetchPackages();
+  }, [fetchPackages]);
+
+  const _handleInputChange = (
     index: number,
     field: keyof ServicePackage,
     value: string,
@@ -111,7 +113,7 @@ const AdminPackagesPage = () => {
         setMessage("Статус оновлено");
         setTimeout(() => setMessage(""), 3000);
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка оновлення");
     } finally {
       setSaving(false);
@@ -137,7 +139,7 @@ const AdminPackagesPage = () => {
       } else {
         setMessage("Помилка створення пакету");
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка з'єднання");
     } finally {
       setSaving(false);
@@ -159,7 +161,7 @@ const AdminPackagesPage = () => {
       } else {
         setMessage("Помилка видалення пакету");
       }
-    } catch (e) {
+    } catch (_e) {
       setMessage("Помилка з'єднання");
     } finally {
       setSaving(false);
@@ -215,20 +217,20 @@ const AdminPackagesPage = () => {
           <h2>Новий пакет свят</h2>
           <div className={styles.formGrid}>
             <div className={styles.fieldGroup}>
-              <label>Назва пакету</label>
+              <label htmlFor="pkg-name">Назва пакету</label>
               <input
+                id="pkg-name"
                 type="text"
                 value={newPackage.name}
-                onChange={(e) =>
-                  handleNewPackageChange("name", e.target.value)
-                }
+                onChange={(e) => handleNewPackageChange("name", e.target.value)}
                 placeholder="Наприклад, Базове свято"
                 required
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>Ціна</label>
+              <label htmlFor="pkg-price">Ціна</label>
               <input
+                id="pkg-price"
                 type="text"
                 value={newPackage.price}
                 onChange={(e) =>
@@ -238,8 +240,9 @@ const AdminPackagesPage = () => {
               />
             </div>
             <div className={styles.fieldGroup}>
-              <label>Тривалість</label>
+              <label htmlFor="pkg-duration">Тривалість</label>
               <input
+                id="pkg-duration"
                 type="text"
                 value={newPackage.duration}
                 onChange={(e) =>
@@ -249,8 +252,9 @@ const AdminPackagesPage = () => {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>Опис</label>
+              <label htmlFor="pkg-description">Опис</label>
               <textarea
+                id="pkg-description"
                 value={newPackage.description}
                 onChange={(e) =>
                   handleNewPackageChange("description", e.target.value)
@@ -260,9 +264,10 @@ const AdminPackagesPage = () => {
               />
             </div>
             <div className={`${styles.fieldGroup} ${styles.fullWidth}`}>
-              <label>Чого входить</label>
+              <label htmlFor="pkg-include-input">Чого входить</label>
               <div className={styles.includesList}>
                 {newPackage.includes.map((inc, idx) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: прості рядки без id, редагування на місці за індексом
                   <div key={idx} className={styles.includeItem}>
                     <span>{inc}</span>
                     <button
@@ -276,6 +281,7 @@ const AdminPackagesPage = () => {
                 ))}
                 <div className={styles.includeInput}>
                   <input
+                    id="pkg-include-input"
                     type="text"
                     value={newInclude}
                     onChange={(e) => setNewInclude(e.target.value)}
@@ -293,8 +299,9 @@ const AdminPackagesPage = () => {
               </div>
             </div>
             <div className={styles.fieldGroup}>
-              <label>Іконка (емодзі)</label>
+              <label htmlFor="pkg-icon">Іконка (емодзі)</label>
               <input
+                id="pkg-icon"
                 type="text"
                 value={newPackage.icon}
                 onChange={(e) => handleNewPackageChange("icon", e.target.value)}
@@ -335,7 +342,9 @@ const AdminPackagesPage = () => {
                 <div className={styles.packageInfo}>
                   <h3>{item.name}</h3>
                   {item.recommended && (
-                    <span className={styles.recommendedBadge}>⭐ Рекомендовано</span>
+                    <span className={styles.recommendedBadge}>
+                      ⭐ Рекомендовано
+                    </span>
                   )}
                 </div>
                 <div className={styles.statusBadge}>
@@ -353,12 +362,14 @@ const AdminPackagesPage = () => {
                 <strong>Увійшло:</strong>
                 <ul>
                   {item.includes.map((inc, idx) => (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: статичний список простих рядків без id
                     <li key={idx}>✓ {inc}</li>
                   ))}
                 </ul>
               </div>
               <div className={styles.cardActions}>
                 <button
+                  type="button"
                   onClick={() => handleToggleRecommended(item)}
                   disabled={saving}
                   className={styles.toggleButton}
@@ -366,6 +377,7 @@ const AdminPackagesPage = () => {
                   {item.recommended ? "Прибрати рекомендацію" : "Рекомендувати"}
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDeletePackage(item._id || "")}
                   disabled={saving}
                   className={styles.deleteButton}

@@ -61,9 +61,6 @@ export async function GET() {
     return NextResponse.json(faq);
   } catch (error) {
     console.error("Database error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch faq" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to fetch faq" }, { status: 500 });
   }
 }

@@ -1,7 +1,13 @@
+import type { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import { sendTelegramMessage } from "@/lib/utils";
 import type { SurveyVoteData } from "@/types";
+
+interface SurveyOption {
+  id: string;
+  text: string;
+}
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +21,7 @@ export async function POST(req: Request) {
 
     // Get the news item to verify survey exists and isn't expired
     const news = await db.collection("news").findOne({
-      _id: newsId as any,
+      _id: newsId as unknown as ObjectId,
       "survey.endDate": { $gt: new Date().toISOString() },
     });
 
@@ -27,7 +33,9 @@ export async function POST(req: Request) {
     }
 
     // Verify option IDs are valid
-    const validOptionIds = news.survey.options.map((opt: any) => opt.id);
+    const validOptionIds = news.survey.options.map(
+      (opt: SurveyOption) => opt.id,
+    );
     const invalidOptions = optionIds.filter(
       (id) => !validOptionIds.includes(id),
     );
@@ -58,11 +66,11 @@ export async function POST(req: Request) {
 
     // Update vote counts in the news document
     const updateOps = optionIds.map((optionId) => ({
-      ["survey.results.optionResults." + optionId]: 1,
+      [`survey.results.optionResults.${optionId}`]: 1,
     }));
 
     await db.collection("news").updateOne(
-      { _id: newsId as any },
+      { _id: newsId as unknown as ObjectId },
       {
         $inc: {
           "survey.results.totalVotes": 1,
@@ -77,21 +85,19 @@ export async function POST(req: Request) {
     // Fetch updated news to include in telegram message
     const updatedNews = await db
       .collection("news")
-      .findOne({ _id: newsId as any });
+      .findOne({ _id: newsId as unknown as ObjectId });
 
     try {
       if (updatedNews) {
         const chosenTexts = (news.survey.options || [])
-          .filter((o: any) => optionIds.includes(o.id))
-          .map((o: any) => o.text);
+          .filter((o: SurveyOption) => optionIds.includes(o.id))
+          .map((o: SurveyOption) => o.text);
         const msgLines = [
           `🔔 Новий голос в опитуванні`,
           `Тема: ${updatedNews.title || "—"}`,
           `Питання: ${news.survey.question}`,
           `Вибрано: ${chosenTexts.join(", ")}`,
-          `Всього голосів: ${
-            (updatedNews.survey?.results?.totalVotes as any) || ""
-          }`,
+          `Всього голосів: ${updatedNews.survey?.results?.totalVotes || ""}`,
         ];
         await sendTelegramMessage(msgLines.join("\n"));
       }

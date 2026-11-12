@@ -1,25 +1,26 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
-import styles from "@/styles/NewsPage.module.css";
+import Link from "next/link";
+import React from "react";
 import NewsSlider from "@/components/NewsSlider";
-import { SurveyVote } from "@/components/SurveyVote";
 import SurveyFreeForm from "@/components/SurveyFreeForm";
+import { SurveyVote } from "@/components/SurveyVote";
+import styles from "@/styles/NewsPage.module.css";
+import type { NewsItem } from "@/types";
 
 interface NewsPageClientProps {
-  news: any;
+  news: NewsItem;
   id: string;
 }
 
 const NewsPageClient: React.FC<NewsPageClientProps> = ({ news, id }) => {
   const [showResults, setShowResults] = React.useState(false);
-  const [results, setResults] = React.useState<Record<string, number> | undefined>(
-    news.survey?.results?.optionResults
-  );
+  const [results, setResults] = React.useState<
+    Record<string, number> | undefined
+  >(news.survey?.results?.optionResults);
   const [totalVotes, setTotalVotes] = React.useState<number | undefined>(
-    news.survey?.results?.totalVotes
+    news.survey?.results?.totalVotes,
   );
 
   const handleVote = async (optionIds: string[]) => {
@@ -32,7 +33,9 @@ const NewsPageClient: React.FC<NewsPageClientProps> = ({ news, id }) => {
 
       if (res.ok) {
         // Fetch fresh results
-        const r = await fetch(`/api/survey/results?newsId=${encodeURIComponent(id)}`);
+        const r = await fetch(
+          `/api/survey/results?newsId=${encodeURIComponent(id)}`,
+        );
         if (r.ok) {
           const data = await r.json();
           setResults(data.optionResults || {});
@@ -79,6 +82,7 @@ const NewsPageClient: React.FC<NewsPageClientProps> = ({ news, id }) => {
 
           <div className={styles.content}>
             {news.content.split("\n").map((para: string, i: number) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: абзаци статичного тексту — порядок і склад не змінюються
               <p key={i}>{para}</p>
             ))}
           </div>

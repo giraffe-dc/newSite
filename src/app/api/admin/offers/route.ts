@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
-import { verifyToken } from "@/lib/auth";
 import { ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
+import clientPromise from "@/lib/mongodb";
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       .sort({ priority: -1, startDate: -1, _id: -1 })
       .toArray();
     return NextResponse.json(offers);
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json(
       { error: "Failed to fetch offers" },
       { status: 500 },
@@ -44,9 +44,9 @@ export async function POST(request: NextRequest) {
       recommended: !!body.recommended,
       icon: body.icon || "🎁",
     };
-    const result = await db.collection("offers").insertOne(doc as any);
+    const result = await db.collection("offers").insertOne(doc);
     return NextResponse.json({ success: true, id: result.insertedId });
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json(
       { error: "Failed to create offer" },
       { status: 500 },
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest) {
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
-    const update: any = { ...rest };
+    const update: Record<string, unknown> = { ...rest };
     if (typeof update.priority !== "undefined") {
       update.priority = Number(update.priority);
     }
@@ -72,7 +72,7 @@ export async function PUT(request: NextRequest) {
       .collection("offers")
       .updateOne({ _id: new ObjectId(id) }, { $set: update });
     return NextResponse.json({ success: true });
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json(
       { error: "Failed to update offer" },
       { status: 500 },
@@ -92,7 +92,7 @@ export async function DELETE(request: NextRequest) {
     const db = client.db("zhyrafyk");
     await db.collection("offers").deleteOne({ _id: new ObjectId(id) });
     return NextResponse.json({ success: true });
-  } catch (e) {
+  } catch (_e) {
     return NextResponse.json(
       { error: "Failed to delete offer" },
       { status: 500 },

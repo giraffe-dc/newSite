@@ -1,3 +1,4 @@
+import type { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 
@@ -17,7 +18,7 @@ export async function GET(req: Request) {
 
     // Get the news item with survey results
     const news = await db.collection("news").findOne(
-      { _id: newsId as any },
+      { _id: newsId as unknown as ObjectId },
       {
         projection: {
           "survey.results": 1,

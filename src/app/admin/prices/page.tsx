@@ -1,7 +1,8 @@
 // src/app/admin/prices/page.tsx
 "use client";
-import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
 import styles from "@/styles/admin/AdminPrices.module.css";
 
 interface PriceItem {
@@ -53,9 +54,9 @@ const AdminPricesPage = () => {
   );
   const router = useRouter();
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  // useEffect(() => {
+  //   fetchData();
+  // }, [fetchData]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -120,7 +121,7 @@ const AdminPricesPage = () => {
       } else {
         setMessage("Помилка оновлення ціни");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка оновлення ціни");
     } finally {
       setSaving(false);
@@ -147,7 +148,7 @@ const AdminPricesPage = () => {
       } else {
         setMessage("Помилка створення ціни");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка створення ціни");
     } finally {
       setSaving(false);
@@ -191,7 +192,7 @@ const AdminPricesPage = () => {
       } else {
         setMessage("Помилка оновлення категорії");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка оновлення категорії");
     } finally {
       setSaving(false);
@@ -218,7 +219,7 @@ const AdminPricesPage = () => {
       } else {
         setMessage("Помилка створення категорії");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка створення категорії");
     } finally {
       setSaving(false);
@@ -248,7 +249,7 @@ const AdminPricesPage = () => {
       } else {
         setMessage("Помилка видалення категорії");
       }
-    } catch (error) {
+    } catch (_error) {
       setMessage("Помилка видалення категорії");
     } finally {
       setSaving(false);
@@ -282,6 +283,7 @@ const AdminPricesPage = () => {
           <span className={styles.titleIcon}>🏷️</span>Керування категоріями
         </h1>
         <button
+          type="button"
           onClick={() => setShowCategories(!showCategories)}
           className={styles.toggleFormButton}
         >
@@ -292,6 +294,7 @@ const AdminPricesPage = () => {
       {showCategories && (
         <div className={styles.categoriesSection}>
           <button
+            type="button"
             onClick={() => setShowCategoryForm(!showCategoryForm)}
             className={styles.addCategoryButton}
           >
@@ -341,7 +344,7 @@ const AdminPricesPage = () => {
                   onChange={(e) =>
                     handleNewCategoryChange(
                       "order",
-                      parseInt(e.target.value) || 0,
+                      parseInt(e.target.value, 10) || 0,
                     )
                   }
                   required
@@ -392,13 +395,14 @@ const AdminPricesPage = () => {
                     handleCategoryChange(
                       index,
                       "order",
-                      parseInt(e.target.value) || 0,
+                      parseInt(e.target.value, 10) || 0,
                     )
                   }
                   className={styles.input}
                 />
                 <div className={styles.categoryCardActions}>
                   <button
+                    type="button"
                     onClick={() => handleUpdateCategory(cat)}
                     disabled={saving}
                     className={styles.actionButton}
@@ -406,7 +410,10 @@ const AdminPricesPage = () => {
                     💾
                   </button>
                   <button
-                    onClick={() => handleDeleteCategory(cat._id!)}
+                    type="button"
+                    onClick={() => {
+                      if (cat._id) handleDeleteCategory(cat._id);
+                    }}
                     disabled={saving}
                     className={styles.actionButton}
                   >
@@ -425,6 +432,7 @@ const AdminPricesPage = () => {
           <span className={styles.titleIcon}>💰</span>Керування цінами
         </h1>
         <button
+          type="button"
           onClick={() => setShowAddForm(!showAddForm)}
           className={styles.toggleFormButton}
         >
@@ -436,8 +444,9 @@ const AdminPricesPage = () => {
         <div className={styles.addFormSection}>
           <form onSubmit={handleCreatePrice} className={styles.priceForm}>
             <div className={styles.inputGroup}>
-              <label>Назва</label>
+              <label htmlFor="price-new-name">Назва</label>
               <input
+                id="price-new-name"
                 type="text"
                 value={newPrice.name}
                 onChange={(e) => handleNewPriceChange("name", e.target.value)}
@@ -446,8 +455,9 @@ const AdminPricesPage = () => {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label>Ціна (грн)</label>
+              <label htmlFor="price-new-price">Ціна (грн)</label>
               <input
+                id="price-new-price"
                 type="text"
                 value={newPrice.price}
                 onChange={(e) => handleNewPriceChange("price", e.target.value)}
@@ -456,8 +466,9 @@ const AdminPricesPage = () => {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label>Тривалість</label>
+              <label htmlFor="price-new-duration">Тривалість</label>
               <input
+                id="price-new-duration"
                 type="text"
                 value={newPrice.duration}
                 onChange={(e) =>
@@ -468,8 +479,9 @@ const AdminPricesPage = () => {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label>Категорія</label>
+              <label htmlFor="price-new-category">Категорія</label>
               <select
+                id="price-new-category"
                 value={newPrice.category}
                 onChange={(e) =>
                   handleNewPriceChange("category", e.target.value)
@@ -485,8 +497,9 @@ const AdminPricesPage = () => {
               </select>
             </div>
             <div className={styles.inputGroupFullWidth}>
-              <label>Опис</label>
+              <label htmlFor="price-new-desc">Опис</label>
               <textarea
+                id="price-new-desc"
                 value={newPrice.description}
                 onChange={(e) =>
                   handleNewPriceChange("description", e.target.value)
@@ -497,8 +510,9 @@ const AdminPricesPage = () => {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label>Відео</label>
+              <label htmlFor="price-new-video">Відео</label>
               <input
+                id="price-new-video"
                 type="text"
                 value={newPrice.video}
                 onChange={(e) => handleNewPriceChange("video", e.target.value)}
@@ -523,8 +537,9 @@ const AdminPricesPage = () => {
           <div key={item._id || index} className={styles.priceCard}>
             <div className={styles.cardBody}>
               <div className={styles.inputGroup}>
-                <label>Назва</label>
+                <label htmlFor={`price-name-${index}`}>Назва</label>
                 <input
+                  id={`price-name-${index}`}
                   type="text"
                   value={item.name}
                   onChange={(e) =>
@@ -534,8 +549,9 @@ const AdminPricesPage = () => {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Ціна (грн)</label>
+                <label htmlFor={`price-cost-${index}`}>Ціна (грн)</label>
                 <input
+                  id={`price-cost-${index}`}
                   type="text"
                   value={item.price}
                   onChange={(e) =>
@@ -545,8 +561,9 @@ const AdminPricesPage = () => {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Тривалість</label>
+                <label htmlFor={`price-duration-${index}`}>Тривалість</label>
                 <input
+                  id={`price-duration-${index}`}
                   type="text"
                   value={item.duration}
                   onChange={(e) =>
@@ -556,8 +573,9 @@ const AdminPricesPage = () => {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Категорія</label>
+                <label htmlFor={`price-category-${index}`}>Категорія</label>
                 <select
+                  id={`price-category-${index}`}
                   value={item.category}
                   onChange={(e) =>
                     handleInputChange(index, "category", e.target.value)
@@ -572,8 +590,9 @@ const AdminPricesPage = () => {
                 </select>
               </div>
               <div className={styles.inputGroupFullWidth}>
-                <label>Опис</label>
+                <label htmlFor={`price-desc-${index}`}>Опис</label>
                 <textarea
+                  id={`price-desc-${index}`}
                   value={item.description}
                   onChange={(e) =>
                     handleInputChange(index, "description", e.target.value)
@@ -583,8 +602,9 @@ const AdminPricesPage = () => {
                 />
               </div>
               <div className={styles.inputGroupFullWidth}>
-                <label>Відео</label>
+                <label htmlFor={`price-video-${index}`}>Відео</label>
                 <input
+                  id={`price-video-${index}`}
                   type="text"
                   value={item.video}
                   onChange={(e) =>
@@ -596,6 +616,7 @@ const AdminPricesPage = () => {
             </div>
             <div className={styles.cardActions}>
               <button
+                type="button"
                 onClick={() => handleUpdatePrice(item)}
                 disabled={saving}
                 className={styles.saveButton}
@@ -609,6 +630,7 @@ const AdminPricesPage = () => {
 
       <div className={styles.formActions}>
         <button
+          type="button"
           onClick={() => router.push("/admin")}
           className={styles.backButton}
         >
