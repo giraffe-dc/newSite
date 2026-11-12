@@ -1,4 +1,13 @@
-import type { INews } from "../models/News";
+/** Документ новини колекції `news` (нативний драйвер mongodb;
+ *  mongoose-модель прибрано в етапі 5 — див. план, п. 3). */
+export interface INews {
+  title: string;
+  content: string;
+  date?: Date | string;
+  type?: "news" | "event";
+  image?: string;
+  images?: string[];
+}
 
 export const NewsService = {
   async getAll() {

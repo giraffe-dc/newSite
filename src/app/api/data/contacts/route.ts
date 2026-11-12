@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { SECTION_DEFAULTS } from "@/lib/sectionDefaults";
 
 export async function GET() {
   try {
@@ -8,13 +9,13 @@ export async function GET() {
     const contacts = await db.collection("contacts").findOne({});
 
     if (!contacts) {
-      // Демо-контакти макета №2. Після підключення адмінки їх замінять
-      // реальними значеннями з колекції contacts.
+      // Документа немає → дефолти з content.ts (те саме джерело, що й на
+      // сайті через site_content); демо-контакти макета прибрано (етап 5).
+      const c = SECTION_DEFAULTS.contacts.contacts;
       return NextResponse.json({
-        phone: "+38 (000) 000-00-00",
-        email: "hello@girafik.example",
-        workingHours: "Щодня з 9:00 до 21:00",
-        serviceArea: "Місто й область до 50 км без доплати, далі 15 грн/км",
+        phone: c.phone,
+        email: c.email,
+        workingHours: c.hours,
         whatsapp: "",
         telegram: "",
         socialMedia: {},

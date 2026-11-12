@@ -61,25 +61,11 @@ const AdminDashboard = () => {
 
   const dashboardCards = [
     {
-      title: "Головна сторінка",
-      description: "Редагування контенту головної сторінки",
-      icon: "🏠",
-      href: "/admin/home",
+      title: "Контент сайту",
+      description: "Редактор усіх секцій сайту: головна, послуги, ціни, FAQ",
+      icon: "📝",
+      href: "/admin/content",
       color: "var(--primary-orange)",
-    },
-    {
-      title: "Особливості",
-      description: "Керування особливостями на головній сторінці",
-      icon: "✨",
-      href: "/admin/features",
-      color: "var(--primary-purple)",
-    },
-    {
-      title: "Ціни",
-      description: "Керування цінами на послуги",
-      icon: "💰",
-      href: "/admin/prices",
-      color: "var(--primary-green)",
     },
     {
       title: "Новини",
@@ -249,7 +235,7 @@ const AdminDashboard = () => {
           <Link href="/admin/news" className={styles.actionButton}>
             ➕ Додати новину
           </Link>
-          <Link href="/admin/prices" className={styles.actionButton}>
+          <Link href="/admin/content" className={styles.actionButton}>
             💰 Оновити ціни
           </Link>
           <Link href="/admin/orders" className={styles.actionButton}>

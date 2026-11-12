@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { UpdateFilter } from "mongodb";
 import clientPromise from "@/lib/mongodb";
+import { getSections, type Sections } from "@/lib/siteContent";
 
 // Fetch JSON from an internal API endpoint
 async function fetchData(baseUrl: string, path: string): Promise<unknown> {
@@ -63,19 +64,9 @@ async function logChat(data: {
 }
 
 // ── Formatters ──────────────────────────────────────────────────────────────
-
-interface PriceLike {
-  name: string;
-  price: string;
-  duration?: string;
-  description?: string;
-}
-
-interface CategoryLike {
-  icon?: string;
-  label: string;
-  key: string;
-}
+// Статичні розділи (про нас, контакти, послуги, пакети, FAQ) — із `site_content`
+// через getSections() (етап 5, п. 1); новини й спецпропозиції — живі колекції
+// через /api/data/* (їхні колекції чинні, див. план, розділ 4).
 
 interface NewsLike {
   date?: string;
@@ -88,42 +79,58 @@ interface OfferLike {
   description: string;
 }
 
-interface ContactLike {
-  phone?: string;
-  email?: string;
-  serviceArea?: string;
-  address?: string;
-  workingHours?: string;
-  socialMedia?: {
-    instagram?: string;
-    facebook?: string;
-    telegram?: string;
-  };
+function fmtAbout(s: Sections): string {
+  const h = s.hero.hero;
+  const parts: string[] = [
+    `Заголовок: ${h.titleLead}${h.titleAccent}${h.titleTail}`,
+  ];
+  if (h.lead) parts.push(h.lead);
+  if (s.promises.promises.length) {
+    parts.push(
+      `\nНаші переваги:\n${s.promises.promises
+        .map((p) => `• ${p.title} — ${p.text}`)
+        .join("\n")}`,
+    );
+  }
+  if (s.promises.trust.length) {
+    parts.push(
+      `\nФакти про команду: ${s.promises.trust
+        .map((t) => `${t.value} ${t.label}`)
+        .join(" · ")}`,
+    );
+  }
+  return parts.join("\n");
 }
 
-interface HomeLike {
-  title?: string;
-  description?: string;
-  features?: string[];
-  featureCards?: { title: string; description: string }[];
+function fmtContacts(s: Sections): string {
+  const c = s.contacts.contacts;
+  return [
+    `Телефон: ${c.phone}`,
+    `Email: ${c.email}`,
+    `Коли на зв'язку: ${c.hours}`,
+  ].join("\n");
 }
 
-function fmtPrices(data: unknown): string {
-  if (!Array.isArray(data) || !data.length)
-    return "Інформація про ціни тимчасово недоступна.";
-  return data
-    .map(
-      (p: PriceLike) =>
-        `• ${p.name} — ${p.price} грн${p.duration ? ` (${p.duration})` : ""}${p.description ? `. ${p.description}` : ""}`,
-    )
+function fmtServices(s: Sections): string {
+  return s.services.services
+    .map((x) => `• ${x.title} — ${x.price} ${x.unit}. ${x.desc}`)
     .join("\n");
 }
 
-function fmtCategories(data: unknown): string {
-  if (!Array.isArray(data) || !data.length) return "";
-  return data
-    .map((c: CategoryLike) => `${c.icon || ""} ${c.label} (${c.key})`)
-    .join(", ");
+function fmtPackages(s: Sections): string {
+  const lines = s.packages.packages.map(
+    (p) =>
+      `• ${p.name} (${p.sub}) — ${p.price} ${p.period}; у комплекті: ${p.items
+        .filter((i) => i.included)
+        .map((i) => i.text)
+        .join(", ")}`,
+  );
+  if (s.packages.packageAddons) lines.push(`\n${s.packages.packageAddons}`);
+  return lines.join("\n");
+}
+
+function fmtFaq(s: Sections): string {
+  return s.faq.faq.map((f) => `П: ${f.q}\nВ: ${f.a}`).join("\n\n");
 }
 
 function fmtNews(data: unknown): string {
@@ -143,40 +150,6 @@ function fmtOffers(data: unknown): string {
   return data.map((o: OfferLike) => `${o.title}: ${o.description}`).join("\n");
 }
 
-function fmtContacts(data: unknown): string {
-  if (!data || typeof data !== "object") return "";
-  const c = data as ContactLike;
-  const parts = [];
-  if (c.serviceArea) parts.push(`Зона виїзду: ${c.serviceArea}`);
-  if (c.phone) parts.push(`Телефон: ${c.phone}`);
-  if (c.email) parts.push(`Email: ${c.email}`);
-  if (c.workingHours) parts.push(`Коли на зв'язку: ${c.workingHours}`);
-  if (c.socialMedia) {
-    const sm = c.socialMedia;
-    if (sm.instagram) parts.push(`Instagram: ${sm.instagram}`);
-    if (sm.facebook) parts.push(`Facebook: ${sm.facebook}`);
-    if (sm.telegram) parts.push(`Telegram: ${sm.telegram}`);
-  }
-  return parts.join("\n");
-}
-
-function fmtHome(data: unknown): string {
-  if (!data || typeof data !== "object") return "";
-  const h = data as HomeLike;
-  const parts = [];
-  if (h.title) parts.push(`Назва: ${h.title}`);
-  if (h.description) parts.push(`Опис: ${h.description}`);
-  if (Array.isArray(h.features) && h.features.length) {
-    parts.push(`\nНаші переваги:\n${h.features.join("\n")}`);
-  }
-  if (Array.isArray(h.featureCards) && h.featureCards.length) {
-    parts.push(
-      `\nДетальніше:\n${h.featureCards.map((f: { title: string; description: string }) => `• ${f.title}: ${f.description}`).join("\n")}`,
-    );
-  }
-  return parts.join("\n");
-}
-
 // ── Main handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
@@ -189,14 +162,12 @@ export async function POST(req: Request) {
     req.headers.get("x-real-ip") ||
     "unknown";
 
-  // Fetch ALL site data in parallel
-  const [prices, categories, news, offers, contacts, home] = await Promise.all([
-    fetchData(baseUrl, "/api/data/prices"),
-    fetchData(baseUrl, "/api/data/price-categories"),
+  // Дані: статичні секції — з site_content (один запит), новини й акції —
+  // з живих колекцій через внутрішні API (етап 5, п. 1).
+  const [sections, news, offers] = await Promise.all([
+    getSections(),
     fetchData(baseUrl, "/api/data/news"),
     fetchData(baseUrl, "/api/data/offers"),
-    fetchData(baseUrl, "/api/data/contacts"),
-    fetchData(baseUrl, "/api/data/home"),
   ]);
 
   const systemPrompt = `Ти — розумний ШІ-помічник виїзних свят "Жирафик".
@@ -208,22 +179,27 @@ export async function POST(req: Request) {
   ══════════════════════════
   ПРО НАС
   ══════════════════════════
-  ${fmtHome(home)}
+  ${fmtAbout(sections)}
 
   ══════════════════════════
   КОНТАКТНА ІНФОРМАЦІЯ
   ══════════════════════════
-  ${fmtContacts(contacts)}
+  ${fmtContacts(sections)}
 
   ══════════════════════════
-  КАТЕГОРІЇ ЦІН
+  ПОСЛУГИ ТА ЇХ ЦІНИ
   ══════════════════════════
-  ${fmtCategories(categories)}
+  ${fmtServices(sections)}
 
   ══════════════════════════
-  АКТУАЛЬНІ ЦІНИ
+  ПАКЕТИ СВЯТ
   ══════════════════════════
-  ${fmtPrices(prices)}
+  ${fmtPackages(sections)}
+
+  ══════════════════════════
+  ПОШИРЕНІ ЗАПИТАННЯ (FAQ)
+  ══════════════════════════
+  ${fmtFaq(sections)}
 
   ══════════════════════════
   НОВИНИ ТА ПОДІЇ
@@ -237,11 +213,12 @@ export async function POST(req: Request) {
 
   Правила відповіді:
   1. Відповідай на основі ТІЛЬКИ наданих вище даних. Не вигадуй ціни, новини, контакти, кількість свят чи відстані.
-  2. Якщо питають про ціну — дай точну інформацію з розділу «АКТУАЛЬНІ ЦІНИ». Якщо ціни там немає, скажи, що їх назве команда після заявки.
-  3. Ми — виїзна команда, а не стаціонарний центр з адресою. Приїжджаємо за адресою клієнта: додому, до школи, у садок, кафе чи на майданчик. Працюємо по місту й області до 50 км без доплати, далі — 15 грн/км.
+  2. Якщо питають про ціну — дай точну інформацію з розділів «ПОСЛУГИ ТА ЇХ ЦІНИ» та «ПАКЕТИ СВЯТ». Якщо відповіді там немає — скажи, що їх назве команда після заявки.
+  3. Ми — виїзна команда, а не стаціонарний центр з адресою. Приїжджаємо за адресою клієнта: додому, до школи, у садок, кафе чи на майданчик. Зона виїзду, відстань і доплати — за домовленістю: точні умови повідомить команда, не називай цифр за себе.
   4. Дату, час і наявність вільних слотів підтверджує команда зв'язком із клієнтом після заявки. Табло на сайті — демонстраційне, не обіцяй миттєвого бронювання.
-  5. Якщо не маєш відповіді — порадь залишити заявку на сайті або написати команді в чат.
-  6. Пиши без емодзі, без вигуків й без слів «магія», «чарівний», «найкращий». Тон: конкретний і спокійний.`;
+  5. Типові питання (організація, підготовка, бронювання) закривай розділом «ПОШИРЕНІ ЗАПИТАННЯ (FAQ)» — відповідай звідти, не переказуючи своїми словами.
+  6. Якщо не маєш відповіді — порадь залишити заявку на сайті або написати команді в чат.
+  7. Пиши без емодзі, без вигуків й без слів «магія», «чарівний», «найкращий». Тон: конкретний і спокійний.`;
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
   const model = genAI.getGenerativeModel({
