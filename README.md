@@ -2,13 +2,25 @@
 
 Сайт виїзної команди «Жирафик» — мобільного магістра свят. Це не заклад з адресою: програму й обладнання привозять на локацію клієнта. Головна дія сайту — заявка з датою, адресою й контактом.
 
-**Поточний публічний шар** — повний перенос макета №2 «Табло маршруту» (див. розділ 13 плану). Усі тексти, ціни, пакети, відгуки й контакти перенесено з демо-макета **як є** й лежать статично в `src/components/board/content.ts`. Демонстраційна форма бронювання показує успіх на клієнті й поки не надсилає дані в `/api/orders`: підключення бази, адмінки й уточнення даних — окремий наступний етап. Чат, опитування, новини, статистика й наявні `/api/*` контракти лишаються працювати.
+**Поточний публічний шар** — повний перенос макета №2 «Табло маршруту» (див. розділ 13 плану). Базові тексти, ціни, пакети й контакти лежать у `src/components/board/content.ts` як значення за замовчуванням: після підключення БД публічні сторінки читають секції `site_content` через `getSection()` з ISR 1 год, а правки робляться в `/admin/content`. Демо-цифри й тексти перенесено як є й поки не уточнені. Чат, опитування, новини, статистика й наявні `/api/*` контракти лишаються працювати.
 
-Проєкт містить адмінку на MongoDB/Mongoose, чат, опитування, статистику й Telegram-нотифікації. Концепція, порівняння напрямків і рішення: `docs/2026-11-04-mobile-master-concept.md`. Поточний стан і борги: `docs/2026-11-10-project-audit.md`. Робочі бренд-асети: `public/brand/`.
+Проєкт містить адмінку на MongoDB/Mongoose, чат, опитування, статистику й Telegram-нотифікації. Концепція, порівняння напрямків і рішення: `docs/2026-11-04-mobile-master-concept.md`. Поточний стан і борги: `docs/2026-11-12-project-audit.md`. Робочі бренд-асети: `public/brand/`.
 
 ## Дизайн-система
 
 `src/styles/tokens.css` — єдине джерело палітри й шрифтів; `src/app/globals.css` — базовий шар; `src/styles/board.css` — публічний шар із префіксом `m2-`. Шрифти `Rubik` + `Rubik Mono One` підключаються через `next/font/google` у `src/app/layout.tsx`. Логотип і фавікон — `public/brand/logo.png` і `public/brand/favicon.png`. Палітра: сафаровий зелений, глиняний, вохра, папір, чорнило; єдиний повторюваний декоративний елемент — смуга під героєм і чорне табло маршруту.
+
+## Відгуки
+
+Окрема колекція `reviews`, шар даних `src/lib/reviews.ts`. Форма на `/reviews` пише заявку зі статусом `pending`; головна показує два найновіші `published`. Модерація — `/admin/reviews`: `pending → published | hidden | deleted`, `published → hidden | deleted`, `hidden → published | pending | deleted`. **Видалення м'яке**: запис не видаляється з бази, а переводиться в `deleted` із позначкою `deletedAt` і лишається у фільтрі «Видалені». Відновлення можливе **лише** в `pending` (на перевірку), при цьому `deletedAt` знімається. Прямий `deleted → published` заборонений на рівні API (409). Після зміни статусу `revalidatePath("/", "layout")` скидає кеш `/reviews` і головної.
+
+## Чат із командою
+
+Віджет `src/components/chat/ChatWidget.tsx` має два незалежні режими: «Помічник» (Gemini, логується в `chat_logs`) і «Команда» (людський діалог у колекції `chat_threads`, шар `src/lib/chatThreads.ts`). Ключ діалогу — довговічний `threadId` (`crypto.randomUUID()` у `localStorage`), тому перезавантаження сторінки не обриває переписку: історія тягнеться з `GET /api/chat/history`, відповіді оператора — з `GET /api/chat/poll` раз на 10 с. Публічні записи захищені довжиною тексту (≤2000), honeypot і rate-limit 8/хв на IP.
+
+Адміністратор працює в `/admin/chat` (дві панелі, фільтри за статусом, бейдж непрочитаних у сайдбарі): `GET /api/admin/chat/threads`, `GET|PATCH /api/admin/chat/threads/[id]`, `POST /api/admin/chat/threads/[id]/reply`, `GET /api/admin/chat/stats` — усі під кукою `admin_token`. Статуси `open / closed / archived` **м'які**: з бази нічого не видаляється. Легасі `/api/admin/chat-logs*` лишився для аудиту й зовнішніх інтеграцій, його `DELETE` тепер лише архівує одну сесію, а `reply` дублює відповідь у `chat_threads`.
+
+Міграція старих діалогів — `node scripts/migrate-chat-threads.mjs` (ідемпотентна, `chat_logs` не чіпає). План і залишок по Telegram-мосту: `docs/2026-11-12-chat-admin-telegram-plan.md`. Публічна адреса для майбутнього webhook: https://giraffe-teplyk.vercel.app/.
 
 ## Tech Stack
 - Next.js 15 (App Router), React 19, TypeScript
@@ -42,9 +54,9 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD_HASH=$2b$12$replace_with_bcrypt_hash
 ```
 
-> ⚠️ **Безпека:** `src/app/api/auth/route.ts` має запасний хеш за замовчуванням
-> (`giraFfe2025`). Без `ADMIN_PASSWORD_HASH` у прод-середовищі цей пароль
-> діятиме — обов'язково задайте змінну.
+> ⚠️ **Безпека:** запасного пароля більше немає. Без `ADMIN_USERNAME` і
+> `ADMIN_PASSWORD_HASH` у прод-середовищі `POST /api/auth` повертає 500 і вхід
+> до адмінки неможливий — обов'язково задайте обидві змінні.
 
 3. Run the development server:
 ```bash
@@ -78,13 +90,15 @@ src/
       layout.tsx            # Admin shell (AdminSidebar + AdminHeader)
       page.tsx              # Dashboard
       login/ home/ contacts/ features/ news/ prices/ offers/
-      packages/ services/ orders/ survey/
+      packages/ services/ orders/ survey/ content/ reviews/ chat/
     api/
       auth/ auth/verify/ stats/ orders/ image/
-      chat/ chat/poll/ chat/message/
+      chat/ chat/poll/ chat/message/ chat/history/
       survey/{submit,vote,results}/
       admin/{home,contacts,features,news,offers,packages,prices,
-             price-categories,services,stats,chat-logs,survey/responses}/
+             price-categories,services,stats,content,reviews,chat-logs,
+             chat/{threads,threads/[id],threads/[id]/reply,stats},
+             survey/responses}/
       data/{home,contacts,news,offers,price-categories,prices,
             faq,portfolio,packages,services,testimonials}/
   components/
@@ -98,12 +112,17 @@ src/
   lib/
     mongodb.ts              # Спільний clientPromise (нативний драйвер MongoDB)
     auth.ts                 # JWT + bcryptjs helpers
+    adminRequest.ts         # Перевірка підпису admin_token у /api/admin/*
+    chatThreads.ts          # chat_threads: модель, індекси, poll, історія
+    chatRateLimit.ts        # Ліміт публічного POST /api/chat/message
+    reviews.ts              # Статуси й переходи відгуків
     googleDrive.ts utils.ts
     services/               # NewsService, StatsService (Mongoose)
     models/                 # News (Mongoose-схема)
   styles/                   # tokens.css, board.css (m2-) + CSS modules
   types/                    # Спільні типи
 public/brand/               # logo.png, favicon.png, робочі ассети
+scripts/                    # migrate-chat-threads.mjs (одноразова міграція)
 ```
 
 ## Data & Auth Overview
@@ -122,6 +141,8 @@ public/brand/               # logo.png, favicon.png, робочі ассети
   `TELEGRAM_BOT_TOKEN_SURVEY`: сповіщення про заявки й опитування
 - `NOTIFICATIONS_BASE_URL`, `NOTIFICATIONS_API_KEY`: webhook заявок і `/api/admin/chat-logs`
 - `NEXT_PUBLIC_API_URL`: базовий URL для проксі Google Drive (`/api/image`)
+- `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ADMIN_IDS`: **поки не використовуються** —
+  знадобляться для вхідного Telegram-webhook (Етап 3 плану чату)
  
 ### Telegram Notifications
 To receive booking notifications in Telegram, add:

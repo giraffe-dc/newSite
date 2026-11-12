@@ -1,70 +1,52 @@
-import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import { type NextRequest, NextResponse } from "next/server";
+import {
+  isValidThreadId,
+  legacyThreadId,
+  pollOperatorMessages,
+} from "@/lib/chatThreads";
 
-interface ChatMessage {
-  role?: string;
-  delivered?: boolean;
-  content?: string;
-  adminName?: string;
-  timestamp?: Date | string;
-}
+/* Доставка відповідей оператора клієнту.
 
-/**
- * GET /api/chat/poll?sessionId=xxx&deviceId=xxx
- *
- * Returns undelivered operator messages for the given session.
- * Marks them as delivered after returning.
- */
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-  const sessionId = searchParams.get("sessionId");
-  const deviceId = searchParams.get("deviceId");
+   Раніше шукали по sessionId (який змінювався на F5) і не мали жодної
+   авторизації. Тепер достатньо threadId — високоентропійного UUID із
+   localStorage, який сам є capability. Старі клієнти з deviceId теж
+   обслуговуються через legacy_<deviceId>.
 
-  if (!sessionId || !deviceId) {
+   Відповідь містить стабільні id: віджет дедуплікує навіть якщо сервер
+   повторить видачу (наприклад, після ретраю). */
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function GET(req: NextRequest) {
+  const params = req.nextUrl.searchParams;
+  const rawThreadId = params.get("threadId");
+  const rawDeviceId = params.get("deviceId") ?? "";
+
+  const threadId = isValidThreadId(rawThreadId)
+    ? rawThreadId
+    : legacyThreadId(rawDeviceId);
+  if (!isValidThreadId(threadId)) {
     return NextResponse.json({ messages: [] });
   }
 
   try {
-    const client = await clientPromise;
-    const db = client.db("zhyrafyk");
-
-    // Find the session
-    const session = await db
-      .collection("chat_logs")
-      .findOne({ sessionId, deviceId });
-
-    if (!session || !session.messages) {
-      return NextResponse.json({ messages: [] });
-    }
-
-    // Find undelivered operator messages
-    const undelivered = session.messages
-      .filter((m: ChatMessage) => m.role === "operator" && !m.delivered)
-      .map((m: ChatMessage) => ({
-        role: "operator",
-        content: m.content,
-        adminName: m.adminName || "Адміністратор",
-        timestamp: m.timestamp,
-      }));
-
-    if (undelivered.length > 0) {
-      // Mark all operator messages as delivered
-      await db.collection("chat_logs").updateOne(
-        { sessionId },
-        {
-          $set: {
-            "messages.$[elem].delivered": true,
-          },
-        },
-        {
-          arrayFilters: [{ "elem.role": "operator", "elem.delivered": false }],
-        },
-      );
-    }
-
-    return NextResponse.json({ messages: undelivered });
+    const pending = await pollOperatorMessages(threadId);
+    return NextResponse.json(
+      {
+        messages: pending.map((m) => ({
+          id: m.id,
+          role: "operator",
+          content: m.content,
+          adminName: m.author || "Команда Жирафик",
+          channel: m.channel,
+          createdAt: m.createdAt,
+        })),
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
-    console.error("Poll error:", error);
+    console.error("chat/poll: не вдалося прочитати відповіді", error);
     return NextResponse.json({ messages: [] });
   }
 }

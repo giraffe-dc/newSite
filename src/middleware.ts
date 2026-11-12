@@ -32,8 +32,10 @@ export function middleware(request: NextRequest) {
 
   // Захищаємо адмін-маршрути
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-    // Exclude /api/admin/chat-logs because it uses a different auth mechanism (API key parameter)
-    if (pathname === "/api/admin/chat-logs") {
+    // Легасі /api/admin/chat-logs* авторизується API-ключем, а не кукою.
+    // Раніше виключався лише точний /api/admin/chat-logs, тому /reply вимагав
+    // і куку, і ключ водночас. Нові маршрути /api/admin/chat/* ідуть через куку.
+    if (pathname.startsWith("/api/admin/chat-logs")) {
       return NextResponse.next();
     }
 

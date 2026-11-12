@@ -45,7 +45,8 @@ export async function GET(req: Request) {
       deviceId?: string;
       sessionId?: string;
       createdAt?: { $gte?: Date; $lte?: Date };
-    } = {};
+      archivedAt?: { $exists: boolean };
+    } = { archivedAt: { $exists: false } };
     if (deviceId) filter.deviceId = deviceId;
     if (sessionId) filter.sessionId = sessionId;
     if (from || to) {
@@ -77,7 +78,8 @@ export async function GET(req: Request) {
 /**
  * DELETE /api/admin/chat-logs?key=YOUR_KEY&sessionId=xxx
  *
- * Delete a specific session or all logs (if no sessionId)
+ * М'яке архівування однієї сесії AI-логу. З бази нічого не видаляємо:
+ * масового deleteMany більше немає, sessionId обов'язковий.
  */
 export async function DELETE(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -89,23 +91,27 @@ export async function DELETE(req: Request) {
   }
 
   const sessionId = searchParams.get("sessionId");
+  if (!sessionId) {
+    return NextResponse.json(
+      { error: "sessionId is required" },
+      { status: 400 },
+    );
+  }
 
   try {
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
-
-    if (sessionId) {
-      await db.collection("chat_logs").deleteOne({ sessionId });
-      return NextResponse.json({ deleted: sessionId });
+    const result = await db
+      .collection("chat_logs")
+      .updateOne({ sessionId }, { $set: { archivedAt: new Date() } });
+    if (result.matchedCount === 0) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
-
-    // Delete all logs
-    const result = await db.collection("chat_logs").deleteMany({});
-    return NextResponse.json({ deletedCount: result.deletedCount });
+    return NextResponse.json({ archived: sessionId });
   } catch (error) {
-    console.error("Delete chat logs error:", error);
+    console.error("Archive chat logs error:", error);
     return NextResponse.json(
-      { error: "Failed to delete chat logs" },
+      { error: "Failed to archive chat logs" },
       { status: 500 },
     );
   }

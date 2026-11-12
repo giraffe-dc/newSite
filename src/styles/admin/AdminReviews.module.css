@@ -123,6 +123,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+/* М'яко видалений запис лишається у списку, але читається як архів. */
+.cardDeleted {
+  background: #f8fafc;
+  border-color: #fecaca;
+  border-left: 3px solid #991b1b;
+}
+
 .cardHead {
   display: flex;
   align-items: center;
@@ -158,6 +165,13 @@
 .context {
   color: #64748b;
   font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.deletedNote {
+  color: #991b1b;
+  font-size: 0.85rem;
+  line-height: 1.5;
   margin: 0 0 0.75rem;
 }
 

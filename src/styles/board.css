@@ -342,11 +342,12 @@
 /* ---------- Секції ---------- */
 .m2-sec {
   padding: 72px 0;
+  margin-top: 1rem;
 }
 
 .m2-sec__head {
   margin-bottom: 36px;
-  max-width: 60ch;
+  /* max-width: 60ch; */
 }
 
 .m2-sec__head h2 {

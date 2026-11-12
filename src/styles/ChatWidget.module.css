@@ -12,6 +12,7 @@
 }
 
 .chatButton {
+  position: relative;
   width: 56px;
   height: 56px;
   min-height: 44px;
@@ -32,6 +33,21 @@
 .chatIcon {
   width: 26px;
   height: 26px;
+}
+.chatBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: var(--gold-deep);
+  color: var(--paper);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
 }
 
 .chatWindow {
@@ -87,6 +103,7 @@
   border-bottom: 1px solid var(--line);
 }
 .modeBtn {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
@@ -109,6 +126,21 @@
 .modeBtnActive {
   background: var(--night);
   color: var(--paper);
+}
+.unreadBadge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: var(--gold-deep);
+  color: var(--paper);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
 }
 
 .messagesContainer {
@@ -176,6 +208,15 @@
 .input:focus-visible {
   outline: 2px solid var(--gold-deep);
   outline-offset: 1px;
+}
+/* Приховане поле-пастка для ботів: люди його не бачать і не заповнюють. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 .sendButton {
   background: var(--gold);

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
+import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminSidebar.module.css";
 
 interface AdminSidebarProps {
@@ -9,13 +10,54 @@ interface AdminSidebarProps {
   onToggle: () => void;
 }
 
+/** /admin/chat оновлює бейдж одразу ж, без очікування наступного опитування. */
+export const CHAT_UNREAD_EVENT = "giraffe:chat-unread";
+
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
   const pathname = usePathname();
+  const [unreadChat, setUnreadChat] = useState(0);
 
-  const menuItems = [
+  const loadUnread = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/chat/stats", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = (await res.json()) as { messages?: number };
+      setUnreadChat(Number(data.messages) || 0);
+    } catch {
+      // тихо: бейдж не критичний, список діалогів покаже помилку сам
+    }
+  }, []);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: перераховуємо бейдж і при переході між сторінками адмінки
+  useEffect(() => {
+    void loadUnread();
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") void loadUnread();
+    }, 20_000);
+    const onStats = (event: Event) => {
+      const detail = (event as CustomEvent<{ messages?: number }>).detail;
+      if (detail && typeof detail.messages === "number") {
+        setUnreadChat(detail.messages);
+      }
+    };
+    window.addEventListener(CHAT_UNREAD_EVENT, onStats);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener(CHAT_UNREAD_EVENT, onStats);
+    };
+  }, [loadUnread, pathname]);
+
+  const menuItems: {
+    href: string;
+    icon: string;
+    label: string;
+    exact?: boolean;
+    badge?: boolean;
+  }[] = [
     { href: "/admin", icon: "🏠", label: "Головна", exact: true },
     { href: "/admin/content", icon: "📝", label: "Контент" },
     { href: "/admin/orders", icon: "🧾", label: "Замовлення" },
+    { href: "/admin/chat", icon: "💬", label: "Чат", badge: true },
     { href: "/admin/news", icon: "📰", label: "Новини" },
     { href: "/admin/reviews", icon: "💌", label: "Відгуки" },
     { href: "/admin/contacts", icon: "📞", label: "Контакти" },
@@ -56,10 +98,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isOpen, onToggle }) => {
                   className={`${styles.menuLink} ${
                     isActive(item.href, item.exact) ? styles.active : ""
                   }`}
+                  aria-label={
+                    item.badge && unreadChat > 0
+                      ? `${item.label}, непрочитаних повідомлень: ${unreadChat}`
+                      : undefined
+                  }
                   onClick={() => onToggle()}
                 >
                   <span className={styles.menuIcon}>{item.icon}</span>
                   <span className={styles.menuLabel}>{item.label}</span>
+                  {item.badge && unreadChat > 0 && (
+                    <span className={styles.unreadBadge} aria-hidden="true">
+                      {unreadChat > 99 ? "99+" : unreadChat}
+                    </span>
+                  )}
                 </Link>
               </li>
             ))}

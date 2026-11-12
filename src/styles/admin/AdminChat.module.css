@@ -1,0 +1,409 @@
+/* /admin/chat — двопанельний діалог із клієнтом. Світла тема, ті самі
+   токени, що й в AdminReviews / AdminOrders. */
+
+.page {
+  padding: 2rem 1rem;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pageHeader {
+  margin-bottom: 1.25rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem;
+}
+
+.pageSubtitle {
+  color: #64748b;
+  margin: 0;
+  max-width: 760px;
+  line-height: 1.55;
+}
+
+.message {
+  display: block;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.errorBox {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.successBox {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 0 1rem;
+  padding: 0;
+  border: none;
+  min-inline-size: 0;
+}
+
+.chip {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip:hover {
+  background: #f1f5f9;
+}
+
+.chipActive {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: #ffffff;
+}
+
+.unreadTotal {
+  margin-left: auto;
+  color: #991b1b;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 1rem;
+  height: calc(100vh - 250px);
+  min-height: 460px;
+}
+
+.listPane,
+.chatPane {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.listPane {
+  overflow-y: auto;
+}
+
+.chatPane {
+  display: flex;
+  flex-direction: column;
+}
+
+.threadList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.threadList li {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.threadCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-left: 3px solid transparent;
+  background: #ffffff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.threadCard:hover {
+  background: #f8fafc;
+}
+
+.threadCardActive {
+  background: #f1f5f9;
+  border-left-color: #1e293b;
+}
+
+.threadHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.threadName {
+  font-weight: 600;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unreadBadge {
+  flex: none;
+  min-width: 20px;
+  text-align: center;
+  border-radius: 999px;
+  background: #991b1b;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+}
+
+.threadPreview {
+  color: #64748b;
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.threadMeta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.chatHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.backButton {
+  display: none;
+  border: none;
+  background: transparent;
+  color: #1e293b;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.25rem 0;
+}
+
+.chatHeading {
+  flex: 1;
+  min-width: 140px;
+}
+
+.chatTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.chatMeta {
+  margin: 0.15rem 0 0;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.chatActions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.actionButton {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.actionButton:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.actionButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f8fafc;
+}
+
+.bubbleRow {
+  display: flex;
+}
+
+.rowClient {
+  justify-content: flex-start;
+}
+
+.rowOperator {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: min(75%, 520px);
+  border-radius: 12px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid transparent;
+}
+
+.bubbleClient {
+  background: #ffffff;
+  border-color: #e2e8f0;
+}
+
+.bubbleOperator {
+  background: #e6f1fb;
+  border-color: #b5d4f4;
+}
+
+.bubbleMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.channelTag {
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 0.05rem 0.4rem;
+}
+
+.bubbleText {
+  color: #1e293b;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.composer {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-end;
+  padding: 0.8rem 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.textarea {
+  flex: 1;
+  resize: vertical;
+  min-height: 56px;
+  max-height: 160px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.textarea:focus-visible {
+  outline: 2px solid #185fa5;
+  outline-offset: 1px;
+}
+
+.sendButton {
+  border: none;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #ffffff;
+  padding: 0.65rem 1.1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sendButton:hover:not(:disabled) {
+  background: #334155;
+}
+
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.archivedNote {
+  margin: 0;
+  padding: 0 1rem 0.8rem;
+  color: #991b1b;
+  font-size: 0.8rem;
+}
+
+.hint {
+  color: #64748b;
+  padding: 1.25rem;
+  margin: 0;
+  text-align: center;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+    height: calc(100vh - 260px);
+  }
+
+  .layout > .chatPane {
+    display: none;
+  }
+
+  .layout.showThread > .listPane {
+    display: none;
+  }
+
+  .layout.showThread > .chatPane {
+    display: flex;
+  }
+
+  .backButton {
+    display: block;
+  }
+
+  .bubble {
+    max-width: 90%;
+  }
+}

@@ -1,68 +1,107 @@
-import type { UpdateFilter } from "mongodb";
-import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
+import { type NextRequest, NextResponse } from "next/server";
+import { checkChatRateLimit, clientIp } from "@/lib/chatRateLimit";
+import {
+  appendClientMessage,
+  isValidThreadId,
+  legacyThreadId,
+  normalizeText,
+} from "@/lib/chatThreads";
 
-/**
- * POST /api/chat/message
- *
- * Saves a user message to the chat_logs collection for admin to read.
- * Used when client is in "admin" mode (not AI mode).
- *
- * Body:
- *   - sessionId (required)
- *   - deviceId  (required)
- *   - deviceInfo (optional)
- *   - message   (required) — user's text
- */
-export async function POST(req: Request) {
-  try {
-    const { sessionId, deviceId, deviceInfo, message } = await req.json();
+/* Публічний запис повідомлення в режимі «Зв'язок із командою».
 
-    if (!sessionId || !deviceId || !message) {
-      return NextResponse.json(
-        { error: "sessionId, deviceId and message are required" },
-        { status: 400 },
-      );
-    }
+   Етап 1: замість sessionId із useRef використовуємо довговічний threadId
+   (crypto.randomUUID() у localStorage), тож F5 не обриває діалог.
+   Старі клієнти, що шлють {sessionId, deviceId, message}, теж працюють:
+   для них ключем стає стабільний legacy_<deviceId>.
 
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+   Етап 3: тут же буде вихідне Telegram-сповіщення з карткою діалогу. */
 
-    const client = await clientPromise;
-    const db = client.db("zhyrafyk");
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-    await db.collection("chat_logs").updateOne(
-      { sessionId },
-      {
-        $set: {
-          deviceId,
-          deviceInfo: deviceInfo || {},
-          ip,
-          updatedAt: new Date(),
-          mode: "admin", // flag that this session is in admin mode
-        },
-        $setOnInsert: {
-          createdAt: new Date(),
-        },
-        $push: {
-          messages: {
-            role: "user",
-            content: message,
-            timestamp: new Date(),
-          },
-        } as unknown as UpdateFilter<Record<string, unknown>>,
-      },
-      { upsert: true },
-    );
+interface Body {
+  threadId?: unknown;
+  text?: unknown;
+  message?: unknown;
+  deviceId?: unknown;
+  sessionId?: unknown;
+  deviceInfo?: unknown;
+  clientName?: unknown;
+  clientPhone?: unknown;
+  website?: unknown;
+}
 
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Chat message error:", error);
+export async function POST(req: NextRequest) {
+  const body = (await req.json().catch(() => null)) as Body | null;
+  if (!body) {
     return NextResponse.json(
-      { error: "Failed to save message" },
-      { status: 500 },
+      { error: "Некоректне тіло запиту" },
+      { status: 400 },
+    );
+  }
+
+  // Honeypot: людина його не бачить, бот заповнює. Вдаємо успіх без запису.
+  if (normalizeText(body.website, 200)) {
+    return NextResponse.json({ success: true }, { status: 201 });
+  }
+
+  const ip = clientIp(req);
+  if (!checkChatRateLimit(`msg:${ip}`)) {
+    return NextResponse.json(
+      { error: "Занадто багато повідомлень. Зачекайте хвилину." },
+      { status: 429 },
+    );
+  }
+
+  const rawDeviceId =
+    typeof body.deviceId === "string" ? body.deviceId.slice(0, 80) : "";
+  const rawThreadId = body.threadId;
+  const threadId = isValidThreadId(rawThreadId)
+    ? rawThreadId
+    : legacyThreadId(rawDeviceId);
+  if (!isValidThreadId(threadId)) {
+    return NextResponse.json(
+      { error: "Некоректний ідентифікатор діалогу" },
+      { status: 400 },
+    );
+  }
+  const deviceId = rawDeviceId || threadId;
+
+  const text = normalizeText(body.text ?? body.message, 2000);
+  if (!text) {
+    return NextResponse.json(
+      { error: "Повідомлення не може бути порожнім" },
+      { status: 400 },
+    );
+  }
+
+  const clientName = normalizeText(body.clientName, 60);
+  const clientPhone = normalizeText(body.clientPhone, 30);
+  const deviceInfo =
+    body.deviceInfo && typeof body.deviceInfo === "object"
+      ? (body.deviceInfo as Record<string, unknown>)
+      : undefined;
+
+  try {
+    const { message, isNew } = await appendClientMessage({
+      threadId,
+      deviceId,
+      text,
+      ip,
+      deviceInfo,
+      clientName: clientName || undefined,
+      clientPhone: clientPhone || undefined,
+    });
+
+    return NextResponse.json(
+      { success: true, threadId, messageId: message.id, isNew },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("chat/message: не вдалося зберегти повідомлення", error);
+    return NextResponse.json(
+      { error: "Не вдалося відправити повідомлення. Спробуйте пізніше." },
+      { status: 503 },
     );
   }
 }
