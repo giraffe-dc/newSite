@@ -13,7 +13,9 @@ import { getDb } from "@/lib/mongodb";
 
 export const REVIEWS_COLLECTION = "reviews";
 
-export type ReviewStatus = "pending" | "published" | "hidden";
+/** `hidden` — прихований адміном; `deleted` — м'яке видалення: лишається
+ *  в БД для історії, з сайту зникає, відновлення повертає в `pending`. */
+export type ReviewStatus = "pending" | "published" | "hidden" | "deleted";
 export type ReviewSource = "site" | "seed";
 
 /** Документ колекції (`_id` драйвер додає сам). */

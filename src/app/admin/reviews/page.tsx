@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "@/styles/admin/AdminReviews.module.css";
 
-type ReviewStatus = "pending" | "published" | "hidden";
+type ReviewStatus = "pending" | "published" | "hidden" | "deleted";
 
 interface Review {
   _id: string;
@@ -22,6 +22,7 @@ const STATUS_LABELS: Record<ReviewStatus, string> = {
   pending: "На перевірці",
   published: "Опублікований",
   hidden: "Прихований",
+  deleted: "Видалений",
 };
 
 const FILTER_LABELS: Record<Filter, string> = {
@@ -29,12 +30,14 @@ const FILTER_LABELS: Record<Filter, string> = {
   pending: "На перевірці",
   published: "Опубліковані",
   hidden: "Приховані",
+  deleted: "Видалені",
 };
 
 const BADGE_CLASS: Record<ReviewStatus, string> = {
   pending: styles.badgePending,
   published: styles.badgePublished,
   hidden: styles.badgeHidden,
+  deleted: styles.badgeDeleted,
 };
 
 function stars(rating: number): string {
@@ -81,6 +84,7 @@ export default function AdminReviewsPage() {
     pending: 0,
     published: 0,
     hidden: 0,
+    deleted: 0,
   };
   for (const review of reviews) counts[review.status] += 1;
 
@@ -112,7 +116,9 @@ export default function AdminReviewsPage() {
             ? "Відгук схвалено та опубліковано"
             : status === "hidden"
               ? "Відгук приховано"
-              : "Статус оновлено",
+              : status === "deleted"
+                ? "Відгук видалено (залишився в історії)"
+                : "Відгук повернуто на перевірку",
         );
       } else {
         throw new Error(String(res.status));
@@ -129,25 +135,17 @@ export default function AdminReviewsPage() {
     }
   }
 
-  async function removeReview(review: Review) {
-    if (!window.confirm(`Видалити відгук «${review.name}» назавжди?`)) return;
-    setBusyId(review._id);
-    try {
-      const res = await fetch(`/api/admin/reviews?id=${review._id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (res.ok) {
-        setReviews((prev) => prev.filter((item) => item._id !== review._id));
-        flash("ok", "Відгук видалено");
-      } else {
-        throw new Error(String(res.status));
-      }
-    } catch {
-      flash("err", "Не вдалося видалити відгук");
-    } finally {
-      setBusyId(null);
+  /* М'яке видалення: запис лишається в БД (статус `deleted`), з сайту
+     зникає; «Відновити» повертає його в чергу на перевірку. */
+  function removeReview(review: Review) {
+    if (
+      !window.confirm(
+        `Видалити відгук «${review.name}»? Запис лишиться в історії — його можна буде відновити.`,
+      )
+    ) {
+      return;
     }
+    void changeStatus(review, "deleted");
   }
 
   if (loading) {
@@ -251,34 +249,49 @@ export default function AdminReviewsPage() {
                 )}
 
                 <div className={`${styles.actions} ${busy ? styles.busy : ""}`}>
-                  {review.status !== "published" && (
+                  {review.status === "deleted" ? (
                     <button
                       type="button"
                       className={styles.approveBtn}
                       disabled={busy}
-                      onClick={() => void changeStatus(review, "published")}
+                      onClick={() => void changeStatus(review, "pending")}
                     >
-                      ✔ Схвалити й опублікувати
+                      ♻ Відновити (на перевірку)
                     </button>
+                  ) : (
+                    <>
+                      {review.status !== "published" && (
+                        <button
+                          type="button"
+                          className={styles.approveBtn}
+                          disabled={busy}
+                          onClick={() =>
+                            void changeStatus(review, "published")
+                          }
+                        >
+                          ✔ Схвалити й опублікувати
+                        </button>
+                      )}
+                      {review.status === "published" && (
+                        <button
+                          type="button"
+                          className={styles.hideBtn}
+                          disabled={busy}
+                          onClick={() => void changeStatus(review, "hidden")}
+                        >
+                          Приховати
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className={styles.deleteBtn}
+                        disabled={busy}
+                        onClick={() => removeReview(review)}
+                      >
+                        🗑 Видалити
+                      </button>
+                    </>
                   )}
-                  {review.status === "published" && (
-                    <button
-                      type="button"
-                      className={styles.hideBtn}
-                      disabled={busy}
-                      onClick={() => void changeStatus(review, "hidden")}
-                    >
-                      Приховати
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className={styles.deleteBtn}
-                    disabled={busy}
-                    onClick={() => void removeReview(review)}
-                  >
-                    🗑 Видалити
-                  </button>
                 </div>
               </li>
             );

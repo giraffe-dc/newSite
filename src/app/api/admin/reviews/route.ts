@@ -9,11 +9,12 @@ import {
   type ReviewStatus,
 } from "@/lib/reviews";
 
-/* Модерація відгуків (етап 6, п. 3): список, зміна статусу, видалення —
-   лише для адміна. Після зміни миємо кеш, щоб /reviews і головна
-   оновилися одразу, без очікування ISR. */
+/* Модерація відгуків (етап 6, п. 3): список і зміна статусу — лише для
+   адміна. Видалення м'яке: статус `deleted` (запис лишається в БД для
+   історії, відновлення повертає в `pending`); жорсткого DELETE немає.
+   Після зміни миємо кеш, щоб /reviews і головна оновилися одразу. */
 
-const STATUSES: ReviewStatus[] = ["pending", "published", "hidden"];
+const STATUSES: ReviewStatus[] = ["pending", "published", "hidden", "deleted"];
 
 function isAuthorized(request: NextRequest): boolean {
   const token = request.cookies.get("admin_token")?.value;
@@ -63,29 +64,6 @@ export async function PATCH(request: NextRequest) {
     .updateOne({ _id: new ObjectId(id) }, { $set: { status } });
 
   if (result.matchedCount === 0) {
-    return NextResponse.json({ error: "Review not found" }, { status: 404 });
-  }
-
-  revalidatePath("/", "layout");
-  return NextResponse.json({ success: true });
-}
-
-export async function DELETE(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const id = request.nextUrl.searchParams.get("id") ?? "";
-  if (!ObjectId.isValid(id)) {
-    return NextResponse.json({ error: "Invalid review id" }, { status: 400 });
-  }
-
-  const db = await getDb();
-  const result = await db
-    .collection<ReviewDoc>(REVIEWS_COLLECTION)
-    .deleteOne({ _id: new ObjectId(id) });
-
-  if (result.deletedCount === 0) {
     return NextResponse.json({ error: "Review not found" }, { status: 404 });
   }
 

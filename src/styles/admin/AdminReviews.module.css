@@ -186,6 +186,13 @@
   color: #475569;
 }
 
+/* М'яке видалення: запис у БД лишається, показуємо приглушено. */
+.badgeDeleted {
+  background: #fee2e2;
+  color: #991b1b;
+  text-decoration: line-through;
+}
+
 .badgeSource {
   background: #e0f2fe;
   color: #075985;
