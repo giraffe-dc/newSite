@@ -85,11 +85,12 @@ export default function ReviewForm() {
       <fieldset className="m2-rating">
         <legend>Ваша оцінка</legend>
         <div className="m2-rating__stars">
-          {[1, 2, 3, 4, 5].map((n) => (
-            // По зірці на значення: порядок DOM зростає, контейнер
-            // row-reverse — візуально 5 зліва, і селектор input:checked ~ label
-            // підсвічує "правильні" зірки без JavaScript (input і label мають
-            // бути одночасними дітьми контейнера — тому Fragment, не span).
+          {/* Зірки в DOM ідуть 5→1: контейнер row-reverse вертає їх до
+              візуального порядку 1..5 зліва направо, а `input:checked ~ label`
+              світить усі наступні мітки — тобто ліві N, рівно вибрану оцінку.
+              (При порядку 1→5 підсвітка і значення розходилися б.) Fragment,
+              а не span, — щоб input і label були одночасними дітьми контейнера. */}
+          {[5, 4, 3, 2, 1].map((n) => (
             <Fragment key={n}>
               <input
                 type="radio"
