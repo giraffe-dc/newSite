@@ -20,7 +20,7 @@ export default function ServicesGrid({
           <p className="m2-ticket__desc">{service.desc}</p>
           <div className="m2-ticket__price">
             <span>
-              від <b>{service.price}</b>
+              <b>{service.price}</b>
               {service.unit}
             </span>
             <Link href={BOOK_HREF}>Вибрати</Link>
