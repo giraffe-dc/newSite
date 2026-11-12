@@ -13,10 +13,42 @@ import { getDb } from "@/lib/mongodb";
 
 export const REVIEWS_COLLECTION = "reviews";
 
-/** `hidden` — прихований адміном; `deleted` — м'яке видалення: лишається
- *  в БД для історії, з сайту зникає, відновлення повертає в `pending`. */
-export type ReviewStatus = "pending" | "published" | "hidden" | "deleted";
+export const REVIEW_STATUSES = [
+  "pending",
+  "published",
+  "hidden",
+  "deleted",
+] as const;
+
+/** `hidden` — прихований адміном; `deleted` — м'яке видалення: запис лишається
+ *  в БД для історії, з сайту зникає. Відновлення можливе лише в `pending`. */
+export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
 export type ReviewSource = "site" | "seed";
+
+export const REVIEW_STATUS_LABELS: Record<ReviewStatus, string> = {
+  pending: "На перевірці",
+  published: "Опублікований",
+  hidden: "Прихований",
+  deleted: "Видалений",
+};
+
+/** Дозволені переходи статусів. Головне правило: із `deleted` можна тільки
+ *  на перевірку — опублікувати видалений відгук напряму не можна навіть
+ *  прямим PATCH в обхід адмінського UI. */
+export const REVIEW_TRANSITIONS: Record<ReviewStatus, readonly ReviewStatus[]> =
+  {
+    pending: ["published", "hidden", "deleted"],
+    published: ["hidden", "deleted"],
+    hidden: ["published", "pending", "deleted"],
+    deleted: ["pending"],
+  };
+
+export function canChangeReviewStatus(
+  from: ReviewStatus,
+  to: ReviewStatus,
+): boolean {
+  return REVIEW_TRANSITIONS[from].includes(to);
+}
 
 /** Документ колекції (`_id` драйвер додає сам). */
 export interface ReviewDoc {
@@ -29,6 +61,10 @@ export interface ReviewDoc {
   source: ReviewSource;
   /** ISO-рядок: лексикографне сортування = сортування за часом. */
   createdAt: string;
+  /** Час останньої зміни статусу; відсутній у старіших документах. */
+  updatedAt?: string;
+  /** Час м'якого видалення. При відновленні поле знімається ($unset). */
+  deletedAt?: string;
 }
 
 /** Вхід публічної форми (усі поля — з FormData/JSON, без довіри). */

@@ -1,9 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+/* Type-only: спільний тип статусів без підтягування серверного шару БД
+   у клієнтський бандл. */
+import type { ReviewStatus } from "@/lib/reviews";
 import styles from "@/styles/admin/AdminReviews.module.css";
-
-type ReviewStatus = "pending" | "published" | "hidden" | "deleted";
 
 interface Review {
   _id: string;
@@ -14,6 +15,8 @@ interface Review {
   status: ReviewStatus;
   source: "site" | "seed";
   createdAt: string;
+  updatedAt?: string;
+  deletedAt?: string;
 }
 
 type Filter = "all" | ReviewStatus;
@@ -94,12 +97,20 @@ export default function AdminReviewsPage() {
       : reviews.filter((review) => review.status === filter);
 
   async function changeStatus(review: Review, status: ReviewStatus) {
-    const previous = review.status;
+    const previous = review;
+    const now = new Date().toISOString();
     setBusyId(review._id);
-    /* Оптимістичне оновлення: бейдж міняється одразу. */
+    /* Оптимістичне оновлення: бейдж і дата видалення міняються одразу. */
     setReviews((prev) =>
       prev.map((item) =>
-        item._id === review._id ? { ...item, status } : item,
+        item._id === review._id
+          ? {
+              ...item,
+              status,
+              updatedAt: now,
+              deletedAt: status === "deleted" ? now : undefined,
+            }
+          : item,
       ),
     );
     try {
@@ -109,27 +120,30 @@ export default function AdminReviewsPage() {
         credentials: "include",
         body: JSON.stringify({ id: review._id, status }),
       });
-      if (res.ok) {
-        flash(
-          "ok",
-          status === "published"
-            ? "Відгук схвалено та опубліковано"
-            : status === "hidden"
-              ? "Відгук приховано"
-              : status === "deleted"
-                ? "Відгук видалено (залишився в історії)"
-                : "Відгук повернуто на перевірку",
-        );
-      } else {
-        throw new Error(String(res.status));
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw new Error(body?.error ?? `Помилка ${res.status}`);
       }
-    } catch {
-      setReviews((prev) =>
-        prev.map((item) =>
-          item._id === review._id ? { ...item, status: previous } : item,
-        ),
+      flash(
+        "ok",
+        status === "published"
+          ? "Відгук схвалено та опубліковано"
+          : status === "hidden"
+            ? "Відгук приховано"
+            : status === "deleted"
+              ? "Відгук видалено (запис лишився в базі, доступний у фільтрі «Видалені»)"
+              : "Відгук повернуто на перевірку",
       );
-      flash("err", "Не вдалося змінити статус");
+    } catch (error) {
+      setReviews((prev) =>
+        prev.map((item) => (item._id === review._id ? previous : item)),
+      );
+      flash(
+        "err",
+        error instanceof Error ? error.message : "Не вдалося змінити статус",
+      );
     } finally {
       setBusyId(null);
     }
@@ -140,7 +154,7 @@ export default function AdminReviewsPage() {
   function removeReview(review: Review) {
     if (
       !window.confirm(
-        `Видалити відгук «${review.name}»? Запис лишиться в історії — його можна буде відновити.`,
+        `Видалити відгук «${review.name}»? Запис не видаляється з бази: він лишиться у фільтрі «Видалені», а відновлення поверне його на перевірку.`,
       )
     ) {
       return;
@@ -183,11 +197,14 @@ export default function AdminReviewsPage() {
         <p className={styles.pageSubtitle}>
           Заявки з форми на /reviews з&apos;являються тут зі статусом «на
           перевірці». Схваліть відгук — і він одразу потрапить на сайт.
+          Видалення м&apos;яке: запис лишається в базі у фільтрі «Видалені», а
+          відновлення повертає його на перевірку.
         </p>
       </div>
 
       {message && (
         <output
+          aria-live="polite"
           className={`${styles.message} ${message.kind === "ok" ? styles.successBox : styles.errorBox}`}
         >
           {message.text}
@@ -220,7 +237,10 @@ export default function AdminReviewsPage() {
           {visible.map((review) => {
             const busy = busyId === review._id;
             return (
-              <li key={review._id} className={styles.card}>
+              <li
+                key={review._id}
+                className={`${styles.card} ${review.status === "deleted" ? styles.cardDeleted : ""}`}
+              >
                 <div className={styles.cardHead}>
                   <span className={styles.cardName}>{review.name}</span>
                   <span
@@ -247,6 +267,15 @@ export default function AdminReviewsPage() {
                 {review.context && (
                   <p className={styles.context}>Свято: {review.context}</p>
                 )}
+                {review.status === "deleted" && (
+                  <p className={styles.deletedNote}>
+                    {`Видалено ${new Date(
+                      review.deletedAt ?? review.updatedAt ?? review.createdAt,
+                    ).toLocaleDateString(
+                      "uk-UA",
+                    )}. З бази не видалено — відновлення поверне відгук на перевірку.`}
+                  </p>
+                )}
 
                 <div className={`${styles.actions} ${busy ? styles.busy : ""}`}>
                   {review.status === "deleted" ? (
@@ -265,9 +294,7 @@ export default function AdminReviewsPage() {
                           type="button"
                           className={styles.approveBtn}
                           disabled={busy}
-                          onClick={() =>
-                            void changeStatus(review, "published")
-                          }
+                          onClick={() => void changeStatus(review, "published")}
                         >
                           ✔ Схвалити й опублікувати
                         </button>
