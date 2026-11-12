@@ -15,15 +15,21 @@ interface Props {
   book?: SectionData<"book">["book"];
 }
 
-/** Демонстраційна форма з mac2.html: успіх показуємо на клієнті, без запиту
- *  до API. Після підключення бази тут з'явиться POST /api/orders (етап даних). */
+type Status = "idle" | "sending" | "success" | "error";
+
+/** Телефон: допустимі +, цифри, пробіл, дефіс і дужки (від 7 символів) —
+ *  та сама regex-логіка, що була у старій формі-модалці (прибрана в етапі 4). */
+const PHONE_PATTERN = /^\+?[0-9\s\-()]{7,}$/;
+
 export default function BookingForm({
   date,
   service,
   options = SERVICE_OPTIONS,
   book = BOOK,
 }: Props) {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<Status>("idle");
+  const [error, setError] = useState<string | null>(null);
+  const [phoneInvalid, setPhoneInvalid] = useState(false);
   const dateRef = useRef<HTMLInputElement>(null);
   const serviceRef = useRef<HTMLSelectElement>(null);
 
@@ -40,12 +46,53 @@ export default function BookingForm({
     if (has) serviceRef.current.value = service;
   }, [service]);
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSent(true);
+    /* Захоплюємо форму до await: currentTarget дорівнює null після очікування. */
+    const form = event.currentTarget;
+    const data = new FormData(form);
+
+    const phone = String(data.get("phone") ?? "").trim();
+    if (!PHONE_PATTERN.test(phone)) {
+      setPhoneInvalid(true);
+      setError("Введіть коректний номер телефону");
+      setStatus("error");
+      return;
+    }
+
+    setPhoneInvalid(false);
+    setError(null);
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customerName: String(data.get("name") ?? "").trim(),
+          phone,
+          date: String(data.get("date") ?? ""),
+          eventType: String(data.get("service") ?? ""),
+          eventAddress: String(data.get("address") ?? "").trim(),
+          notes: String(data.get("comment") ?? "").trim(),
+        }),
+      });
+      if (res.ok) {
+        setStatus("success");
+      } else {
+        const body = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setPhoneInvalid(false);
+        setError(body?.error ?? "Щось пішло не так. Спробуйте ще раз.");
+        setStatus("error");
+      }
+    } catch {
+      setError("Помилка з'єднання. Перевірте інтернет та спробуйте ще раз.");
+      setStatus("error");
+    }
   }
 
-  if (sent) {
+  if (status === "success") {
     return (
       <output className="m2-form__success" aria-live="polite">
         <h3>{book.successTitle}</h3>
@@ -54,7 +101,10 @@ export default function BookingForm({
           <button
             className="m2-btn m2-btn--ghost m2-btn--sm"
             type="button"
-            onClick={() => setSent(false)}
+            onClick={() => {
+              setError(null);
+              setStatus("idle");
+            }}
           >
             Заповнити ще одну
           </button>
@@ -64,7 +114,7 @@ export default function BookingForm({
   }
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={(event) => void onSubmit(event)}>
       <div className="m2-two">
         <div className="m2-field">
           <label htmlFor="book-name">Ваше ім'я</label>
@@ -77,7 +127,15 @@ export default function BookingForm({
             name="phone"
             type="tel"
             required
+            aria-invalid={phoneInvalid || undefined}
             placeholder="+380__ ___ __ __"
+            onChange={() => {
+              if (phoneInvalid) {
+                setPhoneInvalid(false);
+                setError(null);
+                setStatus("idle");
+              }
+            }}
           />
         </div>
       </div>
@@ -125,8 +183,17 @@ export default function BookingForm({
           placeholder="6 дітей, 6–8 років, бажано космонавти"
         />
       </div>
-      <button className="m2-btn m2-btn--green" type="submit">
-        Забронювати дату
+      {status === "error" && error && (
+        <p className="m2-form__error" role="alert">
+          {error}
+        </p>
+      )}
+      <button
+        className="m2-btn m2-btn--green"
+        type="submit"
+        disabled={status === "sending"}
+      >
+        {status === "sending" ? "Відправлення..." : "Забронювати дату"}
       </button>
       <p className="m2-form__note">{book.note}</p>
     </form>

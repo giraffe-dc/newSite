@@ -1347,6 +1347,16 @@
   margin-top: 10px;
 }
 
+.m2-form__error {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgb(190 60 50 / 45%);
+  background: rgb(190 60 50 / 10%);
+  color: #9d2b22;
+  font-size: 14px;
+}
+
 /* ---------- Футер ---------- */
 .m2-foot {
   background: var(--ink);

@@ -1,0 +1,293 @@
+/* Сторінка замовлень /admin/orders: фільтр за статусом, картки заявок
+   з розкриттям деталей, зміною статусу та видаленням. */
+
+.page {
+  padding: 2rem 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  margin-bottom: 1.5rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pageSubtitle {
+  color: #64748b;
+  margin: 0;
+}
+
+/* --- Фільтр статусів --- */
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: none;
+  min-inline-size: 0;
+}
+
+.chip {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  color: #475569;
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  background: #f1f5f9;
+}
+
+.chipActive {
+  background: #1e293b;
+  border-color: #1e293b;
+  color: #ffffff;
+}
+
+.chipActive:hover {
+  background: #1e293b;
+}
+
+.chipCount {
+  opacity: 0.75;
+  margin-left: 0.35rem;
+}
+
+/* --- Повідомлення --- */
+
+.message {
+  display: block;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+.errorBox {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.successBox {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.empty {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.loading {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #64748b;
+}
+
+/* --- Список заявок --- */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.cardHead {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #1e293b;
+  flex-wrap: wrap;
+}
+
+.cardHead:hover {
+  background: #f8fafc;
+}
+
+.cardName {
+  font-weight: 700;
+}
+
+.cardMeta {
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.cardArrow {
+  margin-left: auto;
+  color: #94a3b8;
+  transition: transform 0.15s ease;
+}
+
+.cardArrowOpen {
+  transform: rotate(180deg);
+}
+
+/* --- Бейдж статусу --- */
+
+.badge {
+  border-radius: 999px;
+  padding: 0.18rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badgeNew {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badgeProgress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badgeDone {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badgeCancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badgeUnknown {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* --- Деталі --- */
+
+.details {
+  border-top: 1px solid #e2e8f0;
+  padding: 1rem 1.1rem;
+  background: #f8fafc;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem 1.5rem;
+}
+
+.detailLabel {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.detailValue {
+  color: #1e293b;
+  font-size: 0.93rem;
+  white-space: pre-wrap;
+}
+
+.items {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #1e293b;
+  font-size: 0.93rem;
+}
+
+/* --- Дії --- */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  border-top: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.statusLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.statusSelect {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  font-size: 0.9rem;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+.statusSelect:focus {
+  outline: none;
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.deleteBtn {
+  margin-left: auto;
+  border: 1px solid #fecaca;
+  background: #ffffff;
+  color: #b91c1c;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.busy {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .cardHead {
+    font-size: 0.9rem;
+  }
+}

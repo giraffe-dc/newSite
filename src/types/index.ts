@@ -149,7 +149,7 @@ export interface Order {
   programId?: string; // обрана програма виїзду
   contactChannel?: "phone" | "telegram" | "whatsapp" | "chat";
   createdAt?: string;
-  /** Нова заявка на виїзд → На зв'язку → Підтверджено → Виконано. */
+  /** Нова заявка → В роботі → Виконано / Скасовано (статуси етапу 4). */
   status?: OrderStatus;
 }
 
@@ -171,12 +171,7 @@ export interface ContactInfo {
   };
 }
 
-export type OrderStatus =
-  | "new"
-  | "in_contact"
-  | "confirmed"
-  | "done"
-  | "cancelled";
+export type OrderStatus = "new" | "in_progress" | "done" | "cancelled";
 
 export interface Testimonial {
   _id?: string;

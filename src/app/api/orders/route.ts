@@ -30,13 +30,32 @@ function formatOrderForTelegram(order: Order) {
   return lines.join("\n");
 }
 
+/** Телефон: +, цифри, пробіл, дефіс, дужки — щонайменше 7 символів
+ *  (та сама regex-логіка, що була у старій формі-модалці). */
+const PHONE_PATTERN = /^\+?[0-9\s\-()]{7,}$/;
+
+/** Ліміти полів: санітизація перед записом у базу (етап 4, п. 5). */
+function cut(value: unknown, max: number): string {
+  return String(value ?? "")
+    .trim()
+    .slice(0, max);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as Order;
 
-    if (!body?.customerName || !body?.phone) {
+    const customerName = cut(body?.customerName, 100);
+    const phone = cut(body?.phone, 30);
+    if (!customerName || !phone) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Вкажіть ім'я та номер телефону" },
+        { status: 400 },
+      );
+    }
+    if (!PHONE_PATTERN.test(phone)) {
+      return NextResponse.json(
+        { error: "Введіть коректний номер телефону" },
         { status: 400 },
       );
     }
@@ -46,18 +65,33 @@ export async function POST(request: NextRequest) {
 
     const nowIso = new Date().toISOString();
     const doc: Order = {
-      customerName: body.customerName,
-      phone: body.phone,
-      whatsapp: body.whatsapp,
-      date: body.date,
-      time: body.time,
-      eventAddress: body.eventAddress,
-      eventType: body.eventType,
-      childrenCount: body.childrenCount,
-      notes: body.notes,
-      items: body.items,
-      packageId: body.packageId,
-      packageName: body.packageName,
+      customerName,
+      phone,
+      whatsapp: cut(body.whatsapp, 30) || undefined,
+      date: cut(body.date, 10),
+      time: cut(body.time, 10),
+      eventAddress: cut(body.eventAddress, 300),
+      eventType: cut(body.eventType, 100),
+      childrenCount:
+        typeof body.childrenCount === "number" &&
+        Number.isFinite(body.childrenCount) &&
+        body.childrenCount >= 0
+          ? Math.min(Math.trunc(body.childrenCount), 1000)
+          : undefined,
+      notes: cut(body.notes, 2000),
+      items: Array.isArray(body.items)
+        ? body.items.slice(0, 30).map((item) => ({
+            serviceId: cut(item?.serviceId, 100) || undefined,
+            serviceName: cut(item?.serviceName, 200),
+            quantity:
+              typeof item?.quantity === "number" && item.quantity > 0
+                ? Math.min(Math.trunc(item.quantity), 1000)
+                : undefined,
+            price: cut(item?.price, 50) || undefined,
+          }))
+        : undefined,
+      packageId: cut(body.packageId, 100) || undefined,
+      packageName: cut(body.packageName, 200) || undefined,
       status: "new",
       createdAt: nowIso,
     };
