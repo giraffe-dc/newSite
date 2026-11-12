@@ -1,12 +1,13 @@
 "use client";
 
-import { type ReactNode, useEffect, useRef, useState } from "react";
 import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
 
 /* Форма секції будується зі структури дефолтів (SECTION_DEFAULTS), значення
-   беруться з поточних даних. Один універсальний редактор покриває всі 14
-   секцій: поля, вкладені об'єкти, списки з додаванням/перестановкою. */
+   беруться з поточних даних. Один універсальний редактор покриває всі 13
+   секцій: поля, вкладені об'єкти, списки з додаванням/перестановкою.
+   (Відгуки вийшли зі складу в етапі 6 — окрема колекція reviews і
+   розділ модерації /admin/reviews.) */
 
 const LABELS: Record<string, string> = {
   // контакти
@@ -54,15 +55,7 @@ const LABELS: Record<string, string> = {
   promises: "Гарантії",
   ico: "Іконка (емодзі)",
   trust: "Цифри довіри",
-  // відгуки
-  reviews: "Відгуки",
-  stars: "Зірки",
-  quote: "Текст відгуку",
-  initial: "Літера в аватарі",
   name: "Назва",
-  context: "Підпис під ім'ям",
-  avatar: "Стиль аватара (клас)",
-  homeReviewIndexes: "Показувати на головній",
   // кроки й покриття
   steps: "Кроки",
   cover: "Список локацій",
@@ -101,26 +94,23 @@ const LABELS: Record<string, string> = {
 };
 
 /* Назви ключів, що означають різне в різних секціях (однакові ключі
-   в табло, цифрах довіри та відгуках). */
+   в табло та цифрах довіри). */
 const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
   board: { label: "Назва рядка", value: "Текст рядка" },
   cases: { title: "Назва випадку", text: "Опис" },
   promises: { value: "Число", label: "Підпис під числом" },
-  reviews: { name: "Ім'я" },
   services: { title: "Назва послуги" },
 };
 
 /* Ключі, які не редагуються вручну: homeServiceOptions перераховується із
-   списку випадків при збереженні, homeReviewIndexes працює через прапорці
-   під картками відгуків. */
+   списку випадків при збереженні. */
 const HIDDEN: Partial<Record<SectionKey, readonly string[]>> = {
   cases: ["homeServiceOptions"],
-  reviews: ["homeReviewIndexes"],
 };
 
 /* Поля-«токени» лишаються у новому елементі списку: це не вільний текст,
-   а маркери (емодзі, клас аватара, зірки), які важко відновити. */
-const TOKEN_KEYS = new Set(["emoji", "avatar", "stars", "ico", "initial"]);
+   а маркери (емодзі), які важко відновити. */
+const TOKEN_KEYS = new Set(["emoji", "ico"]);
 
 type Obj = Record<string, unknown>;
 
@@ -159,28 +149,17 @@ function makeTemplate(node: unknown, key?: string): unknown {
   return node;
 }
 
-/* Додаткові контроли для конкретного списку (відгуки: прапорець
-   «показувати на головній»). Патчі повертаються разом зі зміною масиву,
-   щоб оновлення списку і позиційних індексів сталося одним станом. */
-interface ListExtra {
-  render?: (index: number) => ReactNode;
-  patchAfterRemove?: (index: number) => Obj;
-  patchAfterMove?: (from: number, to: number) => Obj;
-}
-
 function Fields({
   value,
   shape,
   labels,
   hidden = [],
-  extras,
   onChange,
 }: {
   value: Obj;
   shape: Obj;
   labels: Record<string, string>;
   hidden?: readonly string[];
-  extras?: Record<string, ListExtra>;
   onChange: (next: Obj) => void;
 }) {
   return (
@@ -194,10 +173,7 @@ function Fields({
             value={value[key]}
             shapeValue={shape[key]}
             labels={labels}
-            extra={extras?.[key]}
-            onChange={(next, patch) =>
-              onChange({ ...value, [key]: next, ...(patch ?? {}) })
-            }
+            onChange={(next) => onChange({ ...value, [key]: next })}
           />
         ))}
     </div>
@@ -209,15 +185,13 @@ function Field({
   value,
   shapeValue,
   labels,
-  extra,
   onChange,
 }: {
   name: string;
   value: unknown;
   shapeValue: unknown;
   labels: Record<string, string>;
-  extra?: ListExtra;
-  onChange: (next: unknown, patch?: Obj) => void;
+  onChange: (next: unknown) => void;
 }) {
   const label = labels[name] ?? name;
 
@@ -229,7 +203,6 @@ function Field({
           value={value}
           shapeArray={shapeValue}
           labels={labels}
-          extra={extra}
           onChange={onChange}
         />
       </div>
@@ -327,14 +300,12 @@ function ArrayField({
   value,
   shapeArray,
   labels,
-  extra,
   onChange,
 }: {
   value: unknown;
   shapeArray: unknown[];
   labels: Record<string, string>;
-  extra?: ListExtra;
-  onChange: (next: unknown[], patch?: Obj) => void;
+  onChange: (next: unknown[]) => void;
 }) {
   const items = Array.isArray(value) ? value : [];
   const objectList = isObj(shapeArray[0]);
@@ -345,16 +316,13 @@ function ArrayField({
     onChange(items.map((item, i) => (i === index ? next : item)));
 
   const remove = (index: number) =>
-    onChange(
-      items.filter((_, i) => i !== index),
-      extra?.patchAfterRemove?.(index),
-    );
+    onChange(items.filter((_, i) => i !== index));
 
   const move = (from: number, to: number) => {
     const next = [...items];
     const [moved] = next.splice(from, 1);
     next.splice(to, 0, moved);
-    onChange(next, extra?.patchAfterMove?.(from, to));
+    onChange(next);
   };
 
   const add = () => onChange([...items, makeTemplate(shapeArray[0])]);
@@ -403,7 +371,6 @@ function ArrayField({
               labels={labels}
               onChange={(next) => update(index, next)}
             />
-            {extra?.render?.(index)}
           </div>
         ) : (
           // biome-ignore lint/suspicious/noArrayIndexKey: список повністю контрольований — значення завжди зі стану, перестановка не ламає введення
@@ -478,75 +445,8 @@ export default function SectionForm({
   const shape = SECTION_DEFAULTS[section] as Obj;
   const hidden = HIDDEN[section] ?? [];
   const labels = { ...LABELS, ...(LABEL_OVERRIDES[section] ?? {}) };
-  const [warn, setWarn] = useState<string | null>(null);
-  const warnTimer = useRef<number | null>(null);
-
-  useEffect(
-    () => () => {
-      if (warnTimer.current) window.clearTimeout(warnTimer.current);
-    },
-    [],
-  );
-
-  const showWarn = (text: string) => {
-    setWarn(text);
-    if (warnTimer.current) window.clearTimeout(warnTimer.current);
-    warnTimer.current = window.setTimeout(() => setWarn(null), 4000);
-  };
 
   const visibleKeys = Object.keys(shape).filter((key) => !hidden.includes(key));
-
-  /* Відгуки: прапорець «показувати на головній» під карткою. homeReviewIndexes
-     — позиційний масив, тому при видаленні/перестановці його перераховуємо
-     разом зі зміною списку (патчем в одному оновленні стану). */
-  const homeIndexes =
-    section === "reviews" && Array.isArray(data.homeReviewIndexes)
-      ? data.homeReviewIndexes.filter((n): n is number => typeof n === "number")
-      : [];
-
-  const toggleHome = (index: number, checked: boolean) => {
-    if (!checked) {
-      if (homeIndexes.includes(index) && homeIndexes.length <= 1) {
-        showWarn("На головній має лишитися хоча б один відгук");
-        return;
-      }
-      onChange({
-        ...data,
-        homeReviewIndexes: homeIndexes.filter((i) => i !== index),
-      });
-      return;
-    }
-    onChange({
-      ...data,
-      homeReviewIndexes: [...homeIndexes, index].sort((a, b) => a - b),
-    });
-  };
-
-  const reviewsExtra: ListExtra | undefined =
-    section === "reviews"
-      ? {
-          render: (index) => (
-            <label className={styles.check}>
-              <input
-                type="checkbox"
-                checked={homeIndexes.includes(index)}
-                onChange={(event) => toggleHome(index, event.target.checked)}
-              />
-              <span>Показувати на головній</span>
-            </label>
-          ),
-          patchAfterRemove: (index) => ({
-            homeReviewIndexes: homeIndexes
-              .filter((i) => i !== index)
-              .map((i) => (i > index ? i - 1 : i)),
-          }),
-          patchAfterMove: (from, to) => ({
-            homeReviewIndexes: homeIndexes.map((i) =>
-              i === from ? to : i === to ? from : i,
-            ),
-          }),
-        }
-      : undefined;
 
   /* Єдиний ключ-об'єкт (контакти, герой, табло…) — показуємо його поля
      без зайвої рамки; багатоключові секції рендеряться як є. */
@@ -557,12 +457,6 @@ export default function SectionForm({
 
   return (
     <div className={styles.form}>
-      {warn && (
-        <div className={styles.warn} role="alert">
-          ⚠️ {warn}
-        </div>
-      )}
-
       {soleObjectKey ? (
         <Fields
           value={isObj(data[soleObjectKey]) ? (data[soleObjectKey] as Obj) : {}}
@@ -576,7 +470,6 @@ export default function SectionForm({
           shape={shape}
           labels={labels}
           hidden={hidden}
-          extras={reviewsExtra ? { reviews: reviewsExtra } : undefined}
           onChange={onChange}
         />
       )}

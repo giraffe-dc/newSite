@@ -1,4 +1,5 @@
 import Home from "@/components/board/Home";
+import { getPublishedReviews } from "@/lib/reviews";
 import { getSection } from "@/lib/siteContent";
 
 /** Головна сторінка — композиція варіант Б (docs/home-rework-demo-b.html).
@@ -15,15 +16,17 @@ import { getSection } from "@/lib/siteContent";
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [hero, timeline, cases, promises, reviews, book, contacts] =
+  const [hero, timeline, cases, promises, book, contacts, reviews] =
     await Promise.all([
       getSection("hero"),
       getSection("timeline"),
       getSection("cases"),
       getSection("promises"),
-      getSection("reviews"),
       getSection("book"),
       getSection("contacts"),
+      /* Два найновіші опубліковані відгуки з колекції reviews (етап 6);
+         fallback — дефолти з content.ts. */
+      getPublishedReviews(2),
     ]);
 
   return (
@@ -34,8 +37,7 @@ export default async function HomePage() {
       homeServiceOptions={cases.homeServiceOptions}
       promises={promises.promises}
       trust={promises.trust}
-      reviews={reviews.reviews}
-      homeReviewIndexes={reviews.homeReviewIndexes}
+      reviews={reviews}
       book={book.book}
       contacts={contacts.contacts}
     />

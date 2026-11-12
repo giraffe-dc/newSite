@@ -16,12 +16,10 @@ import {
   COVER_NOTE,
   FAQ,
   HERO,
-  HOME_REVIEW_INDEXES,
   HOME_SERVICE_OPTIONS,
   PACKAGE_ADDONS,
   PACKAGES,
   PROMISES,
-  REVIEWS,
   SERVICE_OPTIONS,
   SERVICES,
   STEPS,
@@ -29,7 +27,9 @@ import {
   TRUST,
 } from "@/components/board/content";
 
-/** Порядок і перелік секцій — мапа 2.1 плану підключення до БД. */
+/** Порядок і перелік секцій — мапа 2.1 плану підключення до БД.
+ *  Секція `reviews` вийшла зі складу в етапі 6: відгуки живуть у власній
+ *  колекції `reviews` (модерація, публічна форма — див. src/lib/reviews.ts). */
 export const SECTION_KEYS = [
   "contacts",
   "hero",
@@ -37,7 +37,6 @@ export const SECTION_KEYS = [
   "timeline",
   "cases",
   "promises",
-  "reviews",
   "steps",
   "cover",
   "book",
@@ -57,7 +56,6 @@ export const SECTION_DEFAULTS = {
   timeline: { timeline: TIMELINE },
   cases: { cases: CASES, homeServiceOptions: HOME_SERVICE_OPTIONS },
   promises: { promises: PROMISES, trust: TRUST },
-  reviews: { reviews: REVIEWS, homeReviewIndexes: HOME_REVIEW_INDEXES },
   steps: { steps: STEPS },
   cover: { cover: COVER, coverNote: COVER_NOTE },
   book: { book: BOOK },

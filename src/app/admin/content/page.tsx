@@ -43,11 +43,6 @@ const SECTION_META: Record<
     label: "Гарантії",
     hint: "Три гарантії та цифри довіри на головній.",
   },
-  reviews: {
-    icon: "💌",
-    label: "Відгуки",
-    hint: "Листівки відгуків; прапорець під карткою показує відгук на головній.",
-  },
   steps: {
     icon: "👣",
     label: "Кроки до свята",
@@ -145,18 +140,6 @@ export default function AdminContentPage() {
 
   const save = async () => {
     if (!current) return;
-    /* Сервер відхиляє порожні обов'язкові списки; для «відгуків на
-       головній» даємо зрозуміле повідомлення замість загальної помилки. */
-    if (active === "reviews") {
-      const indexes = current.homeReviewIndexes;
-      if (!Array.isArray(indexes) || indexes.length === 0) {
-        flash({
-          kind: "err",
-          text: "Помилка збереження даних: на головній має лишитися хоча б один відгук",
-        });
-        return;
-      }
-    }
 
     setSaving(true);
     try {

@@ -1357,6 +1357,82 @@
   font-size: 14px;
 }
 
+/* ---------- Форма відгуку (/reviews): оцінка-зірки, honeypot ---------- */
+
+.m2-vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Honeypot: приховане від людей поле для ботів. */
+.m2-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 0;
+  overflow: hidden;
+}
+
+.m2-rating {
+  border: 0;
+  padding: 0;
+  margin: 0 0 14px;
+  min-inline-size: 0;
+}
+
+.m2-rating legend {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0;
+  margin-bottom: 6px;
+}
+
+.m2-rating__stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.m2-rating__stars input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.m2-rating__stars label {
+  font-size: 26px;
+  line-height: 1;
+  color: #c7cec7;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.m2-rating__stars label:hover {
+  color: var(--ochre);
+}
+
+/* DOM зростає (1→5), контейнер row-reverse: підсвітка `~ label` потрапляє
+   у візуальні "перші N" зірок. */
+.m2-rating__stars input:checked ~ label {
+  color: var(--ochre);
+}
+
+.m2-rating__stars input:focus-visible + label {
+  outline: 2px solid var(--green-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 /* ---------- Футер ---------- */
 .m2-foot {
   background: var(--ink);

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
 import BookingSection from "./BookingSection";
 import CasePicker from "./CasePicker";
+import type { ReviewItem } from "./content";
 import { DATE_SLOTS } from "./content";
 import Hero from "./Hero";
 import PromisesSection from "./PromisesSection";
@@ -19,8 +20,8 @@ interface HomeProps {
   homeServiceOptions: readonly string[];
   promises: SectionData<"promises">["promises"];
   trust: SectionData<"promises">["trust"];
-  reviews: SectionData<"reviews">["reviews"];
-  homeReviewIndexes: readonly number[];
+  /** Два найновіші опубліковані відгуки (етап 6). */
+  reviews: ReviewItem[];
   book: SectionData<"book">["book"];
   contacts: SectionData<"contacts">["contacts"];
 }
@@ -37,7 +38,6 @@ export default function Home({
   promises,
   trust,
   reviews,
-  homeReviewIndexes,
   book,
   contacts,
 }: HomeProps) {
@@ -52,7 +52,7 @@ export default function Home({
       <TimelineSection timeline={timeline} />
       <CasePicker cases={cases} service={service} onPick={setService} />
       <PromisesSection promises={promises} trust={trust} />
-      <ReviewsSection reviews={reviews} homeReviewIndexes={homeReviewIndexes} />
+      <ReviewsSection reviews={reviews} />
       {/* <DateChecker date={date} onPick={setDate} /> */}
       <BookingSection
         date={date}

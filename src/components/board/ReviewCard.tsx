@@ -1,13 +1,14 @@
-import type { SectionData } from "@/lib/siteContent";
-
-/** Редагований тип відгуку (з БД приходять звичайні string, не літерали). */
-type Review = SectionData<"reviews">["reviews"][number];
+import type { ReviewItem } from "./content";
 
 /** Одна листівка-відгук — спільна для сітки відгуків і секції на головній. */
-export default function ReviewCard({ review }: { review: Review }) {
+export default function ReviewCard({ review }: { review: ReviewItem }) {
   return (
     <article className="m2-review">
-      <div className="m2-review__stars" role="img" aria-label="Оцінка: 5 зірок">
+      <div
+        className="m2-review__stars"
+        role="img"
+        aria-label={`Оцінка: ${review.rating} з 5`}
+      >
         {review.stars}
       </div>
       <blockquote>{review.quote}</blockquote>

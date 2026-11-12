@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ReviewForm from "@/components/board/ReviewForm";
 import ReviewsGrid from "@/components/board/ReviewsGrid";
-import { getSection } from "@/lib/siteContent";
+import { getPublishedReviews } from "@/lib/reviews";
 
 export const metadata: Metadata = {
   title: "Відгуки — Жирафик, виїзні свята",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function ReviewsPage() {
-  const reviews = await getSection("reviews");
+  const reviews = await getPublishedReviews();
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -24,13 +25,22 @@ export default async function ReviewsPage() {
           </p>
         </div>
 
-        <ReviewsGrid reviews={reviews.reviews} />
+        <ReviewsGrid reviews={reviews} />
 
-        <div className="m2-notecard" style={{ marginTop: 36 }}>
-          <b>Про ці записи.</b> Тексти перенесено з демо-макета №2. Після
-          підключення бази й адмінки тут будуть реальні відгуки з дозволених
-          публікацій.
-        </div>
+        <section
+          className="m2-notecard"
+          style={{ marginTop: 36 }}
+          aria-labelledby="review-form-title"
+        >
+          <h2 id="review-form-title" style={{ marginBottom: 10 }}>
+            Залишити відгук
+          </h2>
+          <p style={{ marginBottom: 16 }}>
+            Розкажіть, як пройшло свято. Кожен відгук ми перевіряємо перед
+            публікацією — тому на сторінці лише справжні історії.
+          </p>
+          <ReviewForm />
+        </section>
 
         <div className="m2-inline" style={{ marginTop: 24 }}>
           <Link className="m2-btn" href="/#book">

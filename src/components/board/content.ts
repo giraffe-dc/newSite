@@ -210,9 +210,27 @@ export const PACKAGES: Package[] = [
 export const PACKAGE_ADDONS =
   "Плюс до будь-якого пакета: другий аніматор (+1200 грн) · торт на замовлення · виїзд понад 50 км (+15 грн/км) · ранковий або вечірній слот.";
 
-export const REVIEWS = [
+/** Відгук у форматі показу (картки на головній, /reviews і в сітці).
+ *  Джерело — колекція `reviews` (етап 6); REVIEWS нижче — лише fallback,
+ *  коли БД недоступна. */
+export interface ReviewItem {
+  /** Стабільний ключ списків: `_id` документа або `seed-N` для дефолтів. */
+  id: string;
+  stars: string;
+  /** Числова оцінка 1..5 — для доступності картки (aria-label). */
+  rating: number;
+  quote: string;
+  initial: string;
+  name: string;
+  context: string;
+  avatar: string;
+}
+
+export const REVIEWS: ReviewItem[] = [
   {
+    id: "seed-1",
     stars: "★★★★★",
+    rating: 5,
     quote:
       "«Замовляли аніматора-пірата на 7 років сину прямо у двір будинку. Діти були щасливі, а нам не треба нікуди їхати. VR-станція теж заїшла на ура!»",
     initial: "О",
@@ -221,7 +239,9 @@ export const REVIEWS = [
     avatar: "m2-ava--1",
   },
   {
+    id: "seed-2",
     stars: "★★★★★",
+    rating: 5,
     quote:
       "«Випускний у садку — три ростові ляльки та PS-зона для старшаків. Приїхали за годину до початку, все самі підключили. Дякуємо!»",
     initial: "І",
@@ -230,7 +250,9 @@ export const REVIEWS = [
     avatar: "m2-ava--2",
   },
   {
+    id: "seed-3",
     stars: "★★★★★",
+    rating: 5,
     quote:
       "«Здивували дружину та дітей — жираф із кульками прийшов просто в офіс на ранок. Колеги досі згадують. Ціна виявилась чесна, без сюрпризів.»",
     initial: "А",
@@ -238,7 +260,7 @@ export const REVIEWS = [
     context: "Раптове привітання в офісі · 📍 відео",
     avatar: "m2-ava--3",
   },
-] as const;
+];
 
 export const FAQ = [
   {
@@ -538,5 +560,5 @@ export const DATE_BOARD = {
   arrival: { free: "10:00", few: "12:00", busy: "16:00" },
 };
 
-/** Два відгуки для головної (решта лишається на /reviews). */
-export const HOME_REVIEW_INDEXES = [0, 2] as const;
+/** Два відгуки для головної добирає дані-шар (два найновіші опубліковані,
+ *  див. src/lib/reviews.ts); ручний вибір homeReviewIndexes прибрано в етапі 6. */
