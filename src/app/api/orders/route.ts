@@ -15,6 +15,8 @@ function formatOrderForTelegram(order: Order) {
   if (order.eventAddress)
     lines.push(`Адреса проведення: <b>${order.eventAddress}</b>`);
   if (order.eventType) lines.push(`Тип свята: <b>${order.eventType}</b>`);
+  if (order.serviceName)
+    lines.push(`Послуга: <b>${order.serviceName}</b>`);
   if (order.childrenCount)
     lines.push(`Кількість дітей: <b>${order.childrenCount}</b>`);
   if (order.packageName) lines.push(`Пакет: <b>${order.packageName}</b>`);
@@ -92,6 +94,7 @@ export async function POST(request: NextRequest) {
         : undefined,
       packageId: cut(body.packageId, 100) || undefined,
       packageName: cut(body.packageName, 200) || undefined,
+      serviceName: cut(body.serviceName, 200) || undefined,
       status: "new",
       createdAt: nowIso,
     };

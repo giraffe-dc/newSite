@@ -146,6 +146,7 @@ export interface Order {
   items?: OrderItem[];
   packageId?: string;
   packageName?: string;
+  serviceName?: string; // назва послуги (при бронюванні з картки послуги)
   programId?: string; // обрана програма виїзду
   contactChannel?: "phone" | "telegram" | "whatsapp" | "chat";
   createdAt?: string;

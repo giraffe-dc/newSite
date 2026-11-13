@@ -11,6 +11,8 @@ export default function ReviewsSection({
 }) {
   const shown = reviews.slice(0, 2);
 
+  if (!reviews.length) return null;
+
   return (
     <section
       className="m2-sec m2-sec--tint"

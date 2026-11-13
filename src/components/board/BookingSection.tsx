@@ -6,6 +6,11 @@ export default function BookingSection({
   date,
   service,
   options,
+  packageId,
+  packageName,
+  serviceName,
+  programId,
+  items,
   tint = false,
   book = BOOK,
   contacts = CONTACTS,
@@ -13,6 +18,12 @@ export default function BookingSection({
   date?: string;
   service?: string;
   options?: readonly string[];
+  packageId?: string;
+  packageName?: string;
+  programId?: string;
+  /** Назва послуги — з /services (передається окремо від формату «eventType»). */
+  serviceName?: string;
+  items?: Array<{ serviceId?: string; serviceName: string; quantity?: number; price?: string | number }>;
   tint?: boolean;
   book?: SectionData<"book">["book"];
   contacts?: SectionData<"contacts">["contacts"];
@@ -51,7 +62,12 @@ export default function BookingSection({
           <BookingForm
             date={date}
             service={service}
+            serviceName={serviceName}
             options={options}
+            packageId={packageId}
+            packageName={packageName}
+            programId={programId}
+            items={items}
             book={book}
           />
         </div>

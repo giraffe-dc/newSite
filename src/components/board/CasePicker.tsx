@@ -11,10 +11,12 @@ export default function CasePicker({
   cases = CASES,
 }: {
   service: string;
-  onPick: (service: string) => void;
+  onPick: (service: string, caseId: string) => void;
   cases?: SectionData<"cases">["cases"];
 }) {
   const active = cases.find((c) => c.service === service) ?? cases[0];
+
+  if (!cases.length || !active) return null;
 
   return (
     <section
@@ -39,7 +41,7 @@ export default function CasePicker({
               type="button"
               className="m2-case"
               aria-pressed={c.id === active.id}
-              onClick={() => onPick(c.service)}
+              onClick={() => onPick(c.service, c.id)}
             >
               <span className="m2-case__emoji" aria-hidden="true">
                 {c.emoji}

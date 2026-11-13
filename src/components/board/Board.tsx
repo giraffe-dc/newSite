@@ -15,11 +15,14 @@ export default function Board({
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!board.destinations.length) return;
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % board.destinations.length);
     }, 5000);
     return () => window.clearInterval(timer);
   }, [board.destinations.length]);
+
+  if (!board.rows.length && !board.destinations.length) return null;
 
   return (
     <section className="m2-board" aria-label="Табло найближчих виїздів">
@@ -30,11 +33,16 @@ export default function Board({
       <dl>
         {board.rows.map((row, i) => {
           const rotating = i === 1;
+          const { label, value, highlight } = row as {
+            label: string;
+            value: string;
+            highlight?: boolean;
+          };
           return (
-            <div className="m2-board__row" key={row.label}>
-              <dt>{row.label}</dt>
-              <dd className={row.highlight ? "m2-hl" : undefined}>
-                {rotating ? (
+            <div className="m2-board__row" key={label}>
+              <dt>{label}</dt>
+              <dd className={highlight ? "m2-hl" : undefined}>
+                {rotating && board.destinations.length ? (
                   <span className="m2-flip" key={index}>
                     {board.destinations[index]}
                   </span>
@@ -43,7 +51,7 @@ export default function Board({
                     className="m2-flip"
                     style={{ animationDelay: `${0.1 + i * 0.15}s` }}
                   >
-                    {row.value}
+                    {value}
                   </span>
                 )}
               </dd>

@@ -23,7 +23,11 @@ export default function ServicesGrid({
               <b>{service.price}</b>
               {service.unit}
             </span>
-            <Link href={BOOK_HREF}>Вибрати</Link>
+            <Link
+              href={`${BOOK_HREF}?format=${encodeURIComponent(service.format)}&service=${encodeURIComponent(service.title)}`}
+            >
+              Вибрати
+            </Link>
           </div>
         </article>
       ))}

@@ -130,7 +130,11 @@ function fmtPackages(s: Sections): string {
 }
 
 function fmtFaq(s: Sections): string {
-  return s.faq.faq.map((f) => `П: ${f.q}\nВ: ${f.a}`).join("\n\n");
+  if (!s.faq.faq.length) return "";
+  return s.faq.faq.map((f) => {
+    const { q, a } = f as { q: string; a: string };
+    return `П: ${q}\nВ: ${a}`;
+  }).join("\n\n");
 }
 
 function fmtNews(data: unknown): string {

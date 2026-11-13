@@ -6,6 +6,8 @@ export default function StepsSection({
 }: {
   steps?: SectionData<"steps">["steps"];
 }) {
+  if (!steps?.length) return null;
+
   return (
     <section className="m2-steps m2-sec" id="how" aria-labelledby="how-title">
       <div className="m2-wrap">
@@ -13,12 +15,15 @@ export default function StepsSection({
           <h2 id="how-title">Від дзвінка до свята — чотири кроки</h2>
         </div>
         <ol className="m2-steps__list">
-          {steps.map((step) => (
-            <li key={step.title}>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </li>
-          ))}
+          {steps.map((step) => {
+            const { title, text } = step as { title: string; text: string };
+            return (
+              <li key={title}>
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </li>
+            );
+          })}
         </ol>
       </div>
     </section>

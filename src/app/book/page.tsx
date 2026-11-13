@@ -11,12 +11,32 @@ export const metadata: Metadata = {
 
 export const revalidate = 3600;
 
-export default async function BookPage() {
+export default async function BookPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = (await (searchParams ?? {})) as Record<
+    string,
+    string | string[] | undefined
+  >;
+
   const [book, contactsSection] = await Promise.all([
     getSection("book"),
     getSection("contacts"),
   ]);
   const contacts = contactsSection.contacts;
+
+  let items;
+  const rawItems = params.items;
+  if (typeof rawItems === "string") {
+    try {
+      items = JSON.parse(rawItems);
+    } catch {
+      items = undefined;
+    }
+  }
+
   return (
     <div className="m2-inner">
       <div className="m2-wrap">
@@ -29,7 +49,30 @@ export default async function BookPage() {
         </div>
       </div>
 
-      <BookingSection book={book.book} contacts={contacts} />
+      <BookingSection
+        book={book.book}
+        contacts={contacts}
+        service={
+          typeof params.format === "string"
+            ? params.format
+            : typeof params.service === "string"
+              ? params.service
+              : undefined
+        }
+        serviceName={
+          typeof params.service === "string" ? params.service : undefined
+        }
+        packageId={
+          typeof params.package === "string" ? params.package : undefined
+        }
+        packageName={
+          typeof params.packageName === "string" ? params.packageName : undefined
+        }
+        programId={
+          typeof params.programId === "string" ? params.programId : undefined
+        }
+        items={items}
+      />
 
       <div className="m2-wrap">
         <div className="m2-inline">

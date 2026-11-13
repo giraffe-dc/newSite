@@ -1,6 +1,7 @@
 "use client";
 
 import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
+import { SERVICE_OPTIONS } from "@/components/board/content";
 import styles from "@/styles/admin/AdminContent.module.css";
 
 /* Форма секції будується зі структури дефолтів (SECTION_DEFAULTS), значення
@@ -99,7 +100,8 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
   board: { label: "Назва рядка", value: "Текст рядка" },
   cases: { title: "Назва випадку", text: "Опис" },
   promises: { value: "Число", label: "Підпис під числом" },
-  services: { title: "Назва послуги" },
+  services: { title: "Назва послуги", format: "Формат" },
+  packages: { title: "Назва пакета", format: "Формат" },
 };
 
 /* Ключі, які не редагуються вручну: homeServiceOptions перераховується із
@@ -155,12 +157,14 @@ function Fields({
   labels,
   hidden = [],
   onChange,
+  section,
 }: {
   value: Obj;
   shape: Obj;
   labels: Record<string, string>;
   hidden?: readonly string[];
   onChange: (next: Obj) => void;
+  section: SectionKey;
 }) {
   return (
     <div className={styles.grid}>
@@ -173,6 +177,7 @@ function Fields({
             value={value[key]}
             shapeValue={shape[key]}
             labels={labels}
+            section={section}
             onChange={(next) => onChange({ ...value, [key]: next })}
           />
         ))}
@@ -185,15 +190,42 @@ function Field({
   value,
   shapeValue,
   labels,
+  section,
   onChange,
 }: {
   name: string;
   value: unknown;
   shapeValue: unknown;
   labels: Record<string, string>;
+  section: SectionKey;
   onChange: (next: unknown) => void;
 }) {
   const label = labels[name] ?? name;
+
+  /* Поле «Формат» для послуг і пакетів — селект із варіантами калькулятора,
+     а не вільний текст, щоб значення співпадало з селектом у формі бронювання. */
+  if (name === "format" && (section === "services" || section === "packages")) {
+    const text = typeof value === "string" ? value : "";
+    return (
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>
+          {label}
+          <select
+            className={styles.input}
+            value={text}
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="">—</option>
+            {SERVICE_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
 
   if (Array.isArray(shapeValue)) {
     return (
@@ -203,6 +235,7 @@ function Field({
           value={value}
           shapeArray={shapeValue}
           labels={labels}
+          section={section}
           onChange={onChange}
         />
       </div>
@@ -217,6 +250,7 @@ function Field({
           value={isObj(value) ? value : {}}
           shape={shapeValue}
           labels={labels}
+          section={section}
           onChange={(next) => onChange(next)}
         />
       </fieldset>
@@ -301,11 +335,13 @@ function ArrayField({
   shapeArray,
   labels,
   onChange,
+  section,
 }: {
   value: unknown;
   shapeArray: unknown[];
   labels: Record<string, string>;
   onChange: (next: unknown[]) => void;
+  section: SectionKey;
 }) {
   const items = Array.isArray(value) ? value : [];
   const objectList = isObj(shapeArray[0]);
@@ -369,6 +405,7 @@ function ArrayField({
               value={isObj(item) ? item : {}}
               shape={mergeShapes(shapeArray)}
               labels={labels}
+              section={section}
               onChange={(next) => update(index, next)}
             />
           </div>
@@ -462,6 +499,7 @@ export default function SectionForm({
           value={isObj(data[soleObjectKey]) ? (data[soleObjectKey] as Obj) : {}}
           shape={shape[soleObjectKey] as Obj}
           labels={labels}
+          section={section}
           onChange={(next) => onChange({ ...data, [soleObjectKey]: next })}
         />
       ) : (
@@ -470,6 +508,7 @@ export default function SectionForm({
           shape={shape}
           labels={labels}
           hidden={hidden}
+          section={section}
           onChange={onChange}
         />
       )}

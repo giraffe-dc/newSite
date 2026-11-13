@@ -72,10 +72,10 @@ export function matchesShape(value: unknown, shape: unknown): boolean {
     }
     return Object.entries(shape).every(([key, expected]) => {
       if (expected === undefined) return true; // опційне поле
-      return (
-        key in value &&
-        matchesShape((value as Record<string, unknown>)[key], expected)
-      );
+      // Якщо ключа немає в даних з БД — пропускаємо (дані можуть бути частковими).
+      // Важливо: не відхиляємо цілі дані через одне відсутнє поле.
+      if (!(key in value)) return true;
+      return matchesShape((value as Record<string, unknown>)[key], expected);
     });
   }
   return typeof value === typeof shape;

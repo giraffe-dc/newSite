@@ -8,6 +8,8 @@ export default function TimelineSection({
 }: {
   timeline?: SectionData<"timeline">["timeline"];
 }) {
+  if (!timeline.length) return null;
+
   return (
     <section className="m2-sec" id="rail" aria-labelledby="rail-title">
       <div className="m2-wrap">

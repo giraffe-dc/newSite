@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
-import { CALC_NOTE, SERVICES } from "./content";
+import { BOOK_HREF, CALC_NOTE, SERVICES } from "./content";
 
 /** Орієнтовний кошторис із базових цін mac2. Сума не претендує на
  *  остаточну ціну: пакетні знижки й дорогу рахує команда після заявки. */
@@ -14,6 +15,7 @@ export default function Calculator({
   calcNote?: string;
 }) {
   const [picked, setPicked] = useState<string[]>([]);
+  const router = useRouter();
 
   function toggle(id: string) {
     setPicked((prev) =>
@@ -24,6 +26,23 @@ export default function Calculator({
   const total = services
     .filter((service) => picked.includes(service.id))
     .reduce((sum, service) => sum + service.calcValue, 0);
+
+  const goToBooking = () => {
+    const items = services
+      .filter((service) => picked.includes(service.id))
+      .map((service) => ({
+        serviceId: service.id,
+        serviceName: service.title,
+        price: service.price,
+      }));
+    if (items.length === 0) {
+      router.push(BOOK_HREF);
+      return;
+    }
+    router.push(
+      `${BOOK_HREF}?${new URLSearchParams({ items: JSON.stringify(items) }).toString()}`,
+    );
+  };
 
   return (
     <div className="m2-calc">
@@ -56,9 +75,9 @@ export default function Calculator({
         <span>Орієнтовна сума</span>
         <b>{total.toLocaleString("uk-UA")} грн</b>
         <p>{calcNote}</p>
-        <a className="m2-btn" href="/#book" style={{ marginTop: 18 }}>
+        <button className="m2-btn" onClick={goToBooking} style={{ marginTop: 18 }}>
           Забронювати дату
-        </a>
+        </button>
       </aside>
     </div>
   );

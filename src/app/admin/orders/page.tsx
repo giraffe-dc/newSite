@@ -23,6 +23,7 @@ interface Order {
   notes?: string;
   items?: OrderItem[];
   packageName?: string;
+  serviceName?: string;
   createdAt?: string;
   status?: string;
 }
@@ -77,6 +78,7 @@ function formatDetails(order: Order): string[] {
     lines.push(order.time ? `${order.date} о ${order.time}` : order.date);
   }
   if (order.eventType) lines.push(order.eventType);
+  if (order.serviceName) lines.push(`Послуга: ${order.serviceName}`);
   if (order.childrenCount) lines.push(`Дітей: ${order.childrenCount}`);
   if (order.packageName) lines.push(`Пакет: ${order.packageName}`);
   if (order.whatsapp) lines.push(`WhatsApp: ${order.whatsapp}`);

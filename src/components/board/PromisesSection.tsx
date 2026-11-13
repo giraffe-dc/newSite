@@ -9,6 +9,8 @@ export default function PromisesSection({
   promises?: SectionData<"promises">["promises"];
   trust?: SectionData<"promises">["trust"];
 }) {
+  if (!promises.length && !trust.length) return null;
+
   return (
     <section className="m2-sec" id="promises" aria-labelledby="promises-title">
       <div className="m2-wrap">

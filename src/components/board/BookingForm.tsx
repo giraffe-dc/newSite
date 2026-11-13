@@ -4,6 +4,13 @@ import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
 import { BOOK, SERVICE_OPTIONS } from "./content";
 
+interface OrderItemInput {
+  serviceId?: string;
+  serviceName: string;
+  quantity?: number;
+  price?: string | number;
+}
+
 interface Props {
   /** Дата, обрана вище на сторінці (підставляємо у поле). */
   date?: string;
@@ -11,6 +18,16 @@ interface Props {
   service?: string;
   /** Опції селекта: головна передає свої, сторінка /book — стандартні. */
   options?: readonly string[];
+  /** Обраний пакет (id) — з /packages. */
+  packageId?: string;
+  /** Назва пакету — з /packages. */
+  packageName?: string;
+  /** Назва послуги — з /services (передається окремо від формату «eventType»). */
+  serviceName?: string;
+  /** ID випадку (програми) — з CasePicker на головній. */
+  programId?: string;
+  /** Вибрані послуги — з Calculator / ServicesGrid. */
+  items?: OrderItemInput[];
   /** Тексти секції «Бронювання» (з БД або дефолти з content.ts). */
   book?: SectionData<"book">["book"];
 }
@@ -24,7 +41,12 @@ const PHONE_PATTERN = /^\+?[0-9\s\-()]{7,}$/;
 export default function BookingForm({
   date,
   service,
+  serviceName,
   options = SERVICE_OPTIONS,
+  packageId,
+  packageName,
+  programId,
+  items,
   book = BOOK,
 }: Props) {
   const [status, setStatus] = useState<Status>("idle");
@@ -74,6 +96,11 @@ export default function BookingForm({
           eventType: String(data.get("service") ?? ""),
           eventAddress: String(data.get("address") ?? "").trim(),
           notes: String(data.get("comment") ?? "").trim(),
+          ...(packageId ? { packageId } : {}),
+          ...(packageName ? { packageName } : {}),
+          ...(serviceName ? { serviceName } : {}),
+          ...(programId ? { programId } : {}),
+          ...(items?.length ? { items } : {}),
         }),
       });
       if (res.ok) {

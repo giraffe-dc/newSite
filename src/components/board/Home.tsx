@@ -41,22 +41,31 @@ export default function Home({
   book,
   contacts,
 }: HomeProps) {
-  const [date, _setDate] = useState<string>(DATE_SLOTS[1].iso);
+  const [date, _setDate] = useState<string>("");
   const [service, setService] = useState<string>(
     cases[0]?.service ?? homeServiceOptions[0] ?? "",
   );
+  const [programId, setProgramId] = useState<string | undefined>(undefined);
 
   return (
     <>
       <Hero hero={hero} contacts={contacts} />
       <TimelineSection timeline={timeline} />
-      <CasePicker cases={cases} service={service} onPick={setService} />
+      <CasePicker
+        cases={cases}
+        service={service}
+        onPick={(svc, cid) => {
+          setService(svc);
+          setProgramId(cid);
+        }}
+      />
       <PromisesSection promises={promises} trust={trust} />
       <ReviewsSection reviews={reviews} />
       {/* <DateChecker date={date} onPick={setDate} /> */}
       <BookingSection
         date={date}
         service={service}
+        programId={programId}
         options={homeServiceOptions}
         book={book}
         contacts={contacts}

@@ -35,7 +35,7 @@ export default function PackagesGrid({
             </ul>
             <Link
               className={`m2-btn${pkg.hit ? "" : " m2-btn--green"}`}
-              href={BOOK_HREF}
+              href={`${BOOK_HREF}?format=${encodeURIComponent(pkg.format)}&package=${encodeURIComponent(pkg.id)}&packageName=${encodeURIComponent(pkg.name)}&programId=${encodeURIComponent(pkg.id)}`}
             >
               Обрати «{pkg.name}»
             </Link>

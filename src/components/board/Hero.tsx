@@ -28,13 +28,20 @@ export default function Hero({
             </a>
           </div>
           <div className="m2-hero__micro">
-            {hero.micro.map((item) => (
-              <span key={item.bold}>
-                {item.before}
-                <b>{item.bold}</b>
-                {item.after}
-              </span>
-            ))}
+            {hero.micro.map((item) => {
+              const { before, bold, after } = item as {
+                before: string;
+                bold: string;
+                after: string;
+              };
+              return (
+                <span key={bold}>
+                  {before}
+                  <b>{bold}</b>
+                  {after}
+                </span>
+              );
+            })}
           </div>
         </div>
         {/* <Board /> */}

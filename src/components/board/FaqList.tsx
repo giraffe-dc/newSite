@@ -6,14 +6,19 @@ export default function FaqList({
 }: {
   faq?: SectionData<"faq">["faq"];
 }) {
+  if (!faq?.length) return null;
+
   return (
     <div className="m2-faq">
-      {faq.map((item, index) => (
-        <details className="m2-qa" key={item.q} open={index === 0}>
-          <summary>{item.q}</summary>
-          <p>{item.a}</p>
-        </details>
-      ))}
+      {faq.map((item) => {
+        const { q, a } = item as { q: string; a: string };
+        return (
+          <details className="m2-qa" key={q}>
+            <summary>{q}</summary>
+            <p>{a}</p>
+          </details>
+        );
+      })}
     </div>
   );
 }
