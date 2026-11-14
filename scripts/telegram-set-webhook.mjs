@@ -55,7 +55,9 @@ const body =
     : {
         url,
         secret_token: secret,
-        allowed_updates: ["message"],
+        // channel_post — обов'язково: картки йдуть у канал (type:"channel"),
+        // де повідомлення приходять не як message.
+        allowed_updates: ["message", "channel_post"],
         drop_pending_updates: false,
       };
 const method = arg === "--delete" ? "deleteWebhook" : "setWebhook";
@@ -74,7 +76,9 @@ if (!data.ok) {
 
 if (method === "setWebhook") {
   console.log(`✅ Webhook встановлено: ${url}`);
-  console.log("   secret_token: задано, allowed_updates: [message]");
+  console.log(
+    "   secret_token: задано, allowed_updates: [message, channel_post]",
+  );
   console.log("   Перевір: node scripts/telegram-set-webhook.mjs --info");
 } else {
   console.log("✅ Webhook видалено");

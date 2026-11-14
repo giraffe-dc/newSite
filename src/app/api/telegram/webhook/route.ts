@@ -23,6 +23,8 @@ import { sendChatBotMessage } from "@/lib/chatTelegram";
    1. X-Telegram-Bot-Api-Secret-Token === TELEGRAM_WEBHOOK_SECRET, інакше 401.
    2. Allowlist: from.id у TELEGRAM_ADMIN_IDS або chat.id групи карток
       (TELEGRAM_CHAT_CHAT_ID). Ігноруємо мовчки (200), щоб Telegram не ретраїв.
+      Картки йдуть у канал (type:"channel") — там пости приходять як channel_post,
+      тому читаємо і message, і channel_post.
    3. Ігноруємо edited_message, повідомлення від ботів, без тексту.
    4. Ідемпотентність: update_id зберігається в повідомленні, повтор — без дубля.
    5. Обмеження 2000 символів (адмінський reply теж), відповіді — без parse_mode
@@ -49,8 +51,12 @@ interface TgMessage {
 
 interface TgUpdate {
   update_id: number;
+  /** Приватний чат / група. */
   message?: TgMessage;
+  /** Канал (TELEGRAM_CHAT_CHAT_ID має type:"channel") — там пости це channel_post. */
+  channel_post?: TgMessage;
   edited_message?: TgMessage;
+  edited_channel_post?: TgMessage;
 }
 
 const HELP = [
@@ -291,11 +297,11 @@ export async function POST(req: NextRequest) {
   if (!update || typeof update.update_id !== "number") {
     return NextResponse.json({ ok: true, action: "invalid" });
   }
-  if (update.edited_message) {
+  if (update.edited_message || update.edited_channel_post) {
     return NextResponse.json({ ok: true, action: "edited" });
   }
 
-  const msg = update.message;
+  const msg = update.message ?? update.channel_post;
   if (!msg || typeof msg.chat?.id !== "number") {
     return NextResponse.json({ ok: true, action: "ignored" });
   }
