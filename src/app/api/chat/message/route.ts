@@ -6,7 +6,7 @@ import {
   isValidThreadId,
   legacyThreadId,
   normalizeText,
-  setClientMessageTelegramId,
+  setMessageTelegramId,
 } from "@/lib/chatThreads";
 
 /* Публічний запис повідомлення в режимі «Зв'язок із командою».
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     })
       .then((telegramMessageId) => {
         if (telegramMessageId != null) {
-          return setClientMessageTelegramId(
+          return setMessageTelegramId(
             threadId,
             message.id,
             telegramMessageId,

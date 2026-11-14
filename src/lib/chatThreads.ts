@@ -245,9 +245,9 @@ export async function appendOperatorMessage(
   return result.matchedCount > 0 ? message : null;
 }
 
-/** Етап 3а: прив'язати message_id картки в Telegram до повідомлення клієнта —
- *  за ним webhook (3b) знайде тред при «Відповісти». */
-export async function setClientMessageTelegramId(
+/** Етап 3: прив'язати message_id у Telegram (картка клієнта або підтвердження
+ *  webhook) до повідомлення треда — за ним «Відповісти» знайде тред. */
+export async function setMessageTelegramId(
   threadId: string,
   messageId: string,
   telegramMessageId: number,
@@ -265,7 +265,42 @@ export async function setClientMessageTelegramId(
   return result.matchedCount > 0;
 }
 
-/** Невручені відповіді оператора + позначка deliveredAt однією операцією. */export async function pollOperatorMessages(
+/** Етап 3b: знайти тред за message_id картки в Telegram («Відповісти»). */
+export async function findThreadByTelegramMessageId(
+  telegramMessageId: number,
+): Promise<ChatThread | null> {
+  await ensureChatIndexes();
+  return (await getDb())
+    .collection<ChatThread>(CHAT_THREADS_COLLECTION)
+    .findOne({ "messages.telegramMessageId": telegramMessageId });
+}
+
+/** Етап 3b: ідемпотентність — повторний update_id вже оброблений. */
+export async function findThreadByTelegramUpdateId(
+  telegramUpdateId: number,
+): Promise<ChatThread | null> {
+  await ensureChatIndexes();
+  return (await getDb())
+    .collection<ChatThread>(CHAT_THREADS_COLLECTION)
+    .findOne({ "messages.telegramUpdateId": telegramUpdateId });
+}
+
+/** Етап 3b: /reply <shortId> — пошук за префіксом threadId (перші 8 символів
+ *  із картки). Префікс екранується від regex-спецсимволів. */
+export async function findThreadByShortId(
+  shortId: string,
+): Promise<ChatThread | null> {
+  const cleaned = shortId.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
+  if (cleaned.length < 4) return null;
+  await ensureChatIndexes();
+  const escaped = cleaned.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return (await getDb())
+    .collection<ChatThread>(CHAT_THREADS_COLLECTION)
+    .findOne({ threadId: { $regex: `^${escaped}` } });
+}
+
+/** Невручені відповіді оператора + позначка deliveredAt однією операцією. */
+export async function pollOperatorMessages(
   threadId: string,
 ): Promise<ChatMessage[]> {
   await ensureChatIndexes();

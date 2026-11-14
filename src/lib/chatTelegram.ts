@@ -92,3 +92,48 @@ export async function sendChatThreadCard(
     return null;
   }
 }
+
+/** Етап 3b: відповідь бота чату в той самий chat_id, звідки прийшло оновлення
+ *  (група карток або приватний чат адміна). Без parse_mode — тексти наші,
+ *  розмітки немає. Повертає message_id для reply-to ланцюжка. */
+export async function sendChatBotMessage(
+  chatId: string | number,
+  text: string,
+  replyToMessageId?: number,
+): Promise<number | null> {
+  const token = process.env.TELEGRAM_CHAT_BOT_TOKEN;
+  if (!token) {
+    console.warn(
+      "chatTelegram: TELEGRAM_CHAT_BOT_TOKEN не задано — відповідь не надіслано",
+    );
+    return null;
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text.slice(0, 4096),
+          ...(replyToMessageId != null
+            ? { reply_to_message_id: replyToMessageId }
+            : {}),
+        }),
+      },
+    );
+    if (!res.ok) {
+      console.error("chatTelegram: Bot API", res.status, await res.text());
+      return null;
+    }
+    const data = (await res.json().catch(() => null)) as {
+      result?: { message_id?: number };
+    } | null;
+    return data?.result?.message_id ?? null;
+  } catch (error) {
+    console.error("chatTelegram: не вдалося надіслати повідомлення", error);
+    return null;
+  }
+}
