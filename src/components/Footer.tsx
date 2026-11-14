@@ -29,7 +29,7 @@ export default function Footer({
           />
           <span>
             Мобільний магістр свята «Жирафик»
-            <br />© 2026. Свято приїжджає до Вас
+            <br />© с-ще Теплик 2026. Свято приїжджає до Вас
           </span>
         </div>
         <nav className="m2-foot__links" aria-label="Навігація у футері">

@@ -2,7 +2,10 @@ import type { Document } from "mongodb";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
-import { sendTelegramMessageSurvey } from "@/lib/utils";
+import {
+  escapeTelegramHtml,
+  sendTelegramMessageSurvey,
+} from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
@@ -60,15 +63,15 @@ export async function POST(req: Request) {
     try {
       const lines: string[] = [];
       lines.push("📋 Нова відповідь на опитування");
-      lines.push(`Тема: ${news?.title || "—"}`);
+      lines.push(`Тема: ${escapeTelegramHtml(news?.title) || "—"}`);
       if (news?.survey?.question) {
-        lines.push(`Питання: ${news.survey.question}`);
+        lines.push(`Питання: ${escapeTelegramHtml(news.survey.question)}`);
       }
 
       const fields = news?.survey?.fields || [];
       for (const f of fields) {
-        const val = answers[f.id] || "";
-        lines.push(`${f.label}: ${val}`);
+        const val = escapeTelegramHtml(answers[f.id] || "");
+        lines.push(`${escapeTelegramHtml(f.label)}: ${val}`);
       }
 
       await sendTelegramMessageSurvey(lines.join("\n"));

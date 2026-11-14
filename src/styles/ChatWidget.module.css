@@ -145,6 +145,9 @@
 
 .messagesContainer {
   flex: 1;
+  /* Без min-height:0 flex-елемент не стискається нижче вмісту (min-height:auto)
+     і разом із формою контактів витісняв би стрічку за межі вікна. */
+  min-height: 0;
   padding: 16px;
   overflow-y: auto;
   display: flex;
@@ -193,6 +196,92 @@
   border-top: 1px solid var(--ink);
   display: flex;
   gap: 8px;
+}
+
+/* Необов'язкові контакти перед першим повідомленням команді. */
+.contactForm {
+  margin: 0;
+  padding: 12px;
+  background: var(--paper-2);
+  border: 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* <fieldset> за замовчуванням має min-inline-size: min-content і відмовляється
+     звужуватись нижче вмісту: два input поруч дають ~386px, а вікно чату — 350px
+     з overflow:hidden, тож текст і кнопки обрізалися праворуч. */
+  min-inline-size: 0;
+  width: 100%;
+}
+.contactTitle,
+.contactLegend {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink);
+  padding: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.contactTitle span,
+.contactLegend span {
+  display: block;
+  color: var(--muted-on-paper);
+  font-size: 11px;
+}
+.contactFields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.contactInput {
+  flex: 1 1 130px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font-size: 13px;
+  background: var(--paper);
+  color: var(--ink);
+  outline: none;
+  font-family: inherit;
+}
+.contactInput:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 1px;
+}
+.contactActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.contactSkip,
+.contactSave {
+  padding: 6px 12px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.contactSkip {
+  background: transparent;
+  color: var(--ink);
+}
+.contactSave {
+  background: var(--gold);
+  color: var(--ink);
+}
+.contactSkip:hover,
+.contactSave:hover {
+  border-color: var(--gold-deep);
+}
+.contactSkip:focus-visible,
+.contactSave:focus-visible {
+  outline: 2px solid var(--gold-deep);
+  outline-offset: 1px;
 }
 .input {
   flex: 1;
@@ -289,6 +378,23 @@
     width: 100%;
     height: auto;
     max-height: calc(100vh - 140px);
+  }
+
+  /* На вузькому екрані два поля поруч не вміщуються — складаємо стовпцем,
+     щоб кнопки й ввод не виходили за межі вікна. */
+  .contactFields {
+    flex-direction: column;
+  }
+  .contactInput {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .contactActions {
+    justify-content: stretch;
+  }
+  .contactSkip,
+  .contactSave {
+    flex: 1;
   }
 }
 @media (prefers-reduced-motion: reduce) {

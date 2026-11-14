@@ -82,6 +82,16 @@ export function ensureChatIndexes(): Promise<void> {
           { "messages.telegramMessageId": 1 },
           { sparse: true, name: "chat_tg_message" },
         ),
+        // Етап 3: ідемпотентність webhook (повторний update_id не дає дубля).
+        col.createIndex(
+          { "messages.telegramUpdateId": 1 },
+          { sparse: true, name: "chat_tg_update" },
+        ),
+        // Бейдж непрочитаних у сайдбарі / фільтр «Непрочитані».
+        col.createIndex(
+          { unreadForAdmin: 1 },
+          { name: "chat_unread_admin" },
+        ),
       ]);
     })().catch((error) => {
       indexesPromise = null;
@@ -235,8 +245,27 @@ export async function appendOperatorMessage(
   return result.matchedCount > 0 ? message : null;
 }
 
-/** Невручені відповіді оператора + позначка deliveredAt однією операцією. */
-export async function pollOperatorMessages(
+/** Етап 3а: прив'язати message_id картки в Telegram до повідомлення клієнта —
+ *  за ним webhook (3b) знайде тред при «Відповісти». */
+export async function setClientMessageTelegramId(
+  threadId: string,
+  messageId: string,
+  telegramMessageId: number,
+): Promise<boolean> {
+  await ensureChatIndexes();
+  const result = await (await getDb())
+    .collection<ChatThread>(CHAT_THREADS_COLLECTION)
+    .updateOne(
+      { threadId, "messages.id": messageId },
+      { $set: { "messages.$[elem].telegramMessageId": telegramMessageId } },
+      {
+        arrayFilters: [{ "elem.id": messageId }],
+      },
+    );
+  return result.matchedCount > 0;
+}
+
+/** Невручені відповіді оператора + позначка deliveredAt однією операцією. */export async function pollOperatorMessages(
   threadId: string,
 ): Promise<ChatMessage[]> {
   await ensureChatIndexes();

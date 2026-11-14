@@ -1,10 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { checkChatRateLimit, clientIp } from "@/lib/chatRateLimit";
+import { sendChatThreadCard } from "@/lib/chatTelegram";
 import {
   appendClientMessage,
   isValidThreadId,
   legacyThreadId,
   normalizeText,
+  setClientMessageTelegramId,
 } from "@/lib/chatThreads";
 
 /* Публічний запис повідомлення в режимі «Зв'язок із командою».
@@ -92,6 +94,29 @@ export async function POST(req: NextRequest) {
       clientName: clientName || undefined,
       clientPhone: clientPhone || undefined,
     });
+
+    // Етап 3а: картка діалогу в Telegram (окремий бот «Чати сайту»).
+    // Best-effort: якщо Telegram недоступний, діалог це не ламає.
+    sendChatThreadCard({
+      threadId,
+      text,
+      clientName: clientName || undefined,
+      clientPhone: clientPhone || undefined,
+      deviceId,
+    })
+      .then((telegramMessageId) => {
+        if (telegramMessageId != null) {
+          return setClientMessageTelegramId(
+            threadId,
+            message.id,
+            telegramMessageId,
+          );
+        }
+        return null;
+      })
+      .catch((error) => {
+        console.error("chat/message: не вдалося прив'язати картку", error);
+      });
 
     return NextResponse.json(
       { success: true, threadId, messageId: message.id, isNew },

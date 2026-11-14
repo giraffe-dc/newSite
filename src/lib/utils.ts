@@ -3,6 +3,18 @@ export interface TelegramConfig {
   chatId: string | string[];
 }
 
+/** Екранування тексту для parse_mode:"HTML" (Bot API).
+ *  Без нього `<`, `>` або `&` у введеному користувачем тексті ламає
+ *  повідомлення цілком (400 від Telegram) — разом із карткою діалогу
+ *  чи сповіщенням про заявку. Рядки з нашими тегами (<b>, \n) не чіпаємо:
+ *  екранувати треба саме підставні значення. */
+export function escapeTelegramHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 export async function sendTelegramMessage(
   message: string,
   config?: Partial<TelegramConfig>,

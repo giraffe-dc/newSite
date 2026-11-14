@@ -1,34 +1,35 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
-import { sendTelegramMessage } from "@/lib/utils";
+import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { Order } from "@/types";
 
 function formatOrderForTelegram(order: Order) {
+  const e = escapeTelegramHtml;
   const lines: string[] = [];
   lines.push("<b>Нова заявка на виїзд</b>");
-  lines.push(`Ім'я: <b>${order.customerName}</b>`);
-  lines.push(`Телефон: <b>${order.phone}</b>`);
-  if (order.whatsapp) lines.push(`WhatsApp: <b>${order.whatsapp}</b>`);
-  if (order.date) lines.push(`Дата події: <b>${order.date}</b>`);
-  if (order.time) lines.push(`Час: <b>${order.time}</b>`);
+  lines.push(`Ім'я: <b>${e(order.customerName)}</b>`);
+  lines.push(`Телефон: <b>${e(order.phone)}</b>`);
+  if (order.whatsapp) lines.push(`WhatsApp: <b>${e(order.whatsapp)}</b>`);
+  if (order.date) lines.push(`Дата події: <b>${e(order.date)}</b>`);
+  if (order.time) lines.push(`Час: <b>${e(order.time)}</b>`);
   if (order.eventAddress)
-    lines.push(`Адреса проведення: <b>${order.eventAddress}</b>`);
-  if (order.eventType) lines.push(`Тип свята: <b>${order.eventType}</b>`);
+    lines.push(`Адреса проведення: <b>${e(order.eventAddress)}</b>`);
+  if (order.eventType) lines.push(`Тип свята: <b>${e(order.eventType)}</b>`);
   if (order.serviceName)
-    lines.push(`Послуга: <b>${order.serviceName}</b>`);
+    lines.push(`Послуга: <b>${e(order.serviceName)}</b>`);
   if (order.childrenCount)
-    lines.push(`Кількість дітей: <b>${order.childrenCount}</b>`);
-  if (order.packageName) lines.push(`Пакет: <b>${order.packageName}</b>`);
+    lines.push(`Кількість дітей: <b>${e(order.childrenCount)}</b>`);
+  if (order.packageName) lines.push(`Пакет: <b>${e(order.packageName)}</b>`);
   if (order.items?.length) {
     lines.push("Послуги:");
     order.items.forEach((it, idx) => {
       lines.push(
-        `${idx + 1}. ${it.serviceName}${it.quantity ? ` x${it.quantity}` : ""}${it.price ? ` (${it.price})` : ""}`,
+        `${idx + 1}. ${e(it.serviceName)}${it.quantity ? ` x${it.quantity}` : ""}${it.price ? ` (${e(it.price)})` : ""}`,
       );
     });
   }
-  if (order.notes) lines.push(`Коментар: ${order.notes}`);
+  if (order.notes) lines.push(`Коментар: ${e(order.notes)}`);
   return lines.join("\n");
 }
 

@@ -35,6 +35,14 @@ interface HistoryMessage {
 const POLL_INTERVAL = 10_000;
 const THREAD_KEY = "giraffe_chat_thread_id";
 const DEVICE_KEY = "giraffe_chat_device_id";
+/** Що клієнт уже писав команді — тоді poll працює і після F5,
+ *  навіть із закритим віджетом (щоб не загубити відповідь). */
+const AWAITING_KEY = "giraffe_chat_awaiting";
+/** Необов'язкові контакти: адмін бачить, кому відповідає, і може
+ *  продовжити діалог поза сайтом (зокрема — з Telegram). */
+const NAME_KEY = "giraffe_chat_client_name";
+const PHONE_KEY = "giraffe_chat_client_phone";
+const CONTACT_ASKED_KEY = "giraffe_chat_contact_asked";
 
 const AI_WELCOME: Message = {
   id: "welcome_ai",
@@ -110,12 +118,23 @@ export default function ChatWidget() {
   const [unreadTeam, setUnreadTeam] = useState(0);
   const [input, setInput] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [clientName, setClientName] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
+  /** Показуємо форму контактів один раз — перед першим повідомленням
+   *  у режимі «Команда», якщо користувач уже не заповнював її раніше. */
+  const [showContactForm, setShowContactForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [threadReady, setThreadReady] = useState(false);
   const messagesRef = useRef<HTMLDivElement>(null);
   const threadIdRef = useRef<string>("");
   const sessionIdRef = useRef<string>("");
   const seenOperatorIds = useRef<Set<string>>(new Set());
+  /** Історію тягнемо один раз — при першому відкритті віджета. */
+  const historyLoadedRef = useRef(false);
+  /** Клієнт чекає відповіді: надіслав повідомлення або в стрічці є
+   *  його повідомлення. Тоді poll продовжується навіть із закритим віджетом,
+   *  щоб бейдж упіймав відповідь. */
+  const awaitingReplyRef = useRef(false);
 
   useEffect(() => {
     threadIdRef.current = getThreadId();
@@ -124,6 +143,9 @@ export default function ChatWidget() {
       Date.now().toString(36) +
       "_" +
       Math.random().toString(36).slice(2, 8);
+    awaitingReplyRef.current = localStorage.getItem(AWAITING_KEY) === "1";
+    setClientName(localStorage.getItem(NAME_KEY) ?? "");
+    setClientPhone(localStorage.getItem(PHONE_KEY) ?? "");
     setThreadReady(true);
   }, []);
 
@@ -137,10 +159,13 @@ export default function ChatWidget() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [isOpen, visibleMessages]);
 
-  // Відновлення історії після F5 / нової вкладки.
+  // Відновлення історії при ПЕРШОМУ ВІДКРИТТІ віджета, а не при монтуванні:
+  // закритий віджет змонтований на всіх сторінках, і постійний fetch history
+  // на кожен перегляд — зайві інвокації serverless. Після F5 історія
+  // відновиться, щойно користувач відкриє чат.
   useEffect(() => {
-    if (!threadReady) return;
-    let cancelled = false;
+    if (!threadReady || !isOpen || historyLoadedRef.current) return;
+    historyLoadedRef.current = true;
     (async () => {
       try {
         const res = await fetch(
@@ -149,10 +174,13 @@ export default function ChatWidget() {
         );
         if (!res.ok) return;
         const data = (await res.json()) as { messages?: HistoryMessage[] };
-        if (cancelled || !Array.isArray(data.messages)) return;
+        if (!Array.isArray(data.messages)) return;
         const restored = data.messages.map(toWidgetMessage);
         for (const m of restored) {
           if (m.role === "operator") seenOperatorIds.current.add(m.id);
+        }
+        if (restored.some((m) => m.role === "user")) {
+          awaitingReplyRef.current = true;
         }
         if (restored.length > 0) {
           setTeamMessages([TEAM_WELCOME, ...restored]);
@@ -161,10 +189,7 @@ export default function ChatWidget() {
         // тихо: welcome-повідомлення лишається, діалог можна почати наново
       }
     })();
-    return () => {
-      cancelled = true;
-    };
-  }, [threadReady]);
+  }, [threadReady, isOpen]);
 
   /** Відповіді оператора. Dedupe за стабільним id — сервер може повторити
    *  видачу після ретраю, а ми не хочемо дублів у стрічці. */
@@ -200,16 +225,22 @@ export default function ChatWidget() {
   }, []);
 
   useEffect(() => {
+    // Опитування тільки коли віджет відкритий або клієнт реально чекає
+    // відповіді (надіслав повідомлення / у стрічці є його повідомлення).
+    // Закритий віджет без діалогу не має бити в serverless кожні 10 с.
+    if (!isOpen && !awaitingReplyRef.current) return;
     const interval = setInterval(() => {
       if (document.visibilityState === "visible") {
         void pollForOperatorMessages();
       }
     }, POLL_INTERVAL);
     return () => clearInterval(interval);
-  }, [pollForOperatorMessages]);
+  }, [isOpen, pollForOperatorMessages]);
 
-  // Миттєва перевірка при відкритті / поверненні на вкладку.
+  // Миттєва перевірка при відкритті / поверненні на вкладку — тільки якщо
+  // є що опитувати (віджет відкритий або клієнт чекає відповіді).
   useEffect(() => {
+    if (!isOpen && !awaitingReplyRef.current) return;
     if (isOpen) void pollForOperatorMessages();
     const onVisible = () => {
       if (document.visibilityState === "visible") {
@@ -228,7 +259,25 @@ export default function ChatWidget() {
 
   const handleModeSwitch = (mode: ChatMode) => {
     setChatMode(mode);
-    if (mode === "admin") setUnreadTeam(0);
+    if (mode === "admin") {
+      setUnreadTeam(0);
+      // Один раз запропонувати залишити контакти — перед першим
+      // повідомленням команді, якщо користувач це вже не робив.
+      if (localStorage.getItem(CONTACT_ASKED_KEY) !== "1") {
+        setShowContactForm(true);
+      }
+    }
+  };
+
+  /** Зберегти контакти й заховати форму. Поля необов'язкові — можна
+   *  просто закрити, діалог лишиться анонімним. */
+  const saveContacts = () => {
+    const name = clientName.trim().slice(0, 60);
+    const phone = clientPhone.trim().slice(0, 30);
+    if (name) localStorage.setItem(NAME_KEY, name);
+    if (phone) localStorage.setItem(PHONE_KEY, phone);
+    localStorage.setItem(CONTACT_ASKED_KEY, "1");
+    setShowContactForm(false);
   };
 
   const sendToAI = async (history: Message[]) => {
@@ -301,6 +350,8 @@ export default function ChatWidget() {
           deviceId: getDeviceId(),
           deviceInfo: getDeviceInfo(),
           text: userMsg.content,
+          clientName: clientName.trim().slice(0, 60) || undefined,
+          clientPhone: clientPhone.trim().slice(0, 30) || undefined,
           website: honeypot,
         }),
       });
@@ -345,6 +396,8 @@ export default function ChatWidget() {
       await sendToAI(history);
     } else {
       setTeamMessages((prev) => [...prev, userMsg]);
+      awaitingReplyRef.current = true;
+      localStorage.setItem(AWAITING_KEY, "1");
       await sendToAdmin(userMsg);
     }
 
@@ -437,6 +490,53 @@ export default function ChatWidget() {
                 </div>
               )}
           </div>
+
+          {showContactForm && chatMode === "admin" && (
+            <fieldset className={styles.contactForm}>
+              <legend className={styles.contactLegend}>
+                Щоб ми могли відповісти поза сайтом — залиште контакти.
+                <span>Необов'язково.</span>
+              </legend>
+              <div className={styles.contactFields}>
+                <input
+                  className={styles.contactInput}
+                  value={clientName}
+                  placeholder="Ваше ім'я"
+                  maxLength={60}
+                  autoComplete="name"
+                  onChange={(e) => setClientName(e.target.value)}
+                />
+                <input
+                  className={styles.contactInput}
+                  value={clientPhone}
+                  placeholder="Телефон"
+                  maxLength={30}
+                  autoComplete="tel"
+                  inputMode="tel"
+                  onChange={(e) => setClientPhone(e.target.value)}
+                />
+              </div>
+              <div className={styles.contactActions}>
+                <button
+                  type="button"
+                  className={styles.contactSkip}
+                  onClick={() => {
+                    localStorage.setItem(CONTACT_ASKED_KEY, "1");
+                    setShowContactForm(false);
+                  }}
+                >
+                  Пропустити
+                </button>
+                <button
+                  type="button"
+                  className={styles.contactSave}
+                  onClick={saveContacts}
+                >
+                  Зберегти
+                </button>
+              </div>
+            </fieldset>
+          )}
 
           <form onSubmit={handleSubmit} className={styles.inputForm}>
             <input

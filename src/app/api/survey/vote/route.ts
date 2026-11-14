@@ -1,7 +1,7 @@
 import type { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
-import { sendTelegramMessage } from "@/lib/utils";
+import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { SurveyVoteData } from "@/types";
 
 interface SurveyOption {
@@ -94,9 +94,9 @@ export async function POST(req: Request) {
           .map((o: SurveyOption) => o.text);
         const msgLines = [
           `🔔 Новий голос в опитуванні`,
-          `Тема: ${updatedNews.title || "—"}`,
-          `Питання: ${news.survey.question}`,
-          `Вибрано: ${chosenTexts.join(", ")}`,
+          `Тема: ${escapeTelegramHtml(updatedNews.title) || "—"}`,
+          `Питання: ${escapeTelegramHtml(news.survey.question)}`,
+          `Вибрано: ${escapeTelegramHtml(chosenTexts.join(", "))}`,
           `Всього голосів: ${updatedNews.survey?.results?.totalVotes || ""}`,
         ];
         await sendTelegramMessage(msgLines.join("\n"));
