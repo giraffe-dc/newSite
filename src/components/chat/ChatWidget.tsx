@@ -125,6 +125,9 @@ export default function ChatWidget() {
   const [showContactForm, setShowContactForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [threadReady, setThreadReady] = useState(false);
+  /** Тост «Команда відповіла»: текст останньої відповіді, якщо вона
+   *  прийшла, коли клієнт не дивиться стрічку діалогу. */
+  const [replyToast, setReplyToast] = useState<string | null>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
   const threadIdRef = useRef<string>("");
   const sessionIdRef = useRef<string>("");
@@ -135,6 +138,10 @@ export default function ChatWidget() {
    *  його повідомлення. Тоді poll продовжується навіть із закритим віджетом,
    *  щоб бейдж упіймав відповідь. */
   const awaitingReplyRef = useRef(false);
+  /** Чи дивиться клієнт зараз стрічку «Команда» — для рішення
+   *  показувати тост/звук чи ні (у poll є лише замикання на рефи). */
+  const readingTeamRef = useRef(false);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     threadIdRef.current = getThreadId();
@@ -191,6 +198,39 @@ export default function ChatWidget() {
     })();
   }, [threadReady, isOpen]);
 
+  /** Сповіщення про відповідь: короткий звук (Web Audio, без файлів)
+   *  + тост із прев'ю, якщо клієнт не дивиться стрічку. */
+  const notifyReply = useCallback((preview: string) => {
+    try {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+      osc.onended = () => void ctx.close();
+    } catch {
+      // без звуку — не критично
+    }
+
+    setReplyToast(preview.slice(0, 140));
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => setReplyToast(null), 8000);
+  }, []);
+
+  useEffect(
+    () => () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    },
+    [],
+  );
+
   /** Відповіді оператора. Dedupe за стабільним id — сервер може повторити
    *  видачу після ретраю, а ми не хочемо дублів у стрічці. */
   const pollForOperatorMessages = useCallback(async () => {
@@ -219,10 +259,16 @@ export default function ChatWidget() {
       }));
       setTeamMessages((prev) => [...prev, ...incoming]);
       setUnreadTeam((prev) => prev + incoming.length);
+      // Якщо клієнт не дивиться стрічку команди — сповіщаємо (звук + тост).
+      // У стрічці нове видно одразу, там сповіщення було б зайвим.
+      if (!readingTeamRef.current) {
+        const last = incoming[incoming.length - 1];
+        notifyReply(last?.content ?? "");
+      }
     } catch {
       // тихо: наступний цикл опитування повторить спробу
     }
-  }, []);
+  }, [notifyReply]);
 
   useEffect(() => {
     // Опитування тільки коли віджет відкритий або клієнт реально чекає
@@ -256,6 +302,20 @@ export default function ChatWidget() {
   useEffect(() => {
     if (isOpen && chatMode === "admin") setUnreadTeam(0);
   }, [isOpen, chatMode, teamMessages.length]);
+
+  // Для poll (він у useCallback з порожніми залежностями) тримаємо рефом
+  // факт «клієнт зараз читає стрічку команди».
+  useEffect(() => {
+    readingTeamRef.current = isOpen && chatMode === "admin";
+  }, [isOpen, chatMode]);
+
+  /** Клік по тосту: відкрити чат одразу в режимі «Команда». */
+  const openTeamFromToast = () => {
+    setReplyToast(null);
+    setChatMode("admin");
+    setIsOpen(true);
+    setUnreadTeam(0);
+  };
 
   const handleModeSwitch = (mode: ChatMode) => {
     setChatMode(mode);
@@ -569,6 +629,21 @@ export default function ChatWidget() {
             </button>
           </form>
         </div>
+      )}
+
+      {replyToast && (
+        <button
+          type="button"
+          className={styles.replyToast}
+          onClick={openTeamFromToast}
+          aria-live="polite"
+        >
+          <span className={styles.toastTitle}>
+            <Headset size={14} />
+            Команда відповіла
+          </span>
+          <span className={styles.toastPreview}>{replyToast}</span>
+        </button>
       )}
 
       {!isOpen && (
