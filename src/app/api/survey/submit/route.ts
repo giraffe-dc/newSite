@@ -1,6 +1,7 @@
 import type { Document } from "mongodb";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import clientPromise from "@/lib/mongodb";
 import {
   escapeTelegramHtml,
@@ -8,6 +9,14 @@ import {
 } from "@/lib/utils";
 
 export async function POST(req: Request) {
+  // Кожна відповідь шле Telegram-сповіщення — ліміт від флуду.
+  if (!rateLimit(`survey:${clientIp(req)}`, 5, 10 * 60_000)) {
+    return NextResponse.json(
+      { error: "Занадто багато відповідей. Спробуйте пізніше." },
+      { status: 429 },
+    );
+  }
+
   try {
     const body = await req.json();
     const { newsId, answers } = body || {};

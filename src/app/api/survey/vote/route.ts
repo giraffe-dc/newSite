@@ -1,5 +1,6 @@
-import type { ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import { getDb } from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { SurveyVoteData } from "@/types";
@@ -10,18 +11,35 @@ interface SurveyOption {
 }
 
 export async function POST(req: Request) {
+  // Голосування без ліміту = маніпуляція результатами одним запитом-цунамі.
+  if (!rateLimit(`vote:${clientIp(req)}`, 10, 60_000)) {
+    return NextResponse.json(
+      { error: "Занадто багато голосів. Зачекайте хвилину." },
+      { status: 429 },
+    );
+  }
+
   try {
     const { newsId, optionIds }: SurveyVoteData = await req.json();
 
-    if (!newsId || !optionIds || optionIds.length === 0) {
+    // Захист від NoSQL-ін'єкції: newsId має бути рядком з валідним ObjectId
+    // (оператор на кшталт {"$gt": ""} не пройде), optionIds — масив рядків.
+    if (
+      typeof newsId !== "string" ||
+      !ObjectId.isValid(newsId) ||
+      !Array.isArray(optionIds) ||
+      optionIds.length === 0 ||
+      !optionIds.every((id) => typeof id === "string")
+    ) {
       return NextResponse.json({ error: "Invalid vote data" }, { status: 400 });
     }
 
+    const newsObjectId = new ObjectId(newsId);
     const db = await getDb();
 
     // Get the news item to verify survey exists and isn't expired
     const news = await db.collection("news").findOne({
-      _id: newsId as unknown as ObjectId,
+      _id: newsObjectId,
       "survey.endDate": { $gt: new Date().toISOString() },
     });
 
@@ -69,8 +87,13 @@ export async function POST(req: Request) {
       [`survey.results.optionResults.${optionId}`]: 1,
     }));
 
+    // Той самий фільтр, що й у перевірці: документ, який рахуємо, мусить бути
+    // тим самим, який пройшов перевірку терміну дії опитування.
     await db.collection("news").updateOne(
-      { _id: newsId as unknown as ObjectId },
+      {
+        _id: newsObjectId,
+        "survey.endDate": { $gt: new Date().toISOString() },
+      },
       {
         $inc: {
           "survey.results.totalVotes": 1,
@@ -85,7 +108,7 @@ export async function POST(req: Request) {
     // Fetch updated news to include in telegram message
     const updatedNews = await db
       .collection("news")
-      .findOne({ _id: newsId as unknown as ObjectId });
+      .findOne({ _id: newsObjectId });
 
     try {
       if (updatedNews) {

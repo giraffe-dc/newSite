@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { apiKeyFromRequest, isValidApiKey } from "@/lib/apiKey";
 import clientPromise from "@/lib/mongodb";
 
 export const dynamic = "force-dynamic";
@@ -7,30 +8,36 @@ function unauthorized() {
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 }
 
+/** Ключ: `Authorization: Bearer` / `X-Api-Key` (бажано) або `?key=` (застаріле).
+ *  Порівняння — constant-time, без заданого NOTIFICATIONS_API_KEY доступу немає. */
+function isAuthorized(req: Request): boolean {
+  return isValidApiKey(
+    apiKeyFromRequest(req),
+    process.env.NOTIFICATIONS_API_KEY,
+  );
+}
+
 /**
  * GET /api/admin/chat-logs
  *
+ * Auth: header `Authorization: Bearer <NOTIFICATIONS_API_KEY>` (бажано)
+ *       або query `key=` (застаріле — ключ потрапляє в логи проксі).
+ *
  * Query params:
- *   - key       (required) — API key for external access
  *   - limit     (optional) — number of sessions, default 50
  *   - deviceId  (optional) — filter by device
  *   - sessionId (optional) — get a specific session
  *   - from      (optional) — ISO date, filter logs created after
  *   - to        (optional) — ISO date, filter logs created before
  *
- * Example: /api/admin/chat-logs?key=YOUR_KEY&limit=20&from=2025-01-01
+ * Example: GET /api/admin/chat-logs  +  Authorization: Bearer YOUR_KEY
  */
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
-
-  // Auth — simple API key check
-  const key = searchParams.get("key");
-  const API_KEY = process.env.NOTIFICATIONS_API_KEY;
-
-  if (!key || key !== API_KEY) {
+  if (!isAuthorized(req)) {
     return unauthorized();
   }
 
+  const { searchParams } = new URL(req.url);
   const limit = Math.min(Number(searchParams.get("limit")) || 50, 200);
   const deviceId = searchParams.get("deviceId");
   const sessionId = searchParams.get("sessionId");
@@ -76,20 +83,17 @@ export async function GET(req: Request) {
 }
 
 /**
- * DELETE /api/admin/chat-logs?key=YOUR_KEY&sessionId=xxx
+ * DELETE /api/admin/chat-logs?sessionId=xxx  (+ Authorization: Bearer <key>)
  *
  * М'яке архівування однієї сесії AI-логу. З бази нічого не видаляємо:
  * масового deleteMany більше немає, sessionId обов'язковий.
  */
 export async function DELETE(req: Request) {
-  const { searchParams } = new URL(req.url);
-
-  const key = searchParams.get("key");
-  const API_KEY = process.env.NOTIFICATIONS_API_KEY;
-  if (!key || key !== API_KEY) {
+  if (!isAuthorized(req)) {
     return unauthorized();
   }
 
+  const { searchParams } = new URL(req.url);
   const sessionId = searchParams.get("sessionId");
   if (!sessionId) {
     return NextResponse.json(

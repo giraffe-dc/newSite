@@ -1,5 +1,6 @@
 import type { UpdateFilter } from "mongodb";
 import { type NextRequest, NextResponse } from "next/server";
+import { isValidApiKey } from "@/lib/apiKey";
 import {
   appendOperatorMessage,
   getOrCreateLegacyThread,
@@ -17,8 +18,6 @@ import clientPromise from "@/lib/mongodb";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const API_KEY = process.env.NOTIFICATIONS_API_KEY;
-
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json().catch(() => null)) as {
@@ -28,7 +27,15 @@ export async function POST(req: NextRequest) {
       adminName?: unknown;
     } | null;
 
-    if (!body?.key || !API_KEY || body.key !== API_KEY) {
+    // Ключ у тілі JSON (не в URL). Порівняння — constant-time,
+    // без заданого NOTIFICATIONS_API_KEY доступу немає (fail-closed).
+    if (
+      !body ||
+      !isValidApiKey(
+        typeof body.key === "string" ? body.key : null,
+        process.env.NOTIFICATIONS_API_KEY,
+      )
+    ) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

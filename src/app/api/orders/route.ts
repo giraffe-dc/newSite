@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import clientPromise from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { Order } from "@/types";
@@ -45,6 +46,15 @@ function cut(value: unknown, max: number): string {
 }
 
 export async function POST(request: NextRequest) {
+  // Кожна заявка шле Telegram + зовнішній вебхук — без ліміту ендпоінт
+  // стає флуд-каналом для сповіщень адмінів.
+  if (!rateLimit(`orders:${clientIp(request)}`, 5, 10 * 60_000)) {
+    return NextResponse.json(
+      { error: "Занадто багато заявок. Спробуйте пізніше." },
+      { status: 429 },
+    );
+  }
+
   try {
     const body = (await request.json()) as Order;
 
