@@ -1,7 +1,18 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { generateToken, verifyPassword } from "@/lib/auth";
+import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 
 export async function POST(request: NextRequest) {
+  // Брутфорс: не більше 10 спроб за 15 хвилин з одного IP.
+  // bcrypt сповільнює кожну спробу, але без ліміту розподілений перебір
+  // лишався б можливим.
+  if (!rateLimit(`auth:${clientIp(request)}`, 10, 15 * 60_000)) {
+    return NextResponse.json(
+      { error: "Забагато спроб входу. Спробуйте пізніше." },
+      { status: 429 },
+    );
+  }
+
   try {
     const { username, password } = await request.json();
 

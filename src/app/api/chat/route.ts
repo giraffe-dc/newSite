@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { UpdateFilter } from "mongodb";
+import { NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import clientPromise from "@/lib/mongodb";
 import { getSections, type Sections } from "@/lib/siteContent";
 
@@ -157,14 +159,63 @@ function fmtOffers(data: unknown): string {
 // ── Main handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  const { messages, deviceId, deviceInfo, sessionId } = await req.json();
+  // Ліміт: відповіді генерує Gemini (платний API), тож без ліміту
+  // ендпоінт перетворюється на безлімітний гаманець для будь-кого.
+  if (!rateLimit(`ai:${clientIp(req)}`, 10, 60_000)) {
+    return NextResponse.json(
+      { error: "Занадто багато запитів. Зачекайте хвилину." },
+      { status: 429 },
+    );
+  }
+
+  const parsed = (await req.json().catch(() => null)) as {
+    messages?: unknown;
+    deviceId?: unknown;
+    deviceInfo?: unknown;
+    sessionId?: unknown;
+  } | null;
+
+  // Валідація історії: раніше не-масив падав у 500 на messages.slice,
+  // а велика історія необмежено з'їдала токени Gemini.
+  const rawMessages = parsed?.messages;
+  if (!Array.isArray(rawMessages) || rawMessages.length === 0) {
+    return NextResponse.json(
+      { error: "Некоректне тіло запиту" },
+      { status: 400 },
+    );
+  }
+  const lastRaw = rawMessages[rawMessages.length - 1] as
+    | { content?: unknown }
+    | undefined;
+  const lastContent = String(lastRaw?.content ?? "").trim();
+  if (!lastContent) {
+    return NextResponse.json(
+      { error: "Повідомлення не може бути порожнім" },
+      { status: 400 },
+    );
+  }
+
+  type ChatMessage = { role: string; content: string };
+  // Останні 39 повідомлень історії + поточне; вміст кожного ≤8000 символів.
+  const historyRaw = rawMessages.slice(0, -1).slice(-39);
+  const messages: ChatMessage[] = [
+    ...historyRaw
+      .map((m: { role?: unknown; content?: unknown }) => ({
+        role: m?.role === "user" ? "user" : "model",
+        content: String(m?.content ?? "").slice(0, 8000),
+      }))
+      .filter((m: ChatMessage) => m.content.length > 0),
+    { role: "user", content: lastContent.slice(0, 8000) },
+  ];
+
+  const deviceId =
+    typeof parsed?.deviceId === "string" ? parsed.deviceId.slice(0, 120) : "";
+  const sessionId =
+    typeof parsed?.sessionId === "string" ? parsed.sessionId.slice(0, 120) : "";
+  const deviceInfo = parsed?.deviceInfo;
   const baseUrl = new URL(req.url).origin;
 
-  // Get client IP
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
+  const ip = clientIp(req);
 
   // Дані: статичні секції — з site_content (один запит), новини й акції —
   // з живих колекцій через внутрішні API (етап 5, п. 1).
@@ -229,8 +280,6 @@ export async function POST(req: Request) {
     model: "gemini-2.5-flash-lite",
     systemInstruction: systemPrompt,
   });
-
-  type ChatMessage = { role: string; content: string };
 
   const allButLast: ChatMessage[] = messages.slice(0, -1);
   const firstUserIdx = allButLast.findIndex(

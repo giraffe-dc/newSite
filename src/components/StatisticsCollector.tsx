@@ -9,10 +9,10 @@ export function StatisticsCollector() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const isAdmin = document.cookie.includes("admin_token");
-    // const isAdmin = document.cookie.split(';').some(cookie => cookie.trim().startsWith('admin_token='));
-    // console.log('Is admin:', isAdmin);
-    if (isAdmin) {
+    // Збираємо статистику лише на продакшні — із дев-сервера (localhost) дані
+    // не повинні потрапляти в колекцію statistics, інакше графік переглядів
+    // замішаний із тестовими відвідами з локального розробки.
+    if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
       return;
     }
 

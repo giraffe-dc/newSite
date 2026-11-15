@@ -1,10 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import { createReview, type ReviewInput } from "@/lib/reviews";
 
 /* Публічна заявка-відгук з /reviews: статус `pending` — з'явиться на сайті
    лише після схвалення в /admin/reviews (етап 6, п. 3). */
 
 export async function POST(request: NextRequest) {
+  // Honeypot уже є (у createReview); ліміт — від наповнення бази сміттям.
+  if (!rateLimit(`reviews:${clientIp(request)}`, 5, 10 * 60_000)) {
+    return NextResponse.json(
+      { error: "Занадто багато відгуків. Спробуйте пізніше." },
+      { status: 429 },
+    );
+  }
+
   const body = (await request.json().catch(() => null)) as ReviewInput | null;
   if (!body || typeof body !== "object") {
     return NextResponse.json(

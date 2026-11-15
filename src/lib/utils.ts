@@ -15,6 +15,49 @@ export function escapeTelegramHtml(value: unknown): string {
     .replace(/>/g, "&gt;");
 }
 
+/** Telegram обмежує повідомлення 4096 символами: довше → 400, і сповіщення
+ *  (заявка, голосування) не приходить узагалі. Ріжемо так, щоб не лишити
+ *  незакритий тег і не розрізати екрановану сутність (`&amp;`) посередині —
+ *  інакше той самий 400 отримаємо вже від розмітки. */
+function truncateForTelegram(message: string): string {
+  const MAX = 4096;
+  if (message.length <= MAX) return message;
+
+  // Збалансованість тегів + цілісність хвоста (`<b` без `>`, `&am` без `;`).
+  const isSafeCut = (s: string): boolean => {
+    if (/<[^>]*$/.test(s)) return false; // незавершений тег наприкінці
+    if (/&[a-zA-Z#0-9]*$/.test(s)) return false; // незавершена сутність
+    const stack: string[] = [];
+    for (const m of s.matchAll(/<(\/?)([a-zA-Z][a-zA-Z0-9]*)>/g)) {
+      const tag = m[2].toLowerCase();
+      if (m[1] === "/") {
+        const idx = stack.lastIndexOf(tag);
+        if (idx === -1) return false; // зайве закриття
+        stack.splice(idx, 1);
+      } else {
+        stack.push(tag);
+      }
+    }
+    return stack.length === 0; // усі відкриті теги закриті
+  };
+
+  for (let i = MAX; i > MAX - 1000 && i > 0; i--) {
+    const slice = message.slice(0, i);
+    if (isSafeCut(slice)) {
+      if (i < MAX) {
+        console.warn(
+          `Telegram: повідомлення ${message.length} символів обрізано до ${i}`,
+        );
+      }
+      return slice;
+    }
+  }
+  console.warn(
+    `Telegram: не вдалося підібрати межу обрізки для ${message.length} символів`,
+  );
+  return message.slice(0, MAX);
+}
+
 export async function sendTelegramMessage(
   message: string,
   config?: Partial<TelegramConfig>,
@@ -47,6 +90,7 @@ export async function sendTelegramMessage(
   }
 
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+  const safeText = truncateForTelegram(message);
   let allOk = true;
   for (const id of [...new Set(chatIds)]) {
     try {
@@ -55,7 +99,7 @@ export async function sendTelegramMessage(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: id,
-          text: message,
+          text: safeText,
           parse_mode: "HTML",
         }),
       });
@@ -103,6 +147,7 @@ export async function sendTelegramMessageSurvey(
   }
 
   const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+  const safeText = truncateForTelegram(message);
   let allOk = true;
   for (const id of [...new Set(chatIds)]) {
     try {
@@ -111,7 +156,7 @@ export async function sendTelegramMessageSurvey(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: id,
-          text: message,
+          text: safeText,
           parse_mode: "HTML",
         }),
       });
