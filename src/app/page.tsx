@@ -1,3 +1,4 @@
+import { publishedOnly } from "@/components/board/content";
 import Home from "@/components/board/Home";
 import { getPublishedReviews } from "@/lib/reviews";
 import { getSection } from "@/lib/siteContent";
@@ -16,18 +17,27 @@ import { getSection } from "@/lib/siteContent";
 export const revalidate = 3600;
 
 export default async function HomePage() {
-  const [hero, timeline, cases, promises, book, contacts, reviews] =
-    await Promise.all([
-      getSection("hero"),
-      getSection("timeline"),
-      getSection("cases"),
-      getSection("promises"),
-      getSection("book"),
-      getSection("contacts"),
-      /* Два найновіші опубліковані відгуки з колекції reviews (етап 6);
-         fallback — дефолти з content.ts. */
-      getPublishedReviews(2),
-    ]);
+  const [
+    hero,
+    timeline,
+    cases,
+    promises,
+    book,
+    contacts,
+    reviews,
+    packages,
+    services,
+  ] = await Promise.all([
+    getSection("hero"),
+    getSection("timeline"),
+    getSection("cases"),
+    getSection("promises"),
+    getSection("book"),
+    getSection("contacts"),
+    getPublishedReviews(2),
+    getSection("packages"),
+    getSection("services"),
+  ]);
 
   return (
     <Home
@@ -40,6 +50,8 @@ export default async function HomePage() {
       reviews={reviews}
       book={book.book}
       contacts={contacts.contacts}
+      packages={publishedOnly(packages.packages)}
+      services={publishedOnly(services.services)}
     />
   );
 }

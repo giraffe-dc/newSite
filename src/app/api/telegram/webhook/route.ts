@@ -218,16 +218,17 @@ async function appendAndConfirm(
     msg.message_id,
   );
   if (confirmId != null) {
-    await setMessageTelegramId(threadId, saved.id, confirmId).catch(
-      (error) => {
-        console.error("telegram/webhook: не прив'язано підтвердження", error);
-      },
-    );
+    await setMessageTelegramId(threadId, saved.id, confirmId).catch((error) => {
+      console.error("telegram/webhook: не прив'язано підтвердження", error);
+    });
   }
   return { status: 200, body: { ok: true, action: "replied", threadId } };
 }
 
-async function handleMessage(update: TgUpdate, msg: TgMessage): Promise<HandleResult> {
+async function handleMessage(
+  update: TgUpdate,
+  msg: TgMessage,
+): Promise<HandleResult> {
   const text = (msg.text ?? "").trim();
   if (!text) {
     return { status: 200, body: { ok: true, action: "no-text" } };

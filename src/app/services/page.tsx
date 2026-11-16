@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { publishedOnly } from "@/components/board/content";
 import FaqList from "@/components/board/FaqList";
-import ServicesGrid from "@/components/board/ServicesGrid";
+import ServicesCatalog from "@/components/board/ServicesCatalog";
 import { getSection } from "@/lib/siteContent";
 
 export const metadata: Metadata = {
   title: "Що ми привозимо — Жирафик, виїзні свята",
   description:
     "Аніматори, ростові ляльки, VR-клас і PlayStation 4 з виїздом додому, до школи чи на майданчик. Ціни й готові пакети.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/services" },
 };
 
 export const revalidate = 3600;
@@ -29,7 +31,7 @@ export default async function ServicesPage() {
           </p>
         </div>
 
-        <ServicesGrid services={services.services} />
+        <ServicesCatalog services={publishedOnly(services.services)} />
 
         <div className="m2-inline" style={{ marginTop: 32 }}>
           <Link className="m2-btn" href="/#book">

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/auth";
 import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import clientPromise from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
@@ -17,8 +17,7 @@ function formatOrderForTelegram(order: Order) {
   if (order.eventAddress)
     lines.push(`Адреса проведення: <b>${e(order.eventAddress)}</b>`);
   if (order.eventType) lines.push(`Тип свята: <b>${e(order.eventType)}</b>`);
-  if (order.serviceName)
-    lines.push(`Послуга: <b>${e(order.serviceName)}</b>`);
+  if (order.serviceName) lines.push(`Послуга: <b>${e(order.serviceName)}</b>`);
   if (order.childrenCount)
     lines.push(`Кількість дітей: <b>${e(order.childrenCount)}</b>`);
   if (order.packageName) lines.push(`Пакет: <b>${e(order.packageName)}</b>`);
@@ -150,7 +149,7 @@ export async function GET(request: NextRequest) {
   try {
     // Замовлення — приватні дані: лише адмін-кука з валідним JWT.
     const token = request.cookies.get("admin_token")?.value;
-    if (!token || !verifyToken(token)) {
+    if (!token || !verifyAdmin(token)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

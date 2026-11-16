@@ -23,7 +23,12 @@ export default function BookingSection({
   programId?: string;
   /** Назва послуги — з /services (передається окремо від формату «eventType»). */
   serviceName?: string;
-  items?: Array<{ serviceId?: string; serviceName: string; quantity?: number; price?: string | number }>;
+  items?: Array<{
+    serviceId?: string;
+    serviceName: string;
+    quantity?: number;
+    price?: string | number;
+  }>;
   tint?: boolean;
   book?: SectionData<"book">["book"];
   contacts?: SectionData<"contacts">["contacts"];

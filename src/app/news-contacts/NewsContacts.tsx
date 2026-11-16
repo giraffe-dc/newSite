@@ -10,6 +10,7 @@ interface NewsItem {
   content: string;
   date: string;
   type?: "news" | "event";
+  category?: string;
   survey?: unknown;
 }
 
@@ -109,6 +110,19 @@ export default function NewsContacts({
                     {item.title}
                     <span style={{ fontSize: 13, fontWeight: 400 }}>
                       {formatDate(item.date)}
+                      {item.category && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            padding: "1px 8px",
+                            borderRadius: 999,
+                            border: "1px solid currentColor",
+                            fontSize: 12,
+                          }}
+                        >
+                          {item.category}
+                        </span>
+                      )}
                     </span>
                   </summary>
                   <p>

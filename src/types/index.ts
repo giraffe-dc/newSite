@@ -75,8 +75,14 @@ export interface NewsItem {
   content: string;
   date: string;
   type: "news" | "event";
+  /** Обкладинка (окреме від галереї зображення). */
   image?: string;
+  /** Alt-текст обкладинки/галереї (для доступності та SEO). */
+  imageAlt?: string;
   images?: string[];
+  status?: "draft" | "published" | "archived";
+  category?: string;
+  seoDescription?: string;
   survey?: Survey;
 }
 

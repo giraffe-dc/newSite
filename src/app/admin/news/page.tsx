@@ -5,6 +5,7 @@ import type React from "react";
 import type { FC } from "react";
 import { useCallback, useEffect, useState } from "react";
 import SurveyForm from "@/components/admin/SurveyForm";
+import MediaUploadButton from "@/components/admin/MediaUploadButton";
 import {
   extractGoogleDriveFileId,
   getGoogleDriveImageUrl,
@@ -37,13 +38,18 @@ const AdminNewsPage = () => {
     content: "",
     date: new Date().toISOString().split("T")[0],
     type: "news",
+    status: "published",
+    category: "",
+    seoDescription: "",
     images: [],
     survey: undefined,
   });
   // console.log(formData);
   const fetchNews = useCallback(async () => {
     try {
-      const response = await fetch("/api/data/news");
+      const response = await fetch("/api/admin/news", {
+        credentials: "include",
+      });
       if (response.ok) {
         const data = await response.json();
         setNews(data);
@@ -99,6 +105,11 @@ const AdminNewsPage = () => {
       content: "",
       date: new Date().toISOString().split("T")[0],
       type: "news",
+      status: "published",
+      category: "",
+      seoDescription: "",
+      image: "",
+      imageAlt: "",
       images: [],
       survey: undefined,
     });
@@ -268,6 +279,79 @@ const AdminNewsPage = () => {
               </div>
 
               <div className={styles.inputGroup}>
+                <span className={styles.inputLabel}>Статус</span>
+                <div className={styles.typeSelector}>
+                  {(["draft", "published", "archived"] as const).map((s) => (
+                    <label key={s} className={styles.radioLabel}>
+                      <input
+                        type="radio"
+                        name="status"
+                        value={s}
+                        checked={
+                          formData.status === s ||
+                          (!formData.status && s === "published")
+                        }
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            status: e.target.value as
+                              | "draft"
+                              | "published"
+                              | "archived",
+                          })
+                        }
+                      />
+                      <span className={styles.radioCustom}>
+                        {s === "draft" ? "📝" : s === "published" ? "✅" : "📦"}
+                      </span>
+                      {s === "draft"
+                        ? "Чернетка"
+                        : s === "published"
+                          ? "Опубліковано"
+                          : "Архів"}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel} htmlFor="news-category">
+                  Категорія
+                </label>
+                <input
+                  id="news-category"
+                  type="text"
+                  value={formData.category || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      category: e.target.value,
+                    })
+                  }
+                  className={styles.input}
+                  placeholder="наприклад: Новинки, Сезон, Поради"
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel} htmlFor="news-seo">
+                  SEO-опис (до 160 символів)
+                </label>
+                <input
+                  id="news-seo"
+                  type="text"
+                  value={formData.seoDescription || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      seoDescription: e.target.value,
+                    })
+                  }
+                  className={styles.input}
+                  placeholder="Короткий опис для пошуковиків"
+                  maxLength={160}
+                />
+              </div>
+              <div className={styles.inputGroup}>
                 <label className={styles.inputLabel} htmlFor="news-date">
                   Дата
                 </label>
@@ -283,6 +367,53 @@ const AdminNewsPage = () => {
                   }
                   className={styles.input}
                   required
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel} htmlFor="news-cover">
+                  Обкладинка (URL)
+                </label>
+                <input
+                  id="news-cover"
+                  type="url"
+                  value={formData.image || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      image: e.target.value,
+                    })
+                  }
+                  className={styles.input}
+                  placeholder="https://... або посилання Google Drive (file/d/...)"
+                />
+                <div className={styles.imageButtons} style={{ marginTop: 8 }}>
+                  <MediaUploadButton
+                    label="Завантажити файл"
+                    onUploaded={(url) =>
+                      setFormData({ ...formData, image: url })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel} htmlFor="news-cover-alt">
+                  Alt-текст обкладинки
+                </label>
+                <input
+                  id="news-cover-alt"
+                  type="text"
+                  value={formData.imageAlt || ""}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      imageAlt: e.target.value,
+                    })
+                  }
+                  className={styles.input}
+                  placeholder="наприклад: Аніматор за столом з дітьми"
+                  maxLength={120}
                 />
               </div>
 
@@ -426,6 +557,33 @@ const AdminNewsPage = () => {
               </div>
             </div>
 
+            {/* Прев'ю обкладинки: обкладинка або перше зображення галереї */}
+            {(formData.image || formData.images?.[0]) && (
+              <div className={styles.inputGroup}>
+                <span className={styles.inputLabel}>Прев'ю обкладинки</span>
+                {/* biome-ignore lint/performance/noImgElement: динамічний URL з адмінки, розмір задає CSS-модуль */}
+                <img
+                  src={resolveImageSrc(
+                    formData.image || formData.images?.[0] || "",
+                  )}
+                  alt={
+                    formData.imageAlt ||
+                    "Прев'ю обкладинки новини (не опубліковано)"
+                  }
+                  className={styles.previewImage}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display =
+                      "none";
+                  }}
+                />
+                <p className={styles.imageItemInfo} style={{ fontSize: 12 }}>
+                  {formData.image
+                    ? "Обкладинка з цього URL показується в метаданих соцмереж і на сторінці новини."
+                    : "Обкладинку не задано — використовується перше зображення галереї."}
+                </p>
+              </div>
+            )}
+
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel} htmlFor="news-content">
                 Контент
@@ -534,9 +692,7 @@ const AdminNewsPage = () => {
 
       {/* News List */}
       <div className={styles.newsSection}>
-        <h2 className={styles.sectionTitle}>
-          Опубліковані новини ({news.length})
-        </h2>
+        <h2 className={styles.sectionTitle}>Усі новини ({news.length})</h2>
 
         <div className={styles.newsGrid}>
           {news.map((item, index) => {
@@ -574,6 +730,14 @@ const AdminNewsPage = () => {
                         {formatDate(item.date)}
                       </span>
                     </div>
+                    {item.status && item.status !== "published" && (
+                      <span
+                        className={styles.typeBadge}
+                        style={{ marginLeft: 8 }}
+                      >
+                        {item.status === "draft" ? "📝 Чернетка" : "📦 Архів"}
+                      </span>
+                    )}
                   </div>
 
                   <h3 className={styles.newsTitle}>{item.title}</h3>

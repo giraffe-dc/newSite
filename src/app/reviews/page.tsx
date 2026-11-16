@@ -8,6 +8,7 @@ export const metadata: Metadata = {
   title: "Відгуки — Жирафик, виїзні свята",
   description:
     "Відгуки про виїзні свята: день народження вдома, випускний у дитсадку, привітання в офісі. Кожне свято — реальна локація.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/reviews" },
 };
 
 export const revalidate = 3600;

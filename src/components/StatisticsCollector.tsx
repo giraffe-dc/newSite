@@ -12,7 +12,10 @@ export function StatisticsCollector() {
     // Збираємо статистику лише на продакшні — із дев-сервера (localhost) дані
     // не повинні потрапляти в колекцію statistics, інакше графік переглядів
     // замішаний із тестовими відвідами з локального розробки.
-    if (typeof process !== "undefined" && process.env.NODE_ENV !== "production") {
+    if (
+      typeof process !== "undefined" &&
+      process.env.NODE_ENV !== "production"
+    ) {
       return;
     }
 

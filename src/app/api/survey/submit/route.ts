@@ -3,10 +3,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import clientPromise from "@/lib/mongodb";
-import {
-  escapeTelegramHtml,
-  sendTelegramMessageSurvey,
-} from "@/lib/utils";
+import { escapeTelegramHtml, sendTelegramMessageSurvey } from "@/lib/utils";
 
 export async function POST(req: Request) {
   // Кожна відповідь шле Telegram-сповіщення — ліміт від флуду.

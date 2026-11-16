@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
 
 /* Зміна статусу та видалення заявок — лише для адміна (етап 4, п. 3).
@@ -10,7 +10,7 @@ const STATUSES = ["new", "in_progress", "done", "cancelled"] as const;
 
 function isAuthorized(request: NextRequest): boolean {
   const token = request.cookies.get("admin_token")?.value;
-  return Boolean(token && verifyToken(token));
+  return Boolean(token && verifyAdmin(token));
 }
 
 export async function PATCH(request: NextRequest) {

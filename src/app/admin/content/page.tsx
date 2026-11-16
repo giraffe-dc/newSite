@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SECTION_KEYS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
-import SectionForm from "./SectionForm";
+import SectionForm, { type VariantOption } from "./SectionForm";
 
 /** Дані секцій у «сирому» вигляді: JSON із GET /api/admin/content. */
 type SectionMap = Partial<Record<SectionKey, Record<string, unknown>>>;
@@ -66,17 +66,17 @@ const SECTION_META: Record<
   services: {
     icon: "🎭",
     label: "Послуги",
-    hint: "Картки послуг, ціни та позиції калькулятора.",
+    hint: "Картки послуг: категорія, опис, варіанти тривалості та ціни (варіанти — єдине джерело для каталогу й калькулятора), ознака публікації.",
   },
   packages: {
     icon: "🎁",
     label: "Пакети",
-    hint: "Пакети «Міні»/«Стандарт»/«VIP», їхній склад і додатки.",
+    hint: "Пакети: склад із вибором варіантів послуг (видно, що входить і ціна кожного), числова ціна комплексу для розрахунку економії.",
   },
   calculator: {
     icon: "🧮",
     label: "Кошторис",
-    hint: "Опції селекта та примітка на сторінці /calculator.",
+    hint: "Опції селекта, примітка під сумою та транспорт: тариф грн/км, безкоштовна зона і правило розрахунку для клієнта.",
   },
 };
 
@@ -130,6 +130,33 @@ export default function AdminContentPage() {
 
   const setDraft = (next: Record<string, unknown>) =>
     setDrafts((prev) => ({ ...prev, [active]: next }));
+
+  /* Опції селекта складу пакета: усі варіанти всіх послуг (id → підпис і ціна). */
+  const variantOptions = useMemo<VariantOption[]>(() => {
+    const servicesSection = data?.services as
+      | { services?: Array<Record<string, unknown>> }
+      | undefined;
+    const out: VariantOption[] = [];
+    for (const service of servicesSection?.services ?? []) {
+      const title = typeof service.title === "string" ? service.title : "";
+      if (!Array.isArray(service.variants)) continue;
+      for (const variant of service.variants) {
+        if (
+          typeof variant !== "object" ||
+          variant === null ||
+          typeof (variant as { id?: unknown }).id !== "string"
+        ) {
+          continue;
+        }
+        const v = variant as { id: string; label?: unknown; price?: unknown };
+        out.push({
+          value: v.id,
+          label: `${title} › ${String(v.label ?? "")} — ${Number(v.price ?? 0)} грн`,
+        });
+      }
+    }
+    return out;
+  }, [data]);
 
   const revert = () =>
     setDrafts((prev) => {
@@ -258,6 +285,7 @@ export default function AdminContentPage() {
               key={active}
               section={active}
               data={current}
+              variantOptions={variantOptions}
               onChange={setDraft}
             />
           )}

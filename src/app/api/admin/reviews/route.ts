@@ -1,7 +1,7 @@
 import { ObjectId, type UpdateFilter } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
 import {
   canChangeReviewStatus,
@@ -20,7 +20,7 @@ import {
 
 function isAuthorized(request: NextRequest): boolean {
   const token = request.cookies.get("admin_token")?.value;
-  return Boolean(token && verifyToken(token));
+  return Boolean(token && verifyAdmin(token));
 }
 
 function isValidStatus(value: unknown): value is ReviewStatus {

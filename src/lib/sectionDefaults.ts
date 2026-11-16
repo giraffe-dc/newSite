@@ -20,6 +20,9 @@ import {
   PACKAGE_ADDONS,
   PACKAGES,
   PROMISES,
+  ROAD_FREE_KM,
+  ROAD_NOTE,
+  ROAD_TARIFF,
   SERVICE_OPTIONS,
   SERVICES,
   STEPS,
@@ -62,5 +65,11 @@ export const SECTION_DEFAULTS = {
   faq: { faq: FAQ },
   services: { services: SERVICES },
   packages: { packages: PACKAGES, packageAddons: PACKAGE_ADDONS },
-  calculator: { serviceOptions: SERVICE_OPTIONS, calcNote: CALC_NOTE },
+  calculator: {
+    serviceOptions: SERVICE_OPTIONS,
+    calcNote: CALC_NOTE,
+    roadTariff: ROAD_TARIFF,
+    roadFreeKm: ROAD_FREE_KM,
+    roadNote: ROAD_NOTE,
+  },
 } satisfies Record<SectionKey, object>;

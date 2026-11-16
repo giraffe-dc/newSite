@@ -4,3 +4,5 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+
+Sitemap: https://giraffe-teplyk.vercel.app/sitemap.xml

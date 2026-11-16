@@ -6,15 +6,29 @@ export interface INews {
   date?: Date | string;
   type?: "news" | "event";
   image?: string;
+  imageAlt?: string;
   images?: string[];
+  status?: "draft" | "published" | "archived";
+  category?: string;
+  seoDescription?: string;
 }
+
+/** Публічний фільтр: опубліковані або старі документи без статусу.
+ *  Чернетки й архів не потрапляють ні у sitemap, ні на сторінку новини. */
+const PUBLIC_FILTER = {
+  $or: [{ status: "published" }, { status: { $exists: false } }],
+};
 
 export const NewsService = {
   async getAll() {
     const clientPromise = (await import("../mongodb")).default;
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
-    return await db.collection("news").find({}).sort({ date: -1 }).toArray();
+    return await db
+      .collection("news")
+      .find(PUBLIC_FILTER)
+      .sort({ date: -1 })
+      .toArray();
   },
 
   async getById(id: string) {
@@ -28,13 +42,14 @@ export const NewsService = {
     try {
       const news = await db
         .collection("news")
-        .findOne({ _id: new ObjectId(id) });
+        .findOne({ _id: new ObjectId(id), ...PUBLIC_FILTER });
       return news;
     } catch (_e) {
       // Fallback for non-ObjectId strings
-      return await db
-        .collection("news")
-        .findOne({ _id: id as unknown as import("mongodb").ObjectId });
+      return await db.collection("news").findOne({
+        _id: id as unknown as import("mongodb").ObjectId,
+        ...PUBLIC_FILTER,
+      });
     }
   },
 

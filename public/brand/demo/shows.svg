@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#c6c8fa"/>
+  <text x="200" y="140" font-size="64" text-anchor="middle">✨</text>
+  <text x="200" y="200" font-size="18" text-anchor="middle" fill="#12343a" font-family="sans-serif">Шоу-програми</text>
+  <text x="200" y="225" font-size="12" text-anchor="middle" fill="#496069" font-family="sans-serif">демо-зображення</text>
+</svg>

@@ -1,7 +1,9 @@
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { diffFields, recordAudit } from "@/lib/auditLog";
+import { verifyAdmin } from "@/lib/auth";
 import {
+  getSection,
   isSectionKey,
   matchesShape,
   SECTION_DEFAULTS,
@@ -15,7 +17,8 @@ type Params = { params: Promise<{ section: string }> };
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
     const token = request.cookies.get("admin_token")?.value;
-    if (!token || !verifyToken(token)) {
+    const admin = token ? verifyAdmin(token) : null;
+    if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -39,7 +42,20 @@ export async function PUT(request: NextRequest, { params }: Params) {
       );
     }
 
+    // Аудит (ADM-01): diff старого і нового стану секції перед записом.
+    const before = (await getSection(section)) as Record<string, unknown>;
+
     await saveSection(section, data as SectionData<typeof section>);
+
+    const actor = typeof admin.username === "string" ? admin.username : "admin";
+    await recordAudit({
+      actor,
+      action: "update",
+      entity: `section:${section}`,
+      entityId: section,
+      summary: `Секція «${section}» оновлена`,
+      changes: diffFields(before, data as Record<string, unknown>),
+    });
 
     // Правка одразу видна на публіці (усі сторінки кешуються як layout).
     revalidatePath("/", "layout");

@@ -10,12 +10,13 @@ export const CONTACTS = {
 } as const;
 
 export const NAV = [
+  // { href: "/", label: "Головна" },
   { href: "/services", label: "Послуги" },
   { href: "/packages", label: "Пакети" },
-  { href: "/reviews", label: "Відгуки" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/cover", label: "Куди їздимо" },
-  { href: "/news-contacts", label: "Контакти" },
+  { href: "/ideas", label: "Ідеї свят" },
+  { href: "/reviews", label: "Галерея та відгуки" },
+  { href: "/news-contacts", label: "Новини й контакти" },
+  { href: "/calculator", label: "Кошторис" },
 ] as const;
 
 /** Якір секції бронювання на головній — працює з будь-якої сторінки. */
@@ -44,20 +45,55 @@ export const BOARD = {
   foot: "",
 } as const;
 
+export interface ServiceVariant {
+  id: string;
+  label: string;
+  durationMin: number;
+  price: number;
+}
+
 export interface Service {
   id: string;
   emoji: string;
   title: string;
   desc: string;
-  price: string;
-  unit: string;
-  calcValue: number;
-  calcLabel: string;
+  /** Категорія для фільтрів каталогу. */
+  category?: string;
+  /** Аудиторії, для яких підходить послуга. */
+  audiences?: string[];
+  /** Зображення (URL). */
+  images?: string[];
+  /** Опубліковано (для чернеток). */
+  published?: boolean;
+  /** Варіанти тривалості та ціни — єдине джерело правди. */
+  variants?: ServiceVariant[];
+  /** Технічні вимоги (електрика, площа тощо). */
+  requirements?: string[];
+  /** Підпис для калькулятора. */
+  calcLabel?: string;
+  /** Значення для селекта «Формат» у формі бронювання. */
   format: string;
+  /* --- Deprecated (залишено для зворотної сумісності) --- */
+  price?: string;
+  unit?: string;
+  calcValue?: number;
 }
 
 export const SERVICES: Service[] = [
-  { id: "", emoji: "", title: "", desc: "", price: "", unit: "", calcValue: 0, calcLabel: "", format: "" },
+  {
+    id: "",
+    emoji: "",
+    title: "",
+    desc: "",
+    category: "",
+    audiences: [],
+    images: [],
+    published: true,
+    variants: [{ id: "", label: "", durationMin: 0, price: 0 }],
+    requirements: [],
+    calcLabel: "",
+    format: "",
+  },
 ];
 
 export const STEPS: Array<{ time: string; title: string; text: string }> = [
@@ -65,8 +101,12 @@ export const STEPS: Array<{ time: string; title: string; text: string }> = [
 ];
 
 export interface PackageItem {
+  /** Посилання на ServiceVariant.id (якщо позиція — реальна послуга). */
+  variantId?: string;
+  /** Кількість одиниць. */
+  qty?: number;
+  /** Текст для відображення (опис позиції або умова). */
   text: string;
-  included: boolean;
 }
 
 export interface Package {
@@ -75,9 +115,13 @@ export interface Package {
   sub: string;
   price: string;
   period: string;
+  /** Числова ціна комплексу (для розрахунку економії). */
+  bundlePrice?: number;
   items: PackageItem[];
   hit?: boolean;
   format: string;
+  audiences?: string[];
+  published?: boolean;
 }
 
 export const PACKAGES: Package[] = [
@@ -87,13 +131,24 @@ export const PACKAGES: Package[] = [
     sub: "",
     price: "",
     period: "",
-    items: [{ text: "", included: false }],
+    bundlePrice: 0,
+    items: [{ variantId: "", qty: 1, text: "" }],
     hit: false,
     format: "",
+    audiences: [],
+    published: true,
   },
 ];
 
 export const PACKAGE_ADDONS = "";
+
+/** Прибирає чернетки (published === false) — для публічних сторінок.
+ *   Поле відсутнє (старі дані) → позиція показується. */
+export function publishedOnly<T extends { published?: boolean }>(
+  list: readonly T[],
+): T[] {
+  return list.filter((item) => item.published !== false);
+}
 
 /** Відгук у форматі показу (картки на головній, /reviews і в сітці).
  *  Джерело — колекція `reviews` (етап 6); REVIEWS нижче — лише fallback,
@@ -112,7 +167,16 @@ export interface ReviewItem {
 }
 
 export const REVIEWS: ReviewItem[] = [
-  { id: "", stars: "", rating: 0, quote: "", initial: "", name: "", context: "", avatar: "" },
+  {
+    id: "",
+    stars: "",
+    rating: 0,
+    quote: "",
+    initial: "",
+    name: "",
+    context: "",
+    avatar: "",
+  },
 ];
 
 export const FAQ: Array<{ q: string; a: string }> = [{ q: "", a: "" }];
@@ -142,6 +206,15 @@ export const SERVICE_OPTIONS: string[] = [
 
 export const CALC_NOTE = "";
 
+/* --- Транспорт (CALC-02): тариф погоджено з власником 16.11.2026 ---
+   25 грн/км в один бік, без безкоштовної зони (платимо від першого км).
+   Значення налаштовуються в адмінці (секція «Кошторис»); ці дефолти —
+   для сторінок, коли поле відсутнє в БД. */
+export const ROAD_TARIFF = 25;
+export const ROAD_FREE_KM = 0;
+export const ROAD_NOTE =
+  "Транспорт: 25 грн за кілометр в один бік від Теплика. Відстань і вартість уточнюється за адресою — остаточно підтвердить менеджер.";
+
 /* --- Головна, варіант Б (docs/home-rework-demo-b.html) ------------------
    Секції, яких немає на жодній сторінці сайту: сценарій дня, підбір
    випадку, гарантії, перевірка дати. Дані поки статичні — на етапі
@@ -155,9 +228,7 @@ export interface TimelineStep {
   on?: boolean;
 }
 
-export const TIMELINE: TimelineStep[] = [
-  { time: "", title: "", text: "" },
-];
+export const TIMELINE: TimelineStep[] = [{ time: "", title: "", text: "" }];
 
 export interface HolidayCase {
   id: string;
@@ -203,9 +274,7 @@ export interface PromiseItem {
   text: string;
 }
 
-export const PROMISES: PromiseItem[] = [
-  { ico: "", title: "", text: "" },
-];
+export const PROMISES: PromiseItem[] = [{ ico: "", title: "", text: "" }];
 
 export interface TrustItem {
   value: string;
@@ -213,9 +282,7 @@ export interface TrustItem {
 }
 
 /** Цифри довіри з брифу. На етапі даних заміняться на показники з бази. */
-export const TRUST: TrustItem[] = [
-  { value: "", label: "" },
-];
+export const TRUST: TrustItem[] = [{ value: "", label: "" }];
 
 export type SlotStatus = "free" | "few" | "busy";
 

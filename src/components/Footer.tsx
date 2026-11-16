@@ -4,12 +4,15 @@ import { CONTACTS } from "@/components/board/content";
 import type { SectionData } from "@/lib/siteContent";
 
 const LINKS = [
+  // { href: "/", label: "Головна" },
   { href: "/services", label: "Послуги" },
   { href: "/packages", label: "Пакети" },
-  { href: "/calculator", label: "Кошторис" },
-  { href: "/reviews", label: "Відгуки" },
-  { href: "/about", label: "Про команду" },
+  { href: "/ideas", label: "Ідеї свят" },
+  { href: "/reviews", label: "Галерея та відгуки" },
   { href: "/news-contacts", label: "Новини й контакти" },
+  { href: "/calculator", label: "Збери сам" },
+  { href: "/privacy", label: "Конфіденційність" },
+  { href: "/terms", label: "Умови" },
 ];
 
 export default function Footer({

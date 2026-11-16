@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Забронювати свято — Жирафик",
   description:
     "Залиште дату, адресу й контакт. Відповідаємо протягом години щодня з 9:00 до 21:00.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/book" },
 };
 
 export const revalidate = 3600;
@@ -27,7 +28,9 @@ export default async function BookPage({
   ]);
   const contacts = contactsSection.contacts;
 
-  let items;
+  let items:
+    | { serviceId?: string; serviceName: string; quantity?: number; price?: string | number }[]
+    | undefined;
   const rawItems = params.items;
   if (typeof rawItems === "string") {
     try {
@@ -66,7 +69,9 @@ export default async function BookPage({
           typeof params.package === "string" ? params.package : undefined
         }
         packageName={
-          typeof params.packageName === "string" ? params.packageName : undefined
+          typeof params.packageName === "string"
+            ? params.packageName
+            : undefined
         }
         programId={
           typeof params.programId === "string" ? params.programId : undefined

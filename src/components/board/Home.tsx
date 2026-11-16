@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
+import AudiencesSection from "./AudiencesSection";
 import BookingSection from "./BookingSection";
 import CasePicker from "./CasePicker";
 import type { ReviewItem } from "./content";
-import { DATE_SLOTS } from "./content";
 import Hero from "./Hero";
+import PackagesPreview from "./PackagesPreview";
 import PromisesSection from "./PromisesSection";
+import TopServicesSection from "./TopServicesSection";
 import ReviewsSection from "./ReviewsSection";
 import TimelineSection from "./TimelineSection";
 
@@ -24,6 +26,10 @@ interface HomeProps {
   reviews: ReviewItem[];
   book: SectionData<"book">["book"];
   contacts: SectionData<"contacts">["contacts"];
+  /** Готові комплекси (етап редизайну). */
+  packages?: SectionData<"packages">["packages"];
+  /** Послуги (для топ-послуг). */
+  services?: SectionData<"services">["services"];
 }
 
 /** Головна, варіант Б (docs/home-rework-demo-b.html): унікальні секції
@@ -40,6 +46,8 @@ export default function Home({
   reviews,
   book,
   contacts,
+  packages,
+  services,
 }: HomeProps) {
   const [date, _setDate] = useState<string>("");
   const [service, setService] = useState<string>(
@@ -50,6 +58,8 @@ export default function Home({
   return (
     <>
       <Hero hero={hero} contacts={contacts} />
+      <AudiencesSection />
+      <TopServicesSection services={services} />
       <TimelineSection timeline={timeline} />
       <CasePicker
         cases={cases}
@@ -60,6 +70,7 @@ export default function Home({
         }}
       />
       <PromisesSection promises={promises} trust={trust} />
+      <PackagesPreview packages={packages} />
       <ReviewsSection reviews={reviews} />
       {/* <DateChecker date={date} onPick={setDate} /> */}
       <BookingSection

@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Як ми працюємо — Жирафик, виїзні свята",
   description:
     "Від заявки до свята: чотири кроки, куди приїжджаємо, що потрібно підготувати на місці та як відбувається оплата.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/about" },
 };
 
 export const revalidate = 3600;

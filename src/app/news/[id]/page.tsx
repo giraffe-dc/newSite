@@ -19,9 +19,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${news.title} | Жирафик`,
-    description: news.content.substring(0, 160),
+    description: (news.seoDescription || news.content).substring(0, 160),
+    alternates: { canonical: `https://giraffe-teplyk.vercel.app/news/${id}` },
     openGraph: {
-      images: news.images && news.images.length > 0 ? [news.images[0]] : [],
+      images: news.image
+        ? [news.image]
+        : news.images && news.images.length > 0
+          ? [news.images[0]]
+          : [],
     },
   };
 }

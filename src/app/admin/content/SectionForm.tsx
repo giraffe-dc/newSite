@@ -1,7 +1,8 @@
 "use client";
 
-import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
+import { SERVICE_CATEGORIES } from "@/components/board/categories";
 import { SERVICE_OPTIONS } from "@/components/board/content";
+import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
 
 /* Форма секції будується зі структури дефолтів (SECTION_DEFAULTS), значення
@@ -76,10 +77,19 @@ const LABELS: Record<string, string> = {
   desc: "Опис",
   calcValue: "Ціна для калькулятора",
   calcLabel: "Підпис у калькуляторі",
+  category: "Категорія каталогу",
+  audiences: "Для кого підходить",
+  images: "Зображення (URL)",
+  requirements: "Технічні вимоги",
+  published: "Опубліковано (видно на сайті)",
+  durationMin: "Тривалість, хв",
+  variantId: "Послуга (варіант)",
+  qty: "Кількість",
   // пакети
   packages: "Пакети",
   sub: "Підзаголовок",
   period: "Період",
+  bundlePrice: "Ціна комплексу, грн (число)",
   items: "Склад пакета",
   included: "Входить у пакет",
   hit: "Рекомендований (ХІТ)",
@@ -87,6 +97,9 @@ const LABELS: Record<string, string> = {
   // калькулятор
   serviceOptions: "Опції селекта «Формат»",
   calcNote: "Примітка під сумою",
+  roadTariff: "Тариф дороги, грн/км (в один бік)",
+  roadFreeKm: "Безкоштовна зона, км (0 — платити від першого км)",
+  roadNote: "Правило транспорту (текст для клієнта)",
   // контейнери секцій
   contacts: "Контакти",
   hero: "Зміст першого екрана",
@@ -100,8 +113,17 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
   board: { label: "Назва рядка", value: "Текст рядка" },
   cases: { title: "Назва випадку", text: "Опис" },
   promises: { value: "Число", label: "Підпис під числом" },
-  services: { title: "Назва послуги", format: "Формат" },
-  packages: { title: "Назва пакета", format: "Формат" },
+  services: {
+    title: "Назва послуги",
+    format: "Формат",
+    label: "Підпис (напр. «1 год»)",
+    price: "Ціна, грн",
+  },
+  packages: {
+    title: "Назва пакета",
+    format: "Формат",
+    price: "Ціна (текст, напр. «від 3500 грн»)",
+  },
 };
 
 /* Ключі, які не редагуються вручну: homeServiceOptions перераховується із
@@ -151,6 +173,10 @@ function makeTemplate(node: unknown, key?: string): unknown {
   return node;
 }
 
+/** Опції селекта «Послуга (варіант)» у складі пакета: будуються з поточних
+ *  послуг (id варіанту + підпис + ціна). */
+export type VariantOption = { value: string; label: string };
+
 function Fields({
   value,
   shape,
@@ -158,6 +184,7 @@ function Fields({
   hidden = [],
   onChange,
   section,
+  variantOptions = [],
 }: {
   value: Obj;
   shape: Obj;
@@ -165,6 +192,7 @@ function Fields({
   hidden?: readonly string[];
   onChange: (next: Obj) => void;
   section: SectionKey;
+  variantOptions?: VariantOption[];
 }) {
   return (
     <div className={styles.grid}>
@@ -178,6 +206,7 @@ function Fields({
             shapeValue={shape[key]}
             labels={labels}
             section={section}
+            variantOptions={variantOptions}
             onChange={(next) => onChange({ ...value, [key]: next })}
           />
         ))}
@@ -191,6 +220,7 @@ function Field({
   shapeValue,
   labels,
   section,
+  variantOptions = [],
   onChange,
 }: {
   name: string;
@@ -198,6 +228,7 @@ function Field({
   shapeValue: unknown;
   labels: Record<string, string>;
   section: SectionKey;
+  variantOptions?: VariantOption[];
   onChange: (next: unknown) => void;
 }) {
   const label = labels[name] ?? name;
@@ -227,6 +258,58 @@ function Field({
     );
   }
 
+  /* Категорія каталогу — селект з фіксованим списком (спільний з публічними
+     фільтрами), а не вільний текст: значення має збігатися з фільтрами. */
+  if (name === "category" && section === "services") {
+    const text = typeof value === "string" ? value : "";
+    return (
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>
+          {label}
+          <select
+            className={styles.input}
+            value={text}
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="">— без категорії —</option>
+            {SERVICE_CATEGORIES.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
+
+  /* Склад пакета: вибір конкретного варіанту послуги (id → ціна й економія
+     рахуються з нього); порожнє значення — текстова позиція без ціни. */
+  if (name === "variantId" && section === "packages") {
+    const text = typeof value === "string" ? value : "";
+    return (
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>
+          {label}
+          <select
+            className={styles.input}
+            value={
+              variantOptions.some((option) => option.value === text) ? text : ""
+            }
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="">— текстова позиція (без ціни) —</option>
+            {variantOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
+
   if (Array.isArray(shapeValue)) {
     return (
       <div className={`${styles.field} ${styles.fieldWide}`}>
@@ -236,6 +319,7 @@ function Field({
           shapeArray={shapeValue}
           labels={labels}
           section={section}
+          variantOptions={variantOptions}
           onChange={onChange}
         />
       </div>
@@ -251,6 +335,7 @@ function Field({
           shape={shapeValue}
           labels={labels}
           section={section}
+          variantOptions={variantOptions}
           onChange={(next) => onChange(next)}
         />
       </fieldset>
@@ -263,7 +348,10 @@ function Field({
         <label className={styles.check}>
           <input
             type="checkbox"
-            checked={value === true}
+            /* Відсутнє в даних поле показуємо як значення за замовчуванням
+               (published: true), щоб адмін не бачив «знято» там, де поле
+               просто ще не зберігали. */
+            checked={typeof value === "boolean" ? value : shapeValue === true}
             onChange={(event) => onChange(event.target.checked)}
           />
           <span>{label}</span>
@@ -280,7 +368,15 @@ function Field({
           <input
             className={styles.input}
             type="number"
-            value={typeof value === "number" ? value : 0}
+            /* Поле відсутнє в даних БД (нові поля) — показуємо дефолт форми,
+               щоб адмін бачив реальне значення, а не 0. */
+            value={
+              typeof value === "number"
+                ? value
+                : typeof shapeValue === "number"
+                  ? shapeValue
+                  : 0
+            }
             onChange={(event) =>
               onChange(
                 event.target.value === "" ? 0 : Number(event.target.value),
@@ -336,12 +432,14 @@ function ArrayField({
   labels,
   onChange,
   section,
+  variantOptions = [],
 }: {
   value: unknown;
   shapeArray: unknown[];
   labels: Record<string, string>;
   onChange: (next: unknown[]) => void;
   section: SectionKey;
+  variantOptions?: VariantOption[];
 }) {
   const items = Array.isArray(value) ? value : [];
   const objectList = isObj(shapeArray[0]);
@@ -406,6 +504,7 @@ function ArrayField({
               shape={mergeShapes(shapeArray)}
               labels={labels}
               section={section}
+              variantOptions={variantOptions}
               onChange={(next) => update(index, next)}
             />
           </div>
@@ -473,10 +572,13 @@ function ArrayField({
 export default function SectionForm({
   section,
   data,
+  variantOptions = [],
   onChange,
 }: {
   section: SectionKey;
   data: Obj;
+  /** Селект варіантів послуг у складі пакетів (див. VariantOption). */
+  variantOptions?: VariantOption[];
   onChange: (next: Obj) => void;
 }) {
   const shape = SECTION_DEFAULTS[section] as Obj;
@@ -500,6 +602,7 @@ export default function SectionForm({
           shape={shape[soleObjectKey] as Obj}
           labels={labels}
           section={section}
+          variantOptions={variantOptions}
           onChange={(next) => onChange({ ...data, [soleObjectKey]: next })}
         />
       ) : (
@@ -509,6 +612,7 @@ export default function SectionForm({
           labels={labels}
           hidden={hidden}
           section={section}
+          variantOptions={variantOptions}
           onChange={onChange}
         />
       )}

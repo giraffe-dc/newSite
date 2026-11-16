@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 
 export async function GET(request: Request) {
@@ -12,7 +12,7 @@ export async function GET(request: Request) {
       .find((c) => c.trim().startsWith("admin_token="))
       ?.split("=")[1];
 
-    if (!token || !verifyToken(token)) {
+    if (!token || !verifyAdmin(token)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

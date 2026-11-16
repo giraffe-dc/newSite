@@ -69,16 +69,25 @@ const NewsPageClient: React.FC<NewsPageClientProps> = ({ news, id }) => {
               </span>
               <span className={styles.category}>
                 <Tag size={16} />
-                {news.type === "event" ? "Подія" : "Новина"}
+                {news.category || (news.type === "event" ? "Подія" : "Новина")}
               </span>
             </div>
             <h1 className={styles.title}>{news.title}</h1>
           </header>
 
-          {/* Image Slider */}
-          {news.images && news.images.length > 0 && (
-            <NewsSlider images={news.images} />
-          )}
+          {/* Обкладинка + галерея: обкладинка (image) іде першою, без дублікатів */}
+          {(() => {
+            const gallery = [
+              news.image,
+              ...(Array.isArray(news.images) ? news.images : []),
+            ].filter(
+              (src, idx, arr): src is string =>
+                Boolean(src) && arr.indexOf(src) === idx,
+            );
+            return gallery.length > 0 ? (
+              <NewsSlider images={gallery} alt={news.imageAlt || news.title} />
+            ) : null;
+          })()}
 
           <div className={styles.content}>
             {news.content.split("\n").map((para: string, i: number) => (

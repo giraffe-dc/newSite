@@ -11,9 +11,14 @@ import styles from "@/styles/NewsSlider.module.css";
 
 interface NewsSliderProps {
   images: string[];
+  /** Alt-текст головного зображення (за замовчуванням — загальний). */
+  alt?: string;
 }
 
-const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
+const NewsSlider: React.FC<NewsSliderProps> = ({
+  images,
+  alt = "Фото з новини",
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
 
@@ -85,7 +90,7 @@ const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
               }
             }}
             className={styles.slideImage}
-            alt="News slide"
+            alt={alt}
           />
         </AnimatePresence>
 
@@ -123,7 +128,7 @@ const NewsSlider: React.FC<NewsSliderProps> = ({ images }) => {
               }}
             >
               {/* biome-ignore lint/performance/noImgElement: thumbnail size is fixed by CSS module and sources are dynamic external URLs; next/image sizing isn't trivial */}
-              <img src={img} alt={`Thumbnail ${index}`} />
+              <img src={img} alt={`${alt} — фото ${index + 1}`} />
             </button>
           ))}
         </div>
