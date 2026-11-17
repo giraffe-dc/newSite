@@ -84,7 +84,7 @@ const LABELS: Record<string, string> = {
   calcValue: "Ціна для калькулятора",
   calcLabel: "Підпис у калькуляторі",
   category: "Категорія каталогу",
-  audiences: "Для кого підходить",
+  audiences: "Вік / для кого (перший рядок — бейдж на картці, напр. 7+)",
   images: "Зображення (URL)",
   imageAlt: "Alt-текст фото (доступність і SEO)",
   requirements: "Технічні вимоги",

@@ -22,6 +22,9 @@ export default function ServicesGrid({
             : [];
         const priceLabel = priceHeadline(variants, service.price || "");
         const durationLabel = durationHeadline(variants, service.unit || "");
+        /* Замість емодзі (фото вже є) — компактний бейдж рекомендованого
+           віку з першого рядка «Для кого підходить». */
+        const ageBadge = service.audiences?.[0]?.trim() || "";
         // Показуємо точні пари лише коли варіантів більше одного —
         // для одного варіанта достатньо одного рядка ціни/тривалості.
         const allPairs = variantPairs(variants);
@@ -30,10 +33,15 @@ export default function ServicesGrid({
 
         return (
           <article className="m2-ticket" key={service.id}>
-            <div className="m2-ticket__top">
-              <span className="m2-ticket__emoji" aria-hidden="true">
-                {service.emoji}
+          <div>
+            
+              <span className={ageBadge ? "m2-ticket__badge" : "m2-ticket__badge_more"}>
+                {ageBadge}
               </span>
+            
+          </div>
+            <div className="m2-ticket__top">
+             
               <h3>{service.title}</h3>
             </div>
             {/* Фото послуги (MED-01): власне зображення або SVG-заглушка */}

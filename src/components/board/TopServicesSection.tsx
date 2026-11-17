@@ -44,6 +44,7 @@ export default function TopServicesSection({
                 : [];
             const priceLabel = priceHeadline(variants, service.price || "");
             const durationLabel = durationHeadline(variants, service.unit || "");
+            const ageBadge = service.audiences?.[0]?.trim() || "";
             return (
               <Link
                 key={service.id}
@@ -59,9 +60,10 @@ export default function TopServicesSection({
                   />
                 </div>
                 <div className="m2-top-service__body">
-                  <h3>
-                    {service.emoji} {service.title}
-                  </h3>
+                  {ageBadge && (
+                    <span className="m2-top-service__badge">{ageBadge}</span>
+                  )}
+                  <h3>{service.title}</h3>
                   <p>{service.desc?.slice(0, 80)}</p>
                   <span className="m2-top-service__price">
                     {priceLabel}
