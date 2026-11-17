@@ -339,21 +339,33 @@ export interface DateSlot {
 }
 
 export const DATE_SLOTS: DateSlot[] = [
-  { iso: "", status: "free", label: "", hint: "" },
+  { iso: "2026-11-18", status: "free", label: "18 лист", hint: "8 слотів" },
+  { iso: "2026-11-20", status: "few", label: "20 лист", hint: "3 слоти" },
+  { iso: "2026-11-22", status: "busy", label: "22 лист", hint: "зайнято" },
+  { iso: "2026-11-24", status: "free", label: "24 лист", hint: "7 слотів" },
 ];
 
 export const DATE_VERDICT: Record<SlotStatus, { lead: string; rest: string }> =
   {
-    free: { lead: "", rest: "" },
-    few: { lead: "", rest: "" },
-    busy: { lead: "", rest: "" },
+    free: {
+      lead: "Вільно — резервуємо під вас.",
+      rest: "Обирайте зручний час, ми передзвонимо протягом години і підтвердимо персонажів.",
+    },
+    few: {
+      lead: "Мало місця — варто поспішити.",
+      rest: "Лишилося кілька слотів; оберіть час зараз, і ми закріпимо його за вами.",
+    },
+    busy: {
+      lead: "Ця дата вже зайнята.",
+      rest: "Пропонуємо сусідні дні або інший формат — зателефонуйте, підберемо.",
+    },
   };
 
 export const DATE_BOARD = {
-  characters: "",
-  foot: "",
-  slots: { free: "", few: "", busy: "" },
-  arrival: { free: "", few: "", busy: "" },
+  characters: "2 аніматори в роботі",
+  foot: "Слоти оновлюються щодня; остаточне підтвердження — після дзвінка менеджера.",
+  slots: { free: "8 / 8", few: "3 / 8", busy: "0 / 8" },
+  arrival: { free: "за 20 хв до початку", few: "за 20 хв до початку", busy: "—" },
 };
 
 /** Два відгуки для головної добирає дані-шар (два найновіші опубліковані,

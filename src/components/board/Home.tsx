@@ -6,12 +6,13 @@ import AudiencesSection from "./AudiencesSection";
 import BookingSection from "./BookingSection";
 import CasePicker from "./CasePicker";
 import type { ReviewItem } from "./content";
+import DateChecker from "./DateChecker";
 import Hero from "./Hero";
 import PackagesPreview from "./PackagesPreview";
 import PromisesSection from "./PromisesSection";
-import TopServicesSection from "./TopServicesSection";
 import ReviewsSection from "./ReviewsSection";
 import TimelineSection from "./TimelineSection";
+import TopServicesSection from "./TopServicesSection";
 
 /** Секції, які головна отримує пропсами з page.tsx (server → client).
  *  Слоти дат статичні — інтеграція системи бронювання поза цим етапом. */
@@ -49,7 +50,7 @@ export default function Home({
   packages,
   services,
 }: HomeProps) {
-  const [date, _setDate] = useState<string>("");
+  const [date, setDate] = useState<string>("");
   const [service, setService] = useState<string>(
     cases[0]?.service ?? homeServiceOptions[0] ?? "",
   );
@@ -72,7 +73,7 @@ export default function Home({
       <PromisesSection promises={promises} trust={trust} />
       <PackagesPreview packages={packages} />
       <ReviewsSection reviews={reviews} />
-      {/* <DateChecker date={date} onPick={setDate} /> */}
+      <DateChecker date={date} onPick={setDate} />
       <BookingSection
         date={date}
         service={service}
