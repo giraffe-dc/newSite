@@ -7,6 +7,11 @@ export const CONTACTS = {
   tel: "",
   email: "",
   hours: "",
+  whatsapp: "",
+  telegram: "",
+  facebook: "",
+  instagram: "",
+  tiktok: "",
 } as const;
 
 export const NAV = [

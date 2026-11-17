@@ -1689,6 +1689,24 @@
   font-weight: 700;
 }
 
+.m2-foot__socials {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.m2-foot__socials a {
+  color: #cbd5cd;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(203, 213, 205, 0.5);
+}
+
+.m2-foot__socials a:hover {
+  color: var(--ochre);
+  border-color: var(--ochre);
+}
+
 /* ---------- Внутрішні сторінки ---------- */
 .m2-inner {
   padding: 56px 0 80px;
@@ -1992,7 +2010,7 @@
 .m2-seasonal-banner__img {
   border-radius: 12px;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
+  /* aspect-ratio: 4 / 3; */
   background: var(--paper-2);
   display: flex;
   align-items: center;

@@ -18,6 +18,11 @@ const LABELS: Record<string, string> = {
   tel: "Телефон для набору (tel:)",
   email: "Електронна пошта",
   hours: "Години роботи",
+  whatsapp: "WhatsApp (посилання)",
+  telegram: "Telegram (посилання)",
+  facebook: "Facebook (посилання)",
+  instagram: "Instagram (посилання)",
+  tiktok: "TikTok (посилання)",
   // перший екран
   titleLead: "Початок заголовка",
   titleAccent: "Виділена частина",
@@ -388,7 +393,14 @@ export function Field({
     return (
       <div className={`${styles.field} ${styles.fieldWide}`}>
         <span className={styles.fieldLabel}>{label}</span>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            marginTop: 4,
+          }}
+        >
           <input
             className={styles.input}
             type="text"

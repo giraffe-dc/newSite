@@ -45,6 +45,59 @@ export default function Footer({
         <a className="m2-foot__tel" href={`tel:${contacts.tel}`}>
           {contacts.phone}
         </a>
+        {(contacts.whatsapp ||
+          contacts.telegram ||
+          contacts.facebook ||
+          contacts.instagram ||
+          contacts.tiktok) && (
+          <div className="m2-foot__socials">
+            {contacts.whatsapp && (
+              <a
+                href={contacts.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                WhatsApp
+              </a>
+            )}
+            {contacts.telegram && (
+              <a
+                href={contacts.telegram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Telegram
+              </a>
+            )}
+            {contacts.facebook && (
+              <a
+                href={contacts.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Facebook
+              </a>
+            )}
+            {contacts.instagram && (
+              <a
+                href={contacts.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Instagram
+              </a>
+            )}
+            {contacts.tiktok && (
+              <a
+                href={contacts.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                TikTok
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </footer>
   );
