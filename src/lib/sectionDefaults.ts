@@ -7,6 +7,9 @@
    завжди збігається зі структурою дефолтів без дублювання. */
 
 import {
+  ASSISTANT_AGE_GROUPS,
+  ASSISTANT_DURATIONS,
+  ASSISTANT_KIDS_PER_ANIMATOR,
   BOARD,
   BOOK,
   CALC_NOTE,
@@ -47,6 +50,7 @@ export const SECTION_KEYS = [
   "services",
   "packages",
   "calculator",
+  "assistant",
 ] as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -71,5 +75,13 @@ export const SECTION_DEFAULTS = {
     roadTariff: ROAD_TARIFF,
     roadFreeKm: ROAD_FREE_KM,
     roadNote: ROAD_NOTE,
+  },
+  /* Помічник підбору (/assistant): параметри добіру замість зашитих
+     у компонент значень — адмін змінює ліміт групи, вікові групи з
+     рекомендованими категоріями та варіанти тривалості. */
+  assistant: {
+    kidsPerAnimator: ASSISTANT_KIDS_PER_ANIMATOR,
+    ageGroups: ASSISTANT_AGE_GROUPS,
+    durations: ASSISTANT_DURATIONS,
   },
 } satisfies Record<SectionKey, object>;

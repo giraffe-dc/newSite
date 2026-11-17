@@ -1,0 +1,319 @@
+/* Календар зайнятості /admin/calendar (ADM-02): місячна сітка заявок,
+   добір дня, бейджі статусів. Часовий пояс дня — Europe/Kyiv (у page.tsx). */
+
+.page {
+  padding: 2rem 1rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.loading,
+.error {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.error {
+  color: #991b1b;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.retry,
+.refresh,
+.navBtn {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.retry:hover,
+.refresh:hover,
+.navBtn:hover {
+  border-color: #0ea5e9;
+  background: #f0f9ff;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.4rem 0;
+}
+
+.subtitle {
+  color: #64748b;
+  margin: 0;
+  max-width: 56ch;
+  line-height: 1.5;
+}
+
+.summary {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.todayTag {
+  margin-left: auto;
+  font-weight: 600;
+  color: #0369a1;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.monthTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  min-width: 12rem;
+  text-align: center;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.4rem;
+}
+
+.weekdays span {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.cellEmpty {
+  min-height: 76px;
+}
+
+.cell {
+  min-height: 76px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.cell:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.cellToday {
+  border-color: #0ea5e9;
+  box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+}
+
+.cellSelected {
+  background: #e0f2fe;
+  border-color: #0ea5e9;
+}
+
+.dayNum {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.dots {
+  display: flex;
+  gap: 0.2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotConfirmed {
+  background: #10b981;
+}
+
+.dotPending {
+  background: #f59e0b;
+}
+
+.count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+}
+
+/* --- Панель дня --- */
+
+.dayPanel {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 1rem 1.1rem;
+}
+
+.dayTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.75rem 0;
+}
+
+.dayEmpty {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.dayList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dayItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  background: #f8fafc;
+}
+
+.itemTime {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0369a1;
+  min-width: 5.5rem;
+}
+
+.itemMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
+  font-size: 0.92rem;
+  color: #1e293b;
+}
+
+.itemMeta {
+  font-size: 0.78rem;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  border-radius: 999px;
+  padding: 0.18rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.statusNew {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.statusProgress {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.statusConfirmed {
+  background: #ccfbf1;
+  color: #115e59;
+}
+
+.statusDone {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.statusCancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 720px) {
+  .cell {
+    min-height: 56px;
+    padding: 0.25rem;
+  }
+
+  .cellEmpty {
+    min-height: 56px;
+  }
+
+  .dayItem {
+    flex-wrap: wrap;
+  }
+
+  .todayTag {
+    margin-left: 0;
+  }
+}

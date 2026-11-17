@@ -34,7 +34,10 @@ export default async function ServicesPage() {
         <ServicesCatalog services={publishedOnly(services.services)} />
 
         <div className="m2-inline" style={{ marginTop: 32 }}>
-          <Link className="m2-btn" href="/#book">
+          <Link className="m2-btn" href="/assistant">
+            Підібрати за 30 секунд
+          </Link>
+          <Link className="m2-btn m2-btn--ghost" href="/#book">
             Забронювати дату
           </Link>
           <Link className="m2-btn m2-btn--ghost" href="/calculator">

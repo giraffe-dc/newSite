@@ -3,7 +3,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SECTION_KEYS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
-import SectionForm, { type VariantOption } from "./SectionForm";
+import AssistantEditor from "./AssistantEditor";
+import CollectionEditor from "./CollectionEditor";
+import SectionForm, {
+  type CatalogOptions,
+  type VariantOption,
+} from "./SectionForm";
+
+/* Секції-колекції (послуги, пакети) редагуються зручним редактором-списком
+   (ADM-03): позиція окремою карткою, а не одним довгим списком полів. */
+/* (assistant має власний редактор AssistantEditor) */
 
 /** Дані секцій у «сирому» вигляді: JSON із GET /api/admin/content. */
 type SectionMap = Partial<Record<SectionKey, Record<string, unknown>>>;
@@ -77,6 +86,11 @@ const SECTION_META: Record<
     icon: "🧮",
     label: "Кошторис",
     hint: "Опції селекта, примітка під сумою та транспорт: тариф грн/км, безкоштовна зона і правило розрахунку для клієнта.",
+  },
+  assistant: {
+    icon: "🧭",
+    label: "Підбір програми",
+    hint: "Параметри помічника /assistant: ліміт дітей на аніматора, вікові групи (назва і галочки послуг/пакетів, які показувати під цей фільтр) та варіанти тривалості.",
   },
 };
 
@@ -157,6 +171,42 @@ export default function AdminContentPage() {
     }
     return out;
   }, [data]);
+
+  /* Каталог послуг і пакетів — для галочок у налаштуваннях «Підбір програми»
+     (UX-02): адмін обирає, що потрібно під кожну вікову групу. */
+  const catalog = useMemo<CatalogOptions>(() => {
+    const servicesSection = (drafts.services ?? data?.services) as
+      | { services?: Array<Record<string, unknown>> }
+      | undefined;
+    const packagesSection = (drafts.packages ?? data?.packages) as
+      | { packages?: Array<Record<string, unknown>> }
+      | undefined;
+    const services = (servicesSection?.services ?? [])
+      .filter((s) => s.published !== false)
+      .map((s) => {
+        const variants = Array.isArray(s.variants) ? s.variants : [];
+        const first = variants[0] as { price?: unknown } | undefined;
+        const price =
+          first && typeof first.price === "number" ? first.price : 0;
+        return {
+          value: `service:${String(s.id ?? "")}`,
+          label: `${String(s.title ?? "")} — ${price} грн`,
+        };
+      });
+    const packages = (packagesSection?.packages ?? [])
+      .filter((p) => p.published !== false)
+      .map((p) => {
+        const price =
+          typeof p.bundlePrice === "number" && p.bundlePrice > 0
+            ? `${p.bundlePrice} грн`
+            : String(p.price ?? "");
+        return {
+          value: `package:${String(p.id ?? "")}`,
+          label: `${String(p.name ?? "")} — ${price}`,
+        };
+      });
+    return { services, packages };
+  }, [data, drafts]);
 
   const revert = () =>
     setDrafts((prev) => {
@@ -280,15 +330,32 @@ export default function AdminContentPage() {
           </div>
           <p className={styles.hint}>{meta.hint}</p>
 
-          {current && (
-            <SectionForm
-              key={active}
-              section={active}
-              data={current}
-              variantOptions={variantOptions}
-              onChange={setDraft}
-            />
-          )}
+          {current &&
+            (active === "services" || active === "packages" ? (
+              <CollectionEditor
+                key={active}
+                section={active as "services" | "packages"}
+                data={current}
+                variantOptions={variantOptions}
+                onChange={setDraft}
+              />
+            ) : active === "assistant" ? (
+              <AssistantEditor
+                key={active}
+                data={current}
+                catalog={catalog}
+                onChange={setDraft}
+              />
+            ) : (
+              <SectionForm
+                key={active}
+                section={active}
+                data={current}
+                variantOptions={variantOptions}
+                catalog={catalog}
+                onChange={setDraft}
+              />
+            ))}
 
           <div className={styles.actions}>
             <button

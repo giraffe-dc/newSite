@@ -116,9 +116,7 @@ export default function AdminAuditPage() {
         <ul className={styles.list}>
           {entries.map((entry) => {
             const key = String(entry._id);
-            const changes = entry.changes
-              ? Object.entries(entry.changes)
-              : [];
+            const changes = entry.changes ? Object.entries(entry.changes) : [];
             const isOpen = expanded === key;
             return (
               <li key={key} className={styles.item}>

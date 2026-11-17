@@ -1,6 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
-  <rect width="400" height="300" fill="#ffbc9a"/>
-  <text x="200" y="140" font-size="64" text-anchor="middle">🎄</text>
-  <text x="200" y="200" font-size="18" text-anchor="middle" fill="#12343a" font-family="sans-serif">Сезонні (Новий рік)</text>
-  <text x="200" y="225" font-size="12" text-anchor="middle" fill="#496069" font-family="sans-serif">демо-зображення</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Сезонні свята — демо-зображення">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#123a5c"/>
+      <stop offset="100%" stop-color="#1f6f8b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <!-- сніжинки та зірки -->
+  <g fill="#ffffff" opacity="0.8">
+    <circle cx="110" cy="90" r="5"/><circle cx="240" cy="150" r="4"/><circle cx="540" cy="80" r="5"/><circle cx="690" cy="160" r="4"/><circle cx="430" cy="120" r="4"/><circle cx="70" cy="260" r="4"/><circle cx="740" cy="300" r="5"/>
+  </g>
+  <!-- ялинка -->
+  <g>
+    <polygon points="400,110 310,260 490,260" fill="#1f8a5a"/>
+    <polygon points="400,190 285,360 515,360" fill="#26a06a"/>
+    <polygon points="400,280 260,460 540,460" fill="#1f8a5a"/>
+    <rect x="380" y="460" width="40" height="60" fill="#8a5a3b"/>
+    <!-- зірка -->
+    <path d="M400 60 l12 30 32 4 -24 22 7 32 -27 -17 -27 17 7 -32 -24 -22 32 -4z" fill="#ffd76a"/>
+    <!-- гірлянда та кульки -->
+    <path d="M345 235 q55 25 110 0" stroke="#ffd76a" stroke-width="4" fill="none"/>
+    <path d="M320 335 q80 30 160 0" stroke="#ffd76a" stroke-width="4" fill="none"/>
+    <circle cx="360" cy="250" r="10" fill="#ff6b35"/><circle cx="440" cy="250" r="10" fill="#e05c7a"/>
+    <circle cx="335" cy="350" r="11" fill="#f4b942"/><circle cx="465" cy="350" r="11" fill="#4f86c6"/>
+    <circle cx="300" cy="435" r="12" fill="#ff6b35"/><circle cx="400" cy="445" r="12" fill="#e05c7a"/><circle cx="500" cy="435" r="12" fill="#f4b942"/>
+  </g>
+  <!-- сніговик -->
+  <g transform="translate(630 330)">
+    <circle cx="0" cy="90" r="55" fill="#ffffff"/><circle cx="0" cy="10" r="38" fill="#ffffff"/>
+    <circle cx="-12" cy="2" r="5" fill="#12343a"/><circle cx="12" cy="2" r="5" fill="#12343a"/>
+    <path d="M0 14 l24 7 -24 7z" fill="#ff8c42"/>
+    <path d="M-55 80 l-35 -25" stroke="#8a5a3b" stroke-width="7" stroke-linecap="round"/>
+    <path d="M55 80 l35 -25" stroke="#8a5a3b" stroke-width="7" stroke-linecap="round"/>
+    <rect x="-26" y="-52" width="52" height="16" fill="#12343a"/><rect x="-16" y="-84" width="32" height="34" fill="#12343a"/>
+  </g>
+  <text x="400" y="545" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#ffffff">Сезонні свята</text>
+  <text x="400" y="575" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#b9d7e4">демо-зображення · замінити на реальне фото</text>
 </svg>

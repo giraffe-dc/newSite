@@ -16,7 +16,7 @@ export const NAV = [
   { href: "/ideas", label: "Ідеї свят" },
   { href: "/reviews", label: "Галерея та відгуки" },
   { href: "/news-contacts", label: "Новини й контакти" },
-  { href: "/calculator", label: "Кошторис" },
+  { href: "/calculator", label: "Збери сам" },
 ] as const;
 
 /** Якір секції бронювання на головній — працює з будь-якої сторінки. */
@@ -63,6 +63,8 @@ export interface Service {
   audiences?: string[];
   /** Зображення (URL). */
   images?: string[];
+  /** Alt-текст першого зображення (доступність і SEO; MED-01). */
+  imageAlt?: string;
   /** Опубліковано (для чернеток). */
   published?: boolean;
   /** Варіанти тривалості та ціни — єдине джерело правди. */
@@ -88,6 +90,7 @@ export const SERVICES: Service[] = [
     category: "",
     audiences: [],
     images: [],
+    imageAlt: "",
     published: true,
     variants: [{ id: "", label: "", durationMin: 0, price: 0 }],
     requirements: [],
@@ -214,6 +217,48 @@ export const ROAD_TARIFF = 25;
 export const ROAD_FREE_KM = 0;
 export const ROAD_NOTE =
   "Транспорт: 25 грн за кілометр в один бік від Теплика. Відстань і вартість уточнюється за адресою — остаточно підтвердить менеджер.";
+
+/* --- Помічник підбору (/assistant, UX-02) --------------------------------
+   Параметри добіру редагуються в адмінці (секція «Підбір програми»):
+   вікові групи з рекомендованими категоріями, варіанти тривалості та
+   місткість групи (BIZ-02: до 10 дітей на аніматора). Ці дефолти —
+   фолбек, коли документа в БД ще немає або поле відсутнє. */
+
+export interface AssistantAgeGroup {
+  id: string;
+  label: string;
+  /** id послуг (service:<id>) і пакетів (package:<id>), які рекомендуємо
+   *  під цю вікову групу. В адмінці обираються з випадаючого списку
+   *  каталогу (секція «Підбір програми»); порожній список = без вікового
+   *  фільтра. */
+  refs: string[];
+  /** Немає даних про вік — замість добору пропонуємо менеджера. */
+  askManager?: boolean;
+}
+
+export interface AssistantDurationOption {
+  min: number;
+  label: string;
+}
+
+export const ASSISTANT_AGE_GROUPS: AssistantAgeGroup[] = [
+  { id: "0-3", label: "Малюки (0–3)", refs: [], askManager: true },
+  { id: "4-6", label: "Дошкільнята (4–6)", refs: [] },
+  { id: "7-11", label: "Школярики (7–11)", refs: [] },
+  { id: "12-17", label: "Підлітки (12–17)", refs: [] },
+  { id: "adults", label: "Дорослі", refs: [] },
+  { id: "mixed", label: "Різний вік", refs: [] },
+];
+
+export const ASSISTANT_DURATIONS: AssistantDurationOption[] = [
+  { min: 30, label: "до 30 хв" },
+  { min: 60, label: "1 год" },
+  { min: 90, label: "1,5 год" },
+  { min: 120, label: "2 год" },
+];
+
+/** Місткість: до 10 дітей на одного аніматора (BIZ-02). */
+export const ASSISTANT_KIDS_PER_ANIMATOR = 10;
 
 /* --- Головна, варіант Б (docs/home-rework-demo-b.html) ------------------
    Секції, яких немає на жодній сторінці сайту: сценарій дня, підбір

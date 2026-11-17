@@ -1,18 +1,11 @@
 import Link from "next/link";
 import type { SectionData } from "@/lib/siteContent";
+import { serviceImage } from "./categories";
 import { BOOK_HREF, SERVICES } from "./content";
 
-const DEMO_IMAGES: Record<string, string> = {
-  animators: "/brand/demo/animators.svg",
-  puppets: "/brand/demo/puppets.svg",
-  shows: "/brand/demo/shows.svg",
-  gaming: "/brand/demo/gaming.svg",
-  extras: "/brand/demo/extras.svg",
-  seasonal: "/brand/demo/seasonal.svg",
-};
-
 /** Топ-послуги на головній — популярні послуги з фото.
- *  Демо-зображення (SVG) — замінити на реальні фото з заходів. */
+ *  Фото: власне зображення послуги (admin/content) або SVG-заглушка
+ *  категорії — реальні фото підставить власник (MED-01). */
 export default function TopServicesSection({
   services = SERVICES,
 }: {
@@ -23,7 +16,11 @@ export default function TopServicesSection({
   if (!top.length) return null;
 
   return (
-    <section className="m2-sec m2-sec--tint" id="top-services" aria-labelledby="top-services-title">
+    <section
+      className="m2-sec m2-sec--tint"
+      id="top-services"
+      aria-labelledby="top-services-title"
+    >
       <div className="m2-wrap">
         <div className="m2-sec__head">
           <span className="m2-eyebrow">Популярні послуги</span>
@@ -34,9 +31,11 @@ export default function TopServicesSection({
         </div>
         <div className="m2-top-services">
           {top.map((service) => {
-            const img = service.images?.[0] || DEMO_IMAGES[service.category || ""] || "/brand/demo/animators.svg";
+            const img = serviceImage(service);
             const variant = service.variants?.[0];
-            const priceLabel = variant ? `${variant.price} грн` : service.price || "";
+            const priceLabel = variant
+              ? `${variant.price} грн`
+              : service.price || "";
             return (
               <Link
                 key={service.id}
@@ -44,11 +43,17 @@ export default function TopServicesSection({
                 className="m2-top-service"
               >
                 <div className="m2-top-service__img">
-                  {/* biome-ignore lint/performance/noImgElement: демо-зображення, замінити на next/image з реальними фото */}
-                  <img src={img} alt={service.title} loading="lazy" />
+                  {/* biome-ignore lint/performance/noImgElement: динамічні URL із БД/статика, next/image потребує remotePatterns */}
+                  <img
+                    src={img}
+                    alt={service.imageAlt || service.title}
+                    loading="lazy"
+                  />
                 </div>
                 <div className="m2-top-service__body">
-                  <h3>{service.emoji} {service.title}</h3>
+                  <h3>
+                    {service.emoji} {service.title}
+                  </h3>
                   <p>{service.desc?.slice(0, 80)}</p>
                   <span className="m2-top-service__price">{priceLabel}</span>
                 </div>
@@ -56,7 +61,10 @@ export default function TopServicesSection({
             );
           })}
         </div>
-        <p className="m2-inline" style={{ marginTop: 24, justifyContent: "center" }}>
+        <p
+          className="m2-inline"
+          style={{ marginTop: 24, justifyContent: "center" }}
+        >
           <Link className="m2-btn m2-btn--ghost m2-btn--sm" href="/services">
             Усі послуги →
           </Link>

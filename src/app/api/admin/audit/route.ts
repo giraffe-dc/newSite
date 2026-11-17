@@ -12,9 +12,7 @@ export async function GET(request: NextRequest) {
 
     const limitRaw = request.nextUrl.searchParams.get("limit");
     const limit = limitRaw ? Number(limitRaw) : 100;
-    const entries = await listAudit(
-      Number.isFinite(limit) ? limit : 100,
-    );
+    const entries = await listAudit(Number.isFinite(limit) ? limit : 100);
 
     // ObjectId → рядок для зручності клієнта.
     const serialized = entries.map((entry) => ({

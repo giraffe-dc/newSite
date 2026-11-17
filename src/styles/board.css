@@ -474,6 +474,36 @@
   margin-bottom: 0;
 }
 
+/* Фото послуги в картці каталогу (MED-01): адаптивне, lazy */
+.m2-ticket__img {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--paper-2);
+  border-bottom: 2px dashed var(--line);
+}
+
+.m2-ticket__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.m2-ticket:hover .m2-ticket__img img {
+  transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m2-ticket__img img {
+    transition: none;
+  }
+
+  .m2-ticket:hover .m2-ticket__img img {
+    transform: none;
+  }
+}
+
 .m2-ticket__desc {
   font-size: 15px;
   color: var(--muted-on-paper);
@@ -521,7 +551,9 @@
   padding: 22px;
   text-decoration: none;
   color: inherit;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .m2-audience:hover {
@@ -1941,5 +1973,323 @@
   .m2-chip:hover {
     transition: none;
     transform: none;
+  }
+}
+
+/* ---------- Помічник підбору (/assistant, UX-02) ---------- */
+
+.m2-assist {
+  display: grid;
+  gap: 24px;
+}
+
+.m2-assist__questions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  align-items: start;
+}
+
+.m2-assist__q {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  padding: 16px 18px 18px;
+  margin: 0;
+  min-width: 0;
+}
+
+.m2-assist__legend {
+  font-family: var(--font-board);
+  font-size: 16px;
+  color: var(--green-deep);
+  padding: 0 6px;
+}
+
+.m2-assist__opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.m2-assist__opt {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--paper-2);
+  border: 2px solid var(--line);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+
+.m2-assist__opt:hover {
+  border-color: var(--ochre);
+}
+
+.m2-assist__opt[aria-pressed="true"] {
+  background: var(--ochre);
+  border-color: var(--ink);
+}
+
+.m2-assist__label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted-on-paper);
+  margin-bottom: 6px;
+}
+
+.m2-assist__input {
+  font: inherit;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.m2-assist__input:focus {
+  outline: none;
+  border-color: var(--ochre);
+}
+
+.m2-assist__hint {
+  font-size: 13px;
+  color: var(--muted-on-paper);
+  margin: 10px 0 0;
+  line-height: 1.45;
+}
+
+.m2-assist__notice {
+  background: var(--paper-2);
+  border: 2px dashed var(--ochre);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.m2-assist__resultsHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.m2-assist__count {
+  font-family: var(--font-board);
+  font-size: 17px;
+  color: var(--green-deep);
+  margin: 0;
+}
+
+.m2-assist__skipped {
+  font-size: 14px;
+  color: var(--muted-on-paper);
+  margin: 0;
+}
+
+.m2-assist__groupTitle {
+  font-family: var(--font-board);
+  font-size: 19px;
+  color: var(--green-deep);
+  margin: 12px 0 6px;
+  font-weight: 400;
+}
+
+.m2-assist__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.m2-assist__items li {
+  font-size: 13px;
+  color: var(--muted-on-paper);
+  line-height: 1.4;
+  padding-left: 14px;
+  position: relative;
+}
+
+.m2-assist__items li::before {
+  content: "·";
+  position: absolute;
+  left: 2px;
+  color: var(--ochre);
+  font-weight: 700;
+}
+
+.m2-assist__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.m2-assist__card {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.m2-assist__cardTop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.m2-assist__emoji {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.m2-assist__cardTop h3 {
+  font-size: 18px;
+  margin: 0 0 4px;
+  color: var(--green-deep);
+}
+
+.m2-assist__cat {
+  font-size: 13px;
+  color: var(--muted-on-paper);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.m2-assist__badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  background: var(--ochre);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
+.m2-assist__desc {
+  font-size: 14.5px;
+  color: var(--muted-on-paper);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.m2-assist__why {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.m2-assist__why li {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--paper-2);
+  border-radius: 8px;
+  padding: 7px 10px;
+}
+
+.m2-assist__reqs {
+  font-size: 13px;
+  color: var(--muted-on-paper);
+  border-top: 2px dashed var(--line);
+  padding-top: 10px;
+}
+
+.m2-assist__reqs ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 3px;
+}
+
+.m2-assist__price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted-on-paper);
+}
+
+.m2-assist__price b {
+  font-family: var(--font-board);
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--clay);
+}
+
+.m2-assist__actions {
+  display: flex;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.m2-assist__actions a {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.m2-assist__actions a:last-child {
+  color: var(--clay-deep);
+}
+
+.m2-assist__manager {
+  background: var(--green-deep);
+  color: var(--white);
+  border-radius: 14px;
+  padding: 22px 24px;
+  display: grid;
+  gap: 8px;
+}
+
+.m2-assist__manager b {
+  font-family: var(--font-board);
+  font-weight: 400;
+  font-size: 18px;
+}
+
+.m2-assist__manager p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  opacity: 0.9;
+  max-width: 62ch;
+}
+
+.m2-assist__managerBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+@media (max-width: 560px) {
+  .m2-assist__list {
+    grid-template-columns: 1fr;
   }
 }

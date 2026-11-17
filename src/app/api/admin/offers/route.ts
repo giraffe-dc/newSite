@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const result = await db.collection("offers").insertOne(doc);
 
     await recordAudit({
-      actor: actorName(admin),
+      actor: actorName(admin as { username?: unknown }),
       action: "create",
       entity: "offer",
       entityId: String(result.insertedId),
@@ -97,7 +97,7 @@ export async function PUT(request: NextRequest) {
       .updateOne({ _id: new ObjectId(id) }, { $set: update });
 
     await recordAudit({
-      actor: actorName(admin),
+      actor: actorName(admin as { username?: unknown }),
       action: "update",
       entity: "offer",
       entityId: String(id),
@@ -135,7 +135,7 @@ export async function DELETE(request: NextRequest) {
     await db.collection("offers").deleteOne({ _id: new ObjectId(id) });
 
     await recordAudit({
-      actor: actorName(admin),
+      actor: actorName(admin as { username?: unknown }),
       action: "delete",
       entity: "offer",
       entityId: String(id),

@@ -22,7 +22,10 @@ export async function GET(_request: NextRequest, { params }: Params) {
     const db = client.db("zhyrafyk");
     const doc = await db
       .collection("media")
-      .findOne({ _id: new ObjectId(id) }, { projection: { data: 1, contentType: 1 } });
+      .findOne(
+        { _id: new ObjectId(id) },
+        { projection: { data: 1, contentType: 1 } },
+      );
 
     if (!doc?.data) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });

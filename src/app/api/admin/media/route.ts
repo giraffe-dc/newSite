@@ -80,7 +80,10 @@ export async function POST(request: NextRequest) {
     const checkType = ALLOWED[declaredType];
     if (!checkType) {
       return NextResponse.json(
-        { error: "Непідтримуваний тип файлу. Дозволено: JPEG, PNG, GIF, WebP, AVIF" },
+        {
+          error:
+            "Непідтримуваний тип файлу. Дозволено: JPEG, PNG, GIF, WebP, AVIF",
+        },
         { status: 415 },
       );
     }
@@ -111,8 +114,7 @@ export async function POST(request: NextRequest) {
       contentType: declaredType,
       size: bytes.length,
       data: Buffer.from(bytes),
-      uploadedBy:
-        typeof admin.username === "string" ? admin.username : "admin",
+      uploadedBy: typeof admin.username === "string" ? admin.username : "admin",
       createdAt: new Date(),
     });
 

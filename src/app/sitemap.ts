@@ -6,6 +6,7 @@ const BASE_URL = "https://giraffe-teplyk.vercel.app";
 const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/`, changeFrequency: "weekly", priority: 1 },
   { url: `${BASE_URL}/services`, changeFrequency: "weekly", priority: 0.9 },
+  { url: `${BASE_URL}/assistant`, changeFrequency: "monthly", priority: 0.7 },
   { url: `${BASE_URL}/packages`, changeFrequency: "weekly", priority: 0.9 },
   { url: `${BASE_URL}/calculator`, changeFrequency: "monthly", priority: 0.7 },
   { url: `${BASE_URL}/reviews`, changeFrequency: "weekly", priority: 0.8 },
@@ -14,7 +15,11 @@ const STATIC_ROUTES: MetadataRoute.Sitemap = [
   { url: `${BASE_URL}/about`, changeFrequency: "monthly", priority: 0.6 },
   { url: `${BASE_URL}/ideas`, changeFrequency: "monthly", priority: 0.6 },
   { url: `${BASE_URL}/gallery`, changeFrequency: "monthly", priority: 0.6 },
-  { url: `${BASE_URL}/news-contacts`, changeFrequency: "weekly", priority: 0.7 },
+  {
+    url: `${BASE_URL}/news-contacts`,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  },
   { url: `${BASE_URL}/book`, changeFrequency: "monthly", priority: 0.9 },
   { url: `${BASE_URL}/privacy`, changeFrequency: "yearly", priority: 0.3 },
   { url: `${BASE_URL}/terms`, changeFrequency: "yearly", priority: 0.3 },
@@ -26,9 +31,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const news = await NewsService.getAll();
     newsRoutes = news
       .map((raw) => {
-        const item = raw as unknown as import("@/lib/services/NewsService").INews & {
-          _id?: unknown;
-        };
+        const item =
+          raw as unknown as import("@/lib/services/NewsService").INews & {
+            _id?: unknown;
+          };
         const id = String(item._id ?? "");
         if (!id) return null;
         const lastModified =

@@ -1,12 +1,13 @@
 "use client";
 
+import MediaUploadButton from "@/components/admin/MediaUploadButton";
 import { SERVICE_CATEGORIES } from "@/components/board/categories";
 import { SERVICE_OPTIONS } from "@/components/board/content";
 import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
 
 /* Форма секції будується зі структури дефолтів (SECTION_DEFAULTS), значення
-   беруться з поточних даних. Один універсальний редактор покриває всі 13
+   беруться з поточних даних. Один універсальний редактор покриває всі 14
    секцій: поля, вкладені об'єкти, списки з додаванням/перестановкою.
    (Відгуки вийшли зі складу в етапі 6 — окрема колекція reviews і
    розділ модерації /admin/reviews.) */
@@ -80,6 +81,7 @@ const LABELS: Record<string, string> = {
   category: "Категорія каталогу",
   audiences: "Для кого підходить",
   images: "Зображення (URL)",
+  imageAlt: "Alt-текст фото (доступність і SEO)",
   requirements: "Технічні вимоги",
   published: "Опубліковано (видно на сайті)",
   durationMin: "Тривалість, хв",
@@ -100,6 +102,13 @@ const LABELS: Record<string, string> = {
   roadTariff: "Тариф дороги, грн/км (в один бік)",
   roadFreeKm: "Безкоштовна зона, км (0 — платити від першого км)",
   roadNote: "Правило транспорту (текст для клієнта)",
+  // підбір програми (/assistant)
+  kidsPerAnimator: "Дітей на одного аніматора",
+  ageGroups: "Вікові групи",
+  durations: "Варіанти тривалості",
+  refs: "Що показувати під цим фільтром (галочки)",
+  askManager: "Без даних — пропонувати менеджера (замість добору)",
+  min: "Тривалість, хв",
   // контейнери секцій
   contacts: "Контакти",
   hero: "Зміст першого екрана",
@@ -124,6 +133,12 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
     format: "Формат",
     price: "Ціна (текст, напр. «від 3500 грн»)",
   },
+  assistant: {
+    id: "Ключ групи (для фільтра)",
+    label: "Назва групи / підпис кнопки",
+    refs: "Відмічені послуги й пакети (вибір з каталогу)",
+    min: "Тривалість варіанта, хв",
+  },
 };
 
 /* Ключі, які не редагуються вручну: homeServiceOptions перераховується із
@@ -131,6 +146,11 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
 const HIDDEN: Partial<Record<SectionKey, readonly string[]>> = {
   cases: ["homeServiceOptions"],
 };
+
+/** Мітки полів секції (спільні + перекриття для конкретної секції). */
+export function sectionLabels(section: SectionKey): Record<string, string> {
+  return { ...LABELS, ...(LABEL_OVERRIDES[section] ?? {}) };
+}
 
 /* Поля-«токени» лишаються у новому елементі списку: це не вільний текст,
    а маркери (емодзі), які важко відновити. */
@@ -144,7 +164,7 @@ function isObj(value: unknown): value is Obj {
 
 /** Об'єднання ключів усіх елементів-дефолтів: опційні поля (highlight,
  *  on, hit) показуються в кожній картці, навіть якщо в першому дефолті їх немає. */
-function mergeShapes(items: unknown[]): Obj {
+export function mergeShapes(items: unknown[]): Obj {
   const out: Obj = {};
   for (const item of items) {
     if (isObj(item)) Object.assign(out, item);
@@ -154,7 +174,7 @@ function mergeShapes(items: unknown[]): Obj {
 
 /** Шаблон нового елемента: структура з дефолту, вільний текст зачищено,
  *  унікальний id. Порожні масиви не робимо — сервер їх відхиляє. */
-function makeTemplate(node: unknown, key?: string): unknown {
+export function makeTemplate(node: unknown, key?: string): unknown {
   if (Array.isArray(node)) return node.map((child) => makeTemplate(child));
   if (isObj(node)) {
     const out: Obj = {};
@@ -176,6 +196,10 @@ function makeTemplate(node: unknown, key?: string): unknown {
 /** Опції селекта «Послуга (варіант)» у складі пакета: будуються з поточних
  *  послуг (id варіанту + підпис + ціна). */
 export type VariantOption = { value: string; label: string };
+export type CatalogOptions = {
+  services: { value: string; label: string }[];
+  packages: { value: string; label: string }[];
+};
 
 function Fields({
   value,
@@ -185,6 +209,7 @@ function Fields({
   onChange,
   section,
   variantOptions = [],
+  catalog,
 }: {
   value: Obj;
   shape: Obj;
@@ -193,6 +218,7 @@ function Fields({
   onChange: (next: Obj) => void;
   section: SectionKey;
   variantOptions?: VariantOption[];
+  catalog?: CatalogOptions;
 }) {
   return (
     <div className={styles.grid}>
@@ -207,6 +233,7 @@ function Fields({
             labels={labels}
             section={section}
             variantOptions={variantOptions}
+            catalog={catalog}
             onChange={(next) => onChange({ ...value, [key]: next })}
           />
         ))}
@@ -214,13 +241,14 @@ function Fields({
   );
 }
 
-function Field({
+export function Field({
   name,
   value,
   shapeValue,
   labels,
   section,
   variantOptions = [],
+  catalog,
   onChange,
 }: {
   name: string;
@@ -229,6 +257,7 @@ function Field({
   labels: Record<string, string>;
   section: SectionKey;
   variantOptions?: VariantOption[];
+  catalog?: CatalogOptions;
   onChange: (next: unknown) => void;
 }) {
   const label = labels[name] ?? name;
@@ -306,6 +335,109 @@ function Field({
             ))}
           </select>
         </label>
+      </div>
+    );
+  }
+
+  /* Вибір послуг і пакетів для вікової групи (UX-02, налаштування
+     «Підбір програми»): замість ручного введення id — галочки з каталогу. */
+  if (
+    (name === "services" || name === "packages") &&
+    section === "assistant" &&
+    catalog
+  ) {
+    const selected = Array.isArray(value) ? (value as string[]) : [];
+    const options = name === "services" ? catalog.services : catalog.packages;
+    const toggle = (itemValue: string) => {
+      if (selected.includes(itemValue)) {
+        onChange(selected.filter((v) => v !== itemValue));
+      } else {
+        onChange([...selected, itemValue]);
+      }
+    };
+    return (
+      <div className={`${styles.field} ${styles.fieldWide}`}>
+        <span className={styles.fieldLabel}>{label}</span>
+        <div
+          className={styles.fieldset}
+          style={{ maxHeight: 260, overflowY: "auto", marginTop: 4 }}
+        >
+          {options.map((option) => (
+            <label key={option.value} className={styles.check}>
+              <input
+                type="checkbox"
+                checked={selected.includes(option.value)}
+                onChange={() => toggle(option.value)}
+              />
+              <span>{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  /* Зображення послуги (MED-01): список URL + прев'ю + завантаження нового
+     файлу через безпечний ендпоінт /api/admin/media (адмін не вводить URL
+     вручну — натискає «Завантажити фото» і бачить результат). */
+  if (name === "images" && section === "services") {
+    const urls = Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string")
+      : [];
+    const setUrls = (next: string[]) => onChange(next);
+    return (
+      <div className={`${styles.field} ${styles.fieldWide}`}>
+        <span className={styles.fieldLabel}>{label}</span>
+        <div className={styles.list}>
+          {urls.map((url, index) => (
+            // biome-ignore lint/suspicious/noArrayIndexKey: список повністю контрольований — значення завжди зі стану
+            <div className={styles.listRow} key={index}>
+              <input
+                className={styles.input}
+                type="text"
+                value={url}
+                placeholder="URL зображення"
+                onChange={(event) =>
+                  setUrls(
+                    urls.map((item, i) =>
+                      i === index ? event.target.value : item,
+                    ),
+                  )
+                }
+              />
+              {url && (
+                // biome-ignore lint/performance/noImgElement: динамічний URL із БД, next/image потребує remotePatterns
+                <img
+                  src={url}
+                  alt={`Прев'ю ${index + 1}`}
+                  className={styles.thumb}
+                />
+              )}
+              <button
+                type="button"
+                className={styles.iconBtn}
+                title="Видалити"
+                disabled={urls.length <= 1}
+                onClick={() => setUrls(urls.filter((_, i) => i !== index))}
+              >
+                🗑️
+              </button>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+          <MediaUploadButton
+            label="📷 Завантажити фото"
+            onUploaded={(url) => setUrls([...urls.filter(Boolean), url])}
+          />
+          <button
+            type="button"
+            className={styles.addButton}
+            onClick={() => setUrls([...urls, ""])}
+          >
+            ➕ Додати URL
+          </button>
+        </div>
       </div>
     );
   }
@@ -433,6 +565,7 @@ function ArrayField({
   onChange,
   section,
   variantOptions = [],
+  catalog,
 }: {
   value: unknown;
   shapeArray: unknown[];
@@ -440,6 +573,7 @@ function ArrayField({
   onChange: (next: unknown[]) => void;
   section: SectionKey;
   variantOptions?: VariantOption[];
+  catalog?: CatalogOptions;
 }) {
   const items = Array.isArray(value) ? value : [];
   const objectList = isObj(shapeArray[0]);
@@ -505,6 +639,7 @@ function ArrayField({
               labels={labels}
               section={section}
               variantOptions={variantOptions}
+              catalog={catalog}
               onChange={(next) => update(index, next)}
             />
           </div>
@@ -573,12 +708,15 @@ export default function SectionForm({
   section,
   data,
   variantOptions = [],
+  catalog,
   onChange,
 }: {
   section: SectionKey;
   data: Obj;
   /** Селект варіантів послуг у складі пакетів (див. VariantOption). */
   variantOptions?: VariantOption[];
+  /** Каталог послуг і пакетів — для галочок у налаштуваннях «Підбір програми». */
+  catalog?: CatalogOptions;
   onChange: (next: Obj) => void;
 }) {
   const shape = SECTION_DEFAULTS[section] as Obj;
@@ -603,6 +741,7 @@ export default function SectionForm({
           labels={labels}
           section={section}
           variantOptions={variantOptions}
+          catalog={catalog}
           onChange={(next) => onChange({ ...data, [soleObjectKey]: next })}
         />
       ) : (
@@ -613,6 +752,7 @@ export default function SectionForm({
           hidden={hidden}
           section={section}
           variantOptions={variantOptions}
+          catalog={catalog}
           onChange={onChange}
         />
       )}

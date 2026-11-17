@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     });
 
     await recordAudit({
-      actor: actorName(admin),
+      actor: actorName(admin as { username?: unknown }),
       action: "create",
       entity: "news",
       entityId: String(result.insertedId),
@@ -108,7 +108,7 @@ export async function PUT(request: NextRequest) {
     }
 
     await recordAudit({
-      actor: actorName(admin),
+      actor: actorName(admin as { username?: unknown }),
       action: "update",
       entity: "news",
       entityId: String(id),
@@ -160,7 +160,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     await recordAudit({
-      actor: actorName(admin),
+      actor: actorName(admin as { username?: unknown }),
       action: "delete",
       entity: "news",
       entityId: String(id),
