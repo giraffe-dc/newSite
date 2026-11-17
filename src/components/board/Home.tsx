@@ -6,7 +6,6 @@ import AudiencesSection from "./AudiencesSection";
 import BookingSection from "./BookingSection";
 import CasePicker from "./CasePicker";
 import type { ReviewItem } from "./content";
-import DateChecker from "./DateChecker";
 import Hero from "./Hero";
 import PackagesPreview from "./PackagesPreview";
 import PromisesSection from "./PromisesSection";
@@ -50,7 +49,6 @@ export default function Home({
   packages,
   services,
 }: HomeProps) {
-  const [date, setDate] = useState<string>("");
   const [service, setService] = useState<string>(
     cases[0]?.service ?? homeServiceOptions[0] ?? "",
   );
@@ -73,9 +71,7 @@ export default function Home({
       <PromisesSection promises={promises} trust={trust} />
       <PackagesPreview packages={packages} />
       <ReviewsSection reviews={reviews} />
-      <DateChecker date={date} onPick={setDate} />
       <BookingSection
-        date={date}
         service={service}
         programId={programId}
         options={homeServiceOptions}
