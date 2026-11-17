@@ -10,7 +10,6 @@ import {
   ASSISTANT_AGE_GROUPS,
   ASSISTANT_DURATIONS,
   ASSISTANT_KIDS_PER_ANIMATOR,
-  BOARD,
   BOOK,
   CALC_NOTE,
   CASES,
@@ -39,7 +38,6 @@ import {
 export const SECTION_KEYS = [
   "contacts",
   "hero",
-  "board",
   "timeline",
   "cases",
   "promises",
@@ -59,7 +57,6 @@ export type SectionKey = (typeof SECTION_KEYS)[number];
 export const SECTION_DEFAULTS = {
   contacts: { contacts: CONTACTS },
   hero: { hero: HERO },
-  board: { board: BOARD },
   timeline: { timeline: TIMELINE },
   cases: { cases: CASES, homeServiceOptions: HOME_SERVICE_OPTIONS },
   promises: { promises: PROMISES, trust: TRUST },

@@ -37,14 +37,6 @@ export interface BoardRow {
   highlight?: boolean;
 }
 
-export const BOARD = {
-  topLeft: "",
-  topRight: "",
-  rows: [{ label: "", value: "", highlight: false }],
-  destinations: [""],
-  foot: "",
-} as const;
-
 export interface ServiceVariant {
   id: string;
   label: string;

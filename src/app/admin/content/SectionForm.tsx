@@ -112,14 +112,12 @@ const LABELS: Record<string, string> = {
   // контейнери секцій
   contacts: "Контакти",
   hero: "Зміст першого екрана",
-  board: "Зміст табло",
   timeline: "Кроки сценарію",
 };
 
 /* Назви ключів, що означають різне в різних секціях (однакові ключі
    в табло та цифрах довіри). */
 const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
-  board: { label: "Назва рядка", value: "Текст рядка" },
   cases: { title: "Назва випадку", text: "Опис" },
   promises: { value: "Число", label: "Підпис під числом" },
   services: {
