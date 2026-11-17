@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  formatDuration,
+  formatMoney,
+  isItemVariant,
+} from "@/lib/serviceVariants";
 import type { SectionData } from "@/lib/siteContent";
 import { categoryLabel } from "./categories";
 import {
@@ -30,42 +35,52 @@ type AssistantSettings = SectionData<"assistant">;
 
 interface Result {
   service: Services[number];
-  variant: { label: string; durationMin: number; price: number } | null;
+  variant: {
+    label: string;
+    pricingUnit?: string;
+    durationMin: number;
+    price: number;
+  } | null;
   reasons: string[];
 }
 
 function fitVariant(
   service: Services[number],
   duration: number | null,
-): { variant: Result["variant"]; skipped: boolean; addon: boolean } {
+): {
+  variant: Result["variant"];
+  skipped: boolean;
+  addon: boolean;
+  item: boolean;
+} {
   const variants = service.variants ?? [];
-  const timed = variants.filter((v) => v.durationMin > 0);
-  /* Послуги без тривалості (1 шт, 1 доба) — доповнення, не прив'язані
-     до часу свята, показуємо завжди. */
+  const items = variants.filter(isItemVariant);
+  const timed = variants.filter((v) => !isItemVariant(v) && v.durationMin > 0);
+  /* Послуги виключно «за шт» (напр. Блиск тату) — повноцінна послуга,
+     а не доповнення: показуємо завжди, незалежно від вибраного часу. */
+  if (timed.length === 0 && items.length > 0) {
+    const cheapest = items.reduce((a, b) => (b.price < a.price ? b : a));
+    return { variant: cheapest, skipped: false, addon: false, item: true };
+  }
+  /* Решта без тривалості (1 доба тощо) — доповнення до замовлення. */
   if (timed.length === 0) {
     const cheapest =
       variants.length > 0
         ? variants.reduce((a, b) => (b.price < a.price ? b : a))
         : null;
-    return { variant: cheapest, skipped: false, addon: true };
+    return { variant: cheapest, skipped: false, addon: true, item: false };
   }
   if (duration === null) {
     const cheapest = timed.reduce((a, b) => (b.price < a.price ? b : a));
-    return { variant: cheapest, skipped: false, addon: false };
+    return { variant: cheapest, skipped: false, addon: false, item: false };
   }
   const fit = timed.filter((v) => v.durationMin <= duration);
   if (fit.length === 0) {
-    return { variant: null, skipped: true, addon: false };
+    return { variant: null, skipped: true, addon: false, item: false };
   }
   /* Найкращий вклад: найдовший варіант, що вміщується. */
   const best = fit.reduce((a, b) => (b.durationMin > a.durationMin ? b : a));
-  return { variant: best, skipped: false, addon: false };
-}
-
-function durationText(min: number): string {
-  if (min < 60) return `${min} хв`;
-  const h = min / 60;
-  return Number.isInteger(h) ? `${h} год` : `${h} год`.replace(".", ",");
+  return { variant: best, skipped: false, addon: false, item: false };
 }
 
 export default function ServiceAssistant({
@@ -147,23 +162,28 @@ export default function ServiceAssistant({
           variant,
           skipped: isSkipped,
           addon,
+          item,
         } = fitVariant(service, duration);
         if (isSkipped || !variant) {
           if (isSkipped) durSkipped += 1;
           continue;
         }
         const reasons: string[] = [];
-        if (addon) {
+        if (item) {
           reasons.push(
-            `Додаткова послуга — додається до основного замовлення: ${variant.price} грн / ${variant.label}`,
+            `Ціна за шт: ${formatMoney(variant.price)} / ${variant.label}`,
+          );
+        } else if (addon) {
+          reasons.push(
+            `Додаткова послуга — додається до основного замовлення: ${formatMoney(variant.price)} / ${variant.label}`,
           );
         } else if (duration !== null) {
           reasons.push(
-            `Вміщується у ваш час: ${durationText(variant.durationMin)} — ${variant.price} грн`,
+            `Вміщується у ваш час: ${formatDuration(variant.durationMin)} — ${formatMoney(variant.price)}`,
           );
         } else {
           reasons.push(
-            `Тривалість ${durationText(variant.durationMin)} — ${variant.price} грн`,
+            `Тривалість ${formatDuration(variant.durationMin)} — ${formatMoney(variant.price)}`,
           );
         }
         if (ageFilterActive) {
@@ -174,11 +194,12 @@ export default function ServiceAssistant({
         if (
           guestsNum !== null &&
           /дитина|дитини|дітей/i.test(variant.label) &&
-          !addon
+          !addon &&
+          !item
         ) {
           const total = variant.price * guestsNum;
           reasons.push(
-            `Для ${guestsNum} дітей: ${variant.price} × ${guestsNum} = ${total} грн (підтвердить менеджер)`,
+            `Для ${guestsNum} дітей: ${formatMoney(variant.price)} × ${guestsNum} = ${formatMoney(total)} (підтвердить менеджер)`,
           );
         }
         outServices.push({ service, variant, reasons });
@@ -355,8 +376,16 @@ export default function ServiceAssistant({
                 )}
 
                 <div className="m2-assist__price">
-                  <b>{variant ? `${variant.price} грн` : "ціна уточнюється"}</b>
-                  <span>{variant ? `/ ${variant.label}` : ""}</span>
+                  <b>
+                    {variant ? formatMoney(variant.price) : "ціна уточнюється"}
+                  </b>
+                  <span>
+                    {variant
+                      ? isItemVariant(variant)
+                        ? " / шт"
+                        : ` / ${variant.label}`
+                      : ""}
+                  </span>
                 </div>
 
                 <div className="m2-assist__actions">
@@ -380,7 +409,7 @@ export default function ServiceAssistant({
             {packageResults.map((pkg) => {
               const priceLabel =
                 typeof pkg.bundlePrice === "number" && pkg.bundlePrice > 0
-                  ? `${pkg.bundlePrice} грн`
+                  ? formatMoney(pkg.bundlePrice)
                   : pkg.price || "ціна уточнюється";
               const periodLabel = (pkg.period || "").replace(/^\//, "").trim();
               return (

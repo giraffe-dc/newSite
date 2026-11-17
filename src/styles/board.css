@@ -422,7 +422,7 @@
 /* ---------- Послуги: квитки ---------- */
 .m2-tickets {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 22px;
 }
 
@@ -512,11 +512,7 @@
 }
 
 .m2-ticket__price {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
+  padding: 14px 20px 20px;
   background: var(--paper-2);
   border-top: 2px dashed var(--line);
   font-weight: 700;
@@ -529,11 +525,53 @@
   font-weight: 400;
 }
 
-.m2-ticket__price a {
-  font-size: 14px;
-  color: var(--green);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* Кнопка «Вибрати» — окремим рядком у низі картки, під ціною/описом.
+   Використовуємо спільний .m2-btn, щоб стиль збігався з іншими CTA. */
+.m2-ticket__cta.m2-btn {
+  margin-top: 14px;
+  min-height: 44px;
+  text-decoration: none;
+}
+
+.m2-ticket__pricing {
+  min-width: 0;
+}
+
+.m2-ticket__priceLine {
+  display: block;
+}
+
+.m2-ticket__duration {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted-on-paper);
+  white-space: nowrap;
+}
+
+.m2-ticket__variants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.m2-ticket__variant {
+  display: inline-block;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted-on-paper);
+  background: var(--paper);
+  white-space: nowrap;
+}
+
+.m2-ticket__variant--more {
+  border-style: dashed;
 }
 
 /* ---------- Аудиторії (редизайн головної) ---------- */
@@ -655,6 +693,13 @@
   color: var(--clay);
   font-size: 16px;
   font-weight: 400;
+}
+
+.m2-top-service__duration {
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--muted-on-paper);
+  white-space: nowrap;
 }
 
 @media (max-width: 780px) {
@@ -1849,6 +1894,46 @@
   font-family: var(--font-board);
   color: var(--clay);
   font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Лічильник кількості для послуг «за шт» (VAR-02). */
+.m2-calc__qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: default;
+}
+
+.m2-calc__qty > span:first-of-type {
+  min-width: 42px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.m2-calc__qtyBtn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.m2-calc__qtyBtn:hover:not(:disabled) {
+  background: var(--ochre);
+}
+
+.m2-calc__qtyBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .m2-calc__total {

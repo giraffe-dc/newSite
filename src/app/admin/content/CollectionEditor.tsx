@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import { categoryLabel } from "@/components/board/categories";
 import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
+import {
+  priceHeadline,
+  variantCountLabel,
+} from "@/lib/serviceVariants";
 import styles from "@/styles/admin/AdminContent.module.css";
 import {
   Field,
@@ -58,12 +62,10 @@ function itemMeta(section: CollectionKey, item: Obj): string {
       ? categoryLabel(item.category)
       : "без категорії";
   const variants = Array.isArray(item.variants) ? item.variants : [];
-  const first = variants[0] as { price?: unknown } | undefined;
-  const price =
-    first && typeof first.price === "number" && first.price > 0
-      ? ` · ${first.price} грн`
-      : "";
-  return `${cat}${price}`;
+  const headline = priceHeadline(variants);
+  const price = headline ? ` · ${headline}` : "";
+  const count = variants.length > 1 ? ` · ${variantCountLabel(variants.length)}` : "";
+  return `${cat}${price}${count}`;
 }
 
 export default function CollectionEditor({

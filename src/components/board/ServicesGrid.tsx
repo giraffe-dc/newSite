@@ -1,5 +1,10 @@
 import Link from "next/link";
 import type { SectionData } from "@/lib/siteContent";
+import {
+  durationHeadline,
+  priceHeadline,
+  variantPairs,
+} from "@/lib/serviceVariants";
 import { serviceImage } from "./categories";
 import { BOOK_HREF, SERVICES } from "./content";
 
@@ -15,15 +20,13 @@ export default function ServicesGrid({
           service.variants && service.variants.length > 0
             ? service.variants
             : [];
-        const firstVariant = variants[0];
-        const priceLabel = firstVariant
-          ? `${firstVariant.price} грн`
-          : service.price || "";
-        const unitLabel = firstVariant
-          ? firstVariant.durationMin > 0
-            ? ` / ${firstVariant.durationMin >= 60 ? `${firstVariant.durationMin / 60} год` : `${firstVariant.durationMin} хв`}`
-            : ""
-          : service.unit || "";
+        const priceLabel = priceHeadline(variants, service.price || "");
+        const durationLabel = durationHeadline(variants, service.unit || "");
+        // Показуємо точні пари лише коли варіантів більше одного —
+        // для одного варіанта достатньо одного рядка ціни/тривалості.
+        const allPairs = variantPairs(variants);
+        const pairs = allPairs.slice(0, 3);
+        const hiddenCount = allPairs.length - pairs.length;
 
         return (
           <article className="m2-ticket" key={service.id}>
@@ -44,18 +47,34 @@ export default function ServicesGrid({
             </div>
             <p className="m2-ticket__desc">{service.desc}</p>
             <div className="m2-ticket__price">
-              <span>
-                <b>{priceLabel}</b>
-                {unitLabel}
-                {variants.length > 1 && (
-                  <small
-                    style={{ display: "block", fontSize: 12, color: "#666" }}
-                  >
-                    {variants.length} варіанти тривалості
-                  </small>
+              <span className="m2-ticket__pricing">
+                <span className="m2-ticket__priceLine">
+                  <b>{priceLabel}</b>
+                  {durationLabel && (
+                    <span className="m2-ticket__duration">
+                      {" "}
+                      · {durationLabel}
+                    </span>
+                  )}
+                </span>
+                {pairs.length > 1 && (
+                  <span className="m2-ticket__variants">
+                    {pairs.map((pair) => (
+                      <span className="m2-ticket__variant" key={pair.key}>
+                        {pair.label ? `${pair.label} — ` : ""}
+                        {pair.price}
+                      </span>
+                    ))}
+                    {hiddenCount > 0 && (
+                      <span className="m2-ticket__variant m2-ticket__variant--more">
+                        +{hiddenCount}
+                      </span>
+                    )}
+                  </span>
                 )}
               </span>
               <Link
+                className="m2-btn m2-btn--green m2-btn--wide m2-ticket__cta"
                 href={`${BOOK_HREF}?format=${encodeURIComponent(service.format)}&service=${encodeURIComponent(service.title)}`}
               >
                 Вибрати

@@ -1,5 +1,9 @@
 import Link from "next/link";
 import type { SectionData } from "@/lib/siteContent";
+import {
+  durationHeadline,
+  priceHeadline,
+} from "@/lib/serviceVariants";
 import { serviceImage } from "./categories";
 import { BOOK_HREF, SERVICES } from "./content";
 
@@ -34,10 +38,12 @@ export default function TopServicesSection({
         <div className="m2-top-services">
           {top.map((service) => {
             const img = serviceImage(service);
-            const variant = service.variants?.[0];
-            const priceLabel = variant
-              ? `${variant.price} грн`
-              : service.price || "";
+            const variants =
+              service.variants && service.variants.length > 0
+                ? service.variants
+                : [];
+            const priceLabel = priceHeadline(variants, service.price || "");
+            const durationLabel = durationHeadline(variants, service.unit || "");
             return (
               <Link
                 key={service.id}
@@ -57,7 +63,15 @@ export default function TopServicesSection({
                     {service.emoji} {service.title}
                   </h3>
                   <p>{service.desc?.slice(0, 80)}</p>
-                  <span className="m2-top-service__price">{priceLabel}</span>
+                  <span className="m2-top-service__price">
+                    {priceLabel}
+                    {durationLabel && (
+                      <span className="m2-top-service__duration">
+                        {" "}
+                        · {durationLabel}
+                      </span>
+                    )}
+                  </span>
                 </div>
               </Link>
             );

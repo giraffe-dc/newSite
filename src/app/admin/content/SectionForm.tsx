@@ -91,6 +91,7 @@ const LABELS: Record<string, string> = {
   published: "Опубліковано (видно на сайті)",
   showOnHome: "Показувати на головній (топ-послуги)",
   durationMin: "Тривалість, хв",
+  pricingUnit: "Одиниця ціни: час / штуки",
   variantId: "Послуга (варіант)",
   qty: "Кількість",
   // пакети
@@ -176,7 +177,7 @@ export function sectionLabels(section: SectionKey): Record<string, string> {
 
 /* Поля-«токени» лишаються у новому елементі списку: це не вільний текст,
    а маркери (емодзі), які важко відновити. */
-const TOKEN_KEYS = new Set(["emoji", "ico"]);
+const TOKEN_KEYS = new Set(["emoji", "ico", "pricingUnit"]);
 
 type Obj = Record<string, unknown>;
 
@@ -306,6 +307,26 @@ export function Field({
                 {option}
               </option>
             ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
+
+  /* Одиниця ціни варіанта (VAR-02): час або штуки. Без поля = `time`. */
+  if (name === "pricingUnit" && section === "services") {
+    const text = typeof value === "string" ? value : "time";
+    return (
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>
+          {label}
+          <select
+            className={styles.input}
+            value={text === "item" ? "item" : "time"}
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="time">Час (тривалість, хв)</option>
+            <option value="item">Кількість (штуки)</option>
           </select>
         </label>
       </div>

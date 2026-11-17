@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { formatMoney, isItemVariant } from "@/lib/serviceVariants";
 import type { SectionData } from "@/lib/siteContent";
 import {
   BOOK_HREF,
@@ -35,9 +36,18 @@ export default function Calculator({
 }) {
   // picked: serviceId -> variantId
   const [picked, setPicked] = useState<Record<string, string>>({});
+  // Кількість для варіантів «за шт» (VAR-02). Для часових варіантів ігнорується.
+  const [qtys, setQtys] = useState<Record<string, number>>({});
   // Відстань в один бік, км; порожнє — «уточнюється» (не вигадуємо маршрут)
   const [kmInput, setKmInput] = useState("");
   const router = useRouter();
+
+  const itemQty = (serviceId: string) => Math.max(1, qtys[serviceId] ?? 1);
+  const changeQty = (serviceId: string, delta: number) =>
+    setQtys((prev) => ({
+      ...prev,
+      [serviceId]: Math.max(1, (prev[serviceId] ?? 1) + delta),
+    }));
 
   function toggle(serviceId: string, variantId: string) {
     setPicked((prev) => {
@@ -54,7 +64,9 @@ export default function Calculator({
   const total = Object.entries(picked).reduce((sum, [sid, vid]) => {
     const service = services.find((s) => s.id === sid);
     const variant = service?.variants?.find((v) => v.id === vid);
-    return sum + (variant?.price ?? service?.calcValue ?? 0);
+    const unit = variant?.price ?? service?.calcValue ?? 0;
+    const qty = variant && isItemVariant(variant) ? itemQty(sid) : 1;
+    return sum + unit * qty;
   }, 0);
 
   /* Транспорт: клієнт сам вказує відстань; без неї — «уточнюється».
@@ -71,11 +83,16 @@ export default function Calculator({
       const service = services.find((s) => s.id === sid);
       if (!service) return [];
       const variant = service.variants?.find((v) => v.id === vid);
+      /* Для «за шт» передаємо ЦІНУ ЗА ОДИНКУ + quantity: форма бронювання
+         сама помножить (BookingForm.tsx), тож сума в кошторисі й заявці
+         збігатиметься. Подвійно множити не можна. */
+      const qty = variant && isItemVariant(variant) ? itemQty(sid) : 1;
       return [
         {
           serviceId: service.id,
           serviceName: `${service.title}${variant ? ` (${variant.label})` : ""}`,
           price: variant ? `${variant.price} грн` : service.price,
+          ...(qty > 1 ? { quantity: qty } : {}),
         },
       ];
     });
@@ -141,21 +158,58 @@ export default function Calculator({
                   )}
                 </div>
                 <div className="m2-calc__variants">
-                  {variants.map((variant) => (
-                    <label className="m2-calc__item" key={variant.id}>
-                      <span>
-                        <input
-                          type="checkbox"
-                          checked={picked[service.id] === variant.id}
-                          onChange={() => toggle(service.id, variant.id)}
-                        />{" "}
-                        {variant.label || service.calcLabel}
-                      </span>
-                      <span className="m2-calc__price">
-                        {variant.price} грн
-                      </span>
-                    </label>
-                  ))}
+                  {variants.map((variant) => {
+                    const isItem = isItemVariant(variant);
+                    const selected = picked[service.id] === variant.id;
+                    const qty = itemQty(service.id);
+                    return (
+                      <label className="m2-calc__item" key={variant.id}>
+                        <span>
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggle(service.id, variant.id)}
+                          />{" "}
+                          {variant.label || service.calcLabel}
+                          {isItem && " / шт"}
+                        </span>
+                        {/* Клік по лічильнику не має перемикати чекбокс
+                            (\label активує вкладені елементи керування). */}
+                        {isItem && selected ? (
+                          <span
+                            className="m2-calc__qty"
+                            onClick={(event) => event.preventDefault()}
+                          >
+                            <button
+                              type="button"
+                              className="m2-calc__qtyBtn"
+                              aria-label="Менше"
+                              disabled={qty <= 1}
+                              onClick={() => changeQty(service.id, -1)}
+                            >
+                              −
+                            </button>
+                            <span aria-live="polite">{qty} шт</span>
+                            <button
+                              type="button"
+                              className="m2-calc__qtyBtn"
+                              aria-label="Більше"
+                              onClick={() => changeQty(service.id, 1)}
+                            >
+                              +
+                            </button>
+                            <span className="m2-calc__price">
+                              {formatMoney(variant.price * qty)}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="m2-calc__price">
+                            {variant.price} грн
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
                 </div>
               </div>
             );

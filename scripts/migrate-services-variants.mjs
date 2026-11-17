@@ -87,6 +87,9 @@ async function main() {
     const variants = items.map((s, idx) => ({
       id: `${base.id || key.replace(/\s/g, "-")}-${idx + 1}`,
       label: durationLabel(s.unit),
+      // VAR-02: позначаємо поштучні варіанти явно, щоб калькулятор
+      // показував лічильник і підпис «/ шт».
+      pricingUnit: /шт|штук/i.test(String(s.unit || "")) ? "item" : "time",
       durationMin: parseDuration(s.unit),
       price: parsePrice(s.price),
     }));

@@ -45,6 +45,9 @@ export interface BoardRow {
 export interface ServiceVariant {
   id: string;
   label: string;
+  /** Як читати варіант: за часом (тривалість) або за кількістю (штуки).
+   *  Відсутнє поле = `time` (зворотна сумісність зі старими записами). */
+  pricingUnit?: "time" | "item";
   durationMin: number;
   price: number;
 }
@@ -92,7 +95,9 @@ export const SERVICES: Service[] = [
     imageAlt: "",
     published: true,
     showOnHome: true,
-    variants: [{ id: "", label: "", durationMin: 0, price: 0 }],
+    variants: [
+      { id: "", label: "", pricingUnit: "time", durationMin: 0, price: 0 },
+    ],
     requirements: [],
     calcLabel: "",
     format: "",
@@ -217,9 +222,11 @@ export const BOOK = {
 export const SERVICE_OPTIONS: string[] = [
   "Аніматори",
   "Ростові ляльки",
-  "VR-клас",
-  "PlayStation 4",
+  "VR-окуляри",
+  "PlayStation",
   "Комбо-програма",
+  "Шоу-програма",
+  "Інше",
 ];
 
 export const CALC_NOTE = "";
