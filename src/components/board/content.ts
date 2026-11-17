@@ -13,7 +13,6 @@ export const NAV = [
   // { href: "/", label: "Головна" },
   { href: "/services", label: "Послуги" },
   { href: "/packages", label: "Пакети" },
-  { href: "/ideas", label: "Ідеї свят" },
   { href: "/reviews", label: "Галерея та відгуки" },
   { href: "/news-contacts", label: "Новини й контакти" },
   { href: "/calculator", label: "Збери сам" },
