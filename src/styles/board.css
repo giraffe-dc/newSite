@@ -2293,3 +2293,14 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Доступність: видимий фокус (SEO-01) ---------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid var(--ochre);
+  outline-offset: 2px;
+}

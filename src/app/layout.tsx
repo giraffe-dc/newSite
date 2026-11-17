@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Rubik, Rubik_Mono_One } from "next/font/google";
 import type React from "react";
-import ChatWidget from "@/components/chat/ChatWidget";
 import ConsentAnalytics from "@/components/ConsentAnalytics";
 import CookieBanner from "@/components/CookieBanner";
+import ChatWidget from "@/components/chat/ChatWidget";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getSection } from "@/lib/siteContent";
@@ -83,6 +83,30 @@ export default async function RootLayout({
   return (
     <html lang="uk" className={`${rubik.variable} ${mono.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: "Жирафик",
+              description,
+              url: "https://giraffe-teplyk.vercel.app",
+              telephone: contacts.tel,
+              email: contacts.email,
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Теплик",
+                addressRegion: "Вінницька область",
+                addressCountry: "UA",
+              },
+              areaServed: "Вінницька область, Україна",
+              priceRange: "₴₴",
+              openingHours: contacts.hours,
+              sameAs: [],
+            }),
+          }}
+        />
         <div className="m2-page">
           <a className="m2-skip" href="#main">
             Перейти до вмісту
