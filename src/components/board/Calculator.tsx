@@ -100,11 +100,6 @@ export default function Calculator({
   return (
     <div className="m2-calc">
       <div>
-        <h2>Оберіть, що привезти</h2>
-        <p className="m2-inner__lede" style={{ marginBottom: 24 }}>
-          Позначте послуги — сума з&apos;явиться праворуч. Це базові ціни за
-          одиницю, а не остаточний рахунок.
-        </p>
         <div className="m2-calc__list">
           {services.map((service) => {
             const variants =
