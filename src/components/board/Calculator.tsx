@@ -120,8 +120,30 @@ export default function Calculator({
                   ];
             return (
               <div key={service.id} className="m2-calc__service">
-                <div className="m2-calc__service-title">
+                <div
+                  className={`m2-calc__service-title${service.desc ? " m2-calc__service-title--hint" : ""}`}
+                  {...(service.desc
+                    ? {
+                        tabIndex: 0,
+                        "aria-describedby": `calc-desc-${service.id}`,
+                      }
+                    : {})}
+                >
                   {service.emoji} {service.title}
+                  {service.desc && (
+                    <>
+                      <span className="m2-calc__hint-icon" aria-hidden="true">
+                        ?
+                      </span>
+                      <span
+                        role="tooltip"
+                        id={`calc-desc-${service.id}`}
+                        className="m2-calc__tooltip"
+                      >
+                        {service.desc}
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="m2-calc__variants">
                   {variants.map((variant) => (

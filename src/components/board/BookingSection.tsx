@@ -62,6 +62,54 @@ export default function BookingSection({
               <div>
                 <b>Години:</b> {contacts.hours}
               </div>
+              <div>
+                <b>Соцмережі:</b>{" "}
+                {contacts.whatsapp && (
+                  <a
+                    href={contacts.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    WhatsApp
+                  </a>
+                )}{" "}
+                {contacts.telegram && (
+                  <a
+                    href={contacts.telegram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Telegram
+                  </a>
+                )}{" "}
+                {contacts.facebook && (
+                  <a
+                    href={contacts.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Facebook
+                  </a>
+                )}{" "}
+                {contacts.instagram && (
+                  <a
+                    href={contacts.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Instagram
+                  </a>
+                )}{" "}
+                {contacts.tiktok && (
+                  <a
+                    href={contacts.tiktok}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    TikTok
+                  </a>
+                )}{" "}
+              </div>
             </div>
           </div>
           <BookingForm
