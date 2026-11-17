@@ -26,7 +26,7 @@ const GROUPS: Record<CollectionKey, { title: string; keys: string[] }[]> = {
   services: [
     {
       title: "Основне",
-      keys: ["emoji", "title", "desc", "category", "format", "audiences"],
+      keys: ["emoji", "title", "desc", "category", "format", "audiences", "showOnHome"],
     },
     { title: "Ціни та тривалість", keys: ["variants"] },
     { title: "Фото", keys: ["images", "imageAlt"] },

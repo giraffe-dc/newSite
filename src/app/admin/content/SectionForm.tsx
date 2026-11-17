@@ -84,6 +84,7 @@ const LABELS: Record<string, string> = {
   imageAlt: "Alt-текст фото (доступність і SEO)",
   requirements: "Технічні вимоги",
   published: "Опубліковано (видно на сайті)",
+  showOnHome: "Показувати на головній (топ-послуги)",
   durationMin: "Тривалість, хв",
   variantId: "Послуга (варіант)",
   qty: "Кількість",
@@ -136,6 +137,15 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
     label: "Назва групи / підпис кнопки",
     refs: "Відмічені послуги й пакети (вибір з каталогу)",
     min: "Тривалість варіанта, хв",
+  },
+  seasonalOffers: {
+    enabled: "Показувати блок на головній",
+    items: "Картки пропозицій",
+    link: "Посилання (необов'язково)",
+    emoji: "Емодзі",
+    title: "Заголовок картки",
+    text: "Текст картки",
+    price: "Ціна (текст)",
   },
 };
 

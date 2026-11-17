@@ -27,6 +27,7 @@ export default async function HomePage() {
     reviews,
     packages,
     services,
+    seasonalOffers,
   ] = await Promise.all([
     getSection("hero"),
     getSection("timeline"),
@@ -37,6 +38,7 @@ export default async function HomePage() {
     getPublishedReviews(2),
     getSection("packages"),
     getSection("services"),
+    getSection("seasonalOffers"),
   ]);
 
   return (
@@ -52,6 +54,7 @@ export default async function HomePage() {
       contacts={contacts.contacts}
       packages={publishedOnly(packages.packages)}
       services={publishedOnly(services.services)}
+      seasonalOffers={seasonalOffers}
     />
   );
 }

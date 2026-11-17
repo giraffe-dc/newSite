@@ -25,6 +25,7 @@ import {
   ROAD_FREE_KM,
   ROAD_NOTE,
   ROAD_TARIFF,
+  SEASONAL_OFFERS_DEFAULT,
   SERVICE_OPTIONS,
   SERVICES,
   STEPS,
@@ -49,6 +50,7 @@ export const SECTION_KEYS = [
   "packages",
   "calculator",
   "assistant",
+  "seasonalOffers",
 ] as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -81,4 +83,5 @@ export const SECTION_DEFAULTS = {
     ageGroups: ASSISTANT_AGE_GROUPS,
     durations: ASSISTANT_DURATIONS,
   },
+  seasonalOffers: SEASONAL_OFFERS_DEFAULT,
 } satisfies Record<SectionKey, object>;

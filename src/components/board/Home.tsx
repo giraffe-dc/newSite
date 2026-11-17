@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
-import AudiencesSection from "./AudiencesSection";
 import BookingSection from "./BookingSection";
 import CasePicker from "./CasePicker";
 import type { ReviewItem } from "./content";
@@ -10,6 +9,7 @@ import Hero from "./Hero";
 import PackagesPreview from "./PackagesPreview";
 import PromisesSection from "./PromisesSection";
 import ReviewsSection from "./ReviewsSection";
+import SeasonalOffersSection from "./SeasonalOffersSection";
 import TimelineSection from "./TimelineSection";
 import TopServicesSection from "./TopServicesSection";
 
@@ -30,6 +30,8 @@ interface HomeProps {
   packages?: SectionData<"packages">["packages"];
   /** Послуги (для топ-послуг). */
   services?: SectionData<"services">["services"];
+  /** Сезонні пропозиції на головній (замість «Для кого»). */
+  seasonalOffers?: SectionData<"seasonalOffers">;
 }
 
 /** Головна, варіант Б (docs/home-rework-demo-b.html): унікальні секції
@@ -48,6 +50,7 @@ export default function Home({
   contacts,
   packages,
   services,
+  seasonalOffers,
 }: HomeProps) {
   const [service, setService] = useState<string>(
     cases[0]?.service ?? homeServiceOptions[0] ?? "",
@@ -57,17 +60,9 @@ export default function Home({
   return (
     <>
       <Hero hero={hero} contacts={contacts} />
-      <AudiencesSection />
+      <SeasonalOffersSection data={seasonalOffers} />
       <TopServicesSection services={services} />
       <TimelineSection timeline={timeline} />
-      <CasePicker
-        cases={cases}
-        service={service}
-        onPick={(svc, cid) => {
-          setService(svc);
-          setProgramId(cid);
-        }}
-      />
       <PromisesSection promises={promises} trust={trust} />
       <PackagesPreview packages={packages} />
       <ReviewsSection reviews={reviews} />

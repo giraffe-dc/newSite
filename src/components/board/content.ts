@@ -59,6 +59,8 @@ export interface Service {
   imageAlt?: string;
   /** Опубліковано (для чернеток). */
   published?: boolean;
+  /** Показувати послугу в блоці «Популярні послуги» на головній. */
+  showOnHome?: boolean;
   /** Варіанти тривалості та ціни — єдине джерело правди. */
   variants?: ServiceVariant[];
   /** Технічні вимоги (електрика, площа тощо). */
@@ -84,6 +86,7 @@ export const SERVICES: Service[] = [
     images: [],
     imageAlt: "",
     published: true,
+    showOnHome: true,
     variants: [{ id: "", label: "", durationMin: 0, price: 0 }],
     requirements: [],
     calcLabel: "",
@@ -136,6 +139,33 @@ export const PACKAGES: Package[] = [
 ];
 
 export const PACKAGE_ADDONS = "";
+
+/* --- Сезонні пропозиції на головній (замість блоку «Для кого») ---
+   Налаштовуються в адмінці (секція «Сезонні пропозиції»): увімкнення
+   блоку + список карток (заголовок, текст, емодзі, ціна, посилання). */
+
+export interface SeasonalOffer {
+  id: string;
+  title: string;
+  text: string;
+  emoji?: string;
+  price?: string;
+  link?: string;
+}
+
+export const SEASONAL_OFFERS_DEFAULT = {
+  enabled: true,
+  items: [
+    {
+      id: "seasonal-1",
+      title: "Новий рік з Жирафиком",
+      text: "Новорічні програми з Дідом Морозом і Снігуронькою — бронюйте заздалегідь.",
+      emoji: "🎄",
+      price: "від 2000 грн",
+      link: "/services",
+    },
+  ],
+};
 
 /** Прибирає чернетки (published === false) — для публічних сторінок.
  *   Поле відсутнє (старі дані) → позиція показується. */

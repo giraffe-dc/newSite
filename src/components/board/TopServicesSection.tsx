@@ -11,8 +11,10 @@ export default function TopServicesSection({
 }: {
   services?: SectionData<"services">["services"];
 }) {
-  // Беремо по одній послузі з кожної категорії (або перші 6)
-  const top = services.slice(0, 6);
+  // Беремо послуги, відмічені «Показувати на головній» (або перші 6 як фолбек)
+  const top = services
+    .filter((s) => s.published !== false && s.showOnHome !== false)
+    .slice(0, 6);
   if (!top.length) return null;
 
   return (
