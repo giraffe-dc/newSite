@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { recordAudit } from "@/lib/auditLog";
 import { verifyAdmin } from "@/lib/auth";
+import { mediaStorage } from "@/lib/cloudinaryMedia";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_MEDIA_BYTES,
+  magicBytesMatch,
+} from "@/lib/mediaValidation";
 import clientPromise from "@/lib/mongodb";
 
 /* Безпечне завантаження медіа (ADM-01 «safe media upload»).
@@ -15,33 +21,7 @@ import clientPromise from "@/lib/mongodb";
 
    Файлову систему не чіпаємо: на Vercel вона read-only. */
 
-const MAX_BYTES = 5 * 1024 * 1024;
-
-/** Дозволені типи: ключ — MIME, значення — сигнатура (hex-початок файлу). */
-const ALLOWED: Record<string, (bytes: Uint8Array) => boolean> = {
-  "image/jpeg": (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
-  "image/png": (b) =>
-    b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47,
-  "image/gif": (b) =>
-    b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x38,
-  "image/webp": (b) =>
-    b.length > 12 &&
-    b[0] === 0x52 &&
-    b[1] === 0x49 &&
-    b[2] === 0x46 &&
-    b[3] === 0x46 &&
-    b[8] === 0x57 &&
-    b[9] === 0x45 &&
-    b[10] === 0x42 &&
-    b[11] === 0x50,
-  "image/avif": (b) =>
-    b.length > 12 &&
-    b[4] === 0x66 &&
-    b[5] === 0x74 &&
-    b[6] === 0x79 &&
-    b[7] === 0x70,
-  "image/svg+xml": () => false, // SVG заборонено (вбудований скрипт)
-};
+const MAX_BYTES = MAX_MEDIA_BYTES;
 
 export async function POST(request: NextRequest) {
   try {
@@ -49,6 +29,15 @@ export async function POST(request: NextRequest) {
     const admin = token ? verifyAdmin(token) : null;
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (mediaStorage() === "cloudinary") {
+      return NextResponse.json(
+        {
+          error:
+            "У режимі cloudinary використовуйте /api/admin/media/upload-config та /api/admin/media/confirm",
+        },
+        { status: 400 },
+      );
     }
 
     let form: FormData;
@@ -77,8 +66,7 @@ export async function POST(request: NextRequest) {
     }
 
     const declaredType = (file.type || "").toLowerCase();
-    const checkType = ALLOWED[declaredType];
-    if (!checkType) {
+    if (!ALLOWED_IMAGE_TYPES.includes(declaredType)) {
       return NextResponse.json(
         {
           error:
@@ -96,7 +84,7 @@ export async function POST(request: NextRequest) {
       );
     }
     // Сигнатура файлу має відповідати задекларованому MIME-типу.
-    if (!checkType(bytes)) {
+    if (!magicBytesMatch(declaredType, bytes)) {
       return NextResponse.json(
         { error: "Вміст файлу не відповідає його типу" },
         { status: 415 },
@@ -113,6 +101,7 @@ export async function POST(request: NextRequest) {
       filename: safeName,
       contentType: declaredType,
       size: bytes.length,
+      storage: "mongo",
       data: Buffer.from(bytes),
       uploadedBy: typeof admin.username === "string" ? admin.username : "admin",
       createdAt: new Date(),
@@ -168,6 +157,7 @@ export async function GET(request: NextRequest) {
         size: item.size,
         uploadedBy: item.uploadedBy,
         createdAt: item.createdAt,
+        storage: item.storage === "cloudinary" ? "cloudinary" : "mongo",
         url: `/api/media/${item._id}`,
       })),
     );

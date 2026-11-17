@@ -20,6 +20,8 @@ const csp = [
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "connect-src 'self' https://va.vercel-scripts.com https://va.vercel-insights.com",
+  // Відео з галереї може віддаватися з CDN Cloudinary.
+  "media-src 'self' https://res.cloudinary.com",
 ].join("; ");
 
 const securityHeaders = [

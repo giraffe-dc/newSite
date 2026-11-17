@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { type NextRequest, NextResponse } from "next/server";
 import { recordAudit } from "@/lib/auditLog";
 import { verifyAdmin } from "@/lib/auth";
+import { destroyAsset } from "@/lib/cloudinaryMedia";
 import clientPromise from "@/lib/mongodb";
 
 type Params = { params: Promise<{ id: string }> };
@@ -24,7 +25,10 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     const db = client.db("zhyrafyk");
     const before = await db
       .collection("media")
-      .findOne({ _id: new ObjectId(id) }, { projection: { filename: 1 } });
+      .findOne(
+        { _id: new ObjectId(id) },
+        { projection: { filename: 1, storage: 1, publicId: 1 } },
+      );
 
     const result = await db
       .collection("media")
@@ -32,6 +36,19 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Хмарний ассет видаляємо best-effort: навіть якщо Cloudinary
+    // тимчасово недоступний, локальний запис уже видалено.
+    if (
+      before?.storage === "cloudinary" &&
+      typeof before.publicId === "string"
+    ) {
+      try {
+        await destroyAsset(before.publicId);
+      } catch (error) {
+        console.error("Cloudinary cleanup failed:", error);
+      }
     }
 
     await recordAudit({

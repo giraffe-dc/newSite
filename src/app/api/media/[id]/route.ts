@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { type NextRequest, NextResponse } from "next/server";
+import { buildDeliveryUrl } from "@/lib/cloudinaryMedia";
 import clientPromise from "@/lib/mongodb";
 
 /* Публічна видача зображення з колекції `media` (байти живуть у БД,
@@ -11,7 +12,7 @@ import clientPromise from "@/lib/mongodb";
 
 type Params = { params: Promise<{ id: string }> };
 
-export async function GET(_request: NextRequest, { params }: Params) {
+export async function GET(request: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
     if (!ObjectId.isValid(id)) {
@@ -20,14 +21,56 @@ export async function GET(_request: NextRequest, { params }: Params) {
 
     const client = await clientPromise;
     const db = client.db("zhyrafyk");
-    const doc = await db
-      .collection("media")
-      .findOne(
-        { _id: new ObjectId(id) },
-        { projection: { data: 1, contentType: 1 } },
-      );
+    const doc = await db.collection("media").findOne(
+      { _id: new ObjectId(id) },
+      {
+        projection: {
+          data: 1,
+          contentType: 1,
+          storage: 1,
+          publicId: 1,
+          version: 1,
+          format: 1,
+        },
+      },
+    );
 
-    if (!doc?.data) {
+    if (!doc) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+
+    // Новий backend: віддаємо не байти через Function, а короткий redirect
+    // на CDN Cloudinary. Рядок `/api/media/<id>` у контенті не змінюємо.
+    if (
+      doc.storage === "cloudinary" &&
+      typeof doc.publicId === "string" &&
+      typeof doc.format === "string"
+    ) {
+      const requested = Number(
+        new URL(request.url).searchParams.get("w") ?? "",
+      );
+      const width =
+        Number.isInteger(requested) && requested >= 40 && requested <= 2400
+          ? requested
+          : undefined;
+      const target = buildDeliveryUrl(
+        {
+          publicId: doc.publicId,
+          version: Number(doc.version ?? 1),
+          format: doc.format,
+        },
+        width,
+      );
+      const response = NextResponse.redirect(target, 302);
+      response.headers.set(
+        "Cache-Control",
+        "public, max-age=3600, s-maxage=31536000, stale-while-revalidate=86400",
+      );
+      response.headers.set("X-Content-Type-Options", "nosniff");
+      return response;
+    }
+
+    if (!doc.data) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 

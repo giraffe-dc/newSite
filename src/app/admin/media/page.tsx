@@ -12,6 +12,7 @@ interface MediaItem {
   uploadedBy?: string;
   createdAt: string;
   url: string;
+  storage?: "mongo" | "cloudinary";
 }
 
 /** Бібліотека завантажених зображень (ADM-01, MED-01): список, завантаження,
@@ -80,9 +81,9 @@ export default function AdminMediaPage() {
       <header className={styles.header}>
         <h1>Медіа-бібліотека</h1>
         <p>
-          Завантажені зображення зберігаються в базі даних — так вони доступні і
-          локально, і на хостингу. Після завантаження скопіюйте URL і вставте в
-          поле обкладинки/галереї новини або контенту.
+          Завантажені зображення доступні за постійним URL. Після завантаження
+          скопіюйте його й вставте в поле обкладинки/галереї новини або
+          контенту. Місце зберігання (БД або хмара) показано на картці.
         </p>
         <div className={styles.uploadRow}>
           <MediaUploadButton
@@ -117,6 +118,9 @@ export default function AdminMediaPage() {
               <div className={styles.info}>
                 <div className={styles.name} title={item.filename}>
                   {item.filename}
+                  {item.storage === "cloudinary" && (
+                    <span className={styles.meta}> · Cloudinary</span>
+                  )}
                 </div>
                 <div className={styles.meta}>
                   {Math.round(item.size / 1024)} КБ ·{" "}
