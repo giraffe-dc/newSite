@@ -463,6 +463,10 @@
 }
 
 /* Бейдж рекомендованого віку замість емодзі (картки з фото). */
+.m2-ticket__badge-wrap {
+  text-align: end;
+  margin-right: 1rem;
+}
 .m2-ticket__badge {
   display: inline-block;
   background: var(--ochre);

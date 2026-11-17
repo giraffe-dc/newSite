@@ -33,7 +33,7 @@ export default function ServicesGrid({
 
         return (
           <article className="m2-ticket" key={service.id}>
-          <div>
+          <div className="m2-ticket__badge-wrap">
             
               <span className={ageBadge ? "m2-ticket__badge" : "m2-ticket__badge_more"}>
                 {ageBadge}
