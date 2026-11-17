@@ -1976,7 +1976,65 @@
   }
 }
 
-/* ---------- Помічник підбору (/assistant, UX-02) ---------- */
+/* ---------- Сезонний банер на головній (замість «Для кого») ---------- */
+.m2-seasonal-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) 1fr;
+  gap: 28px;
+  align-items: center;
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 18px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.m2-seasonal-banner__img {
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--paper-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m2-seasonal-banner__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.m2-seasonal-banner__body {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.m2-seasonal-banner__body h2 {
+  font-size: clamp(22px, 3vw, 32px);
+  color: var(--green-deep);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.m2-seasonal-banner__body p {
+  font-size: 16px;
+  color: var(--muted-on-paper);
+  line-height: 1.5;
+  margin: 0;
+  max-width: 52ch;
+}
+
+@media (max-width: 720px) {
+  .m2-seasonal-banner {
+    grid-template-columns: 1fr;
+  }
+  .m2-seasonal-banner__img {
+    aspect-ratio: 16 / 9;
+  }
+}
 
 .m2-assist {
   display: grid;

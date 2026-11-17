@@ -140,12 +140,12 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
   },
   seasonalOffers: {
     enabled: "Показувати блок на головній",
-    items: "Картки пропозицій",
-    link: "Посилання (необов'язково)",
-    emoji: "Емодзі",
-    title: "Заголовок картки",
-    text: "Текст картки",
-    price: "Ціна (текст)",
+    image: "Зображення банера (URL)",
+    imageAlt: "Alt-текст зображення",
+    title: "Заголовок",
+    text: "Текст",
+    ctaLabel: "Підпис кнопки",
+    ctaLink: "Посилання кнопки",
   },
 };
 
@@ -380,6 +380,35 @@ export function Field({
               <span>{option.label}</span>
             </label>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  /* Зображення банера сезонних пропозицій (MED-01): URL + прев'ю +
+     завантаження через безпечний ендпоінт. */
+  if (name === "image" && section === "seasonalOffers") {
+    const url = typeof value === "string" ? value : "";
+    return (
+      <div className={`${styles.field} ${styles.fieldWide}`}>
+        <span className={styles.fieldLabel}>{label}</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 4 }}>
+          <input
+            className={styles.input}
+            type="text"
+            value={url}
+            placeholder="URL зображення"
+            onChange={(event) => onChange(event.target.value)}
+            style={{ flex: 1 }}
+          />
+          {url && (
+            // biome-ignore lint/performance/noImgElement: динамічний URL із БД, next/image потребує remotePatterns
+            <img src={url} alt="Прев'ю" className={styles.thumb} />
+          )}
+          <MediaUploadButton
+            label="📷 Завантажити фото"
+            onUploaded={(u) => onChange(u)}
+          />
         </div>
       </div>
     );
