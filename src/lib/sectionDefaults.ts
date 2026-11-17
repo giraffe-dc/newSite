@@ -30,6 +30,7 @@ import {
   TIMELINE,
   TRUST,
 } from "@/components/board/content";
+import { GALLERY_ALBUMS } from "@/components/board/galleryContent";
 
 /** Порядок і перелік секцій — мапа 2.1 плану підключення до БД.
  *  Секція `reviews` вийшла зі складу в етапі 6: відгуки живуть у власній
@@ -48,6 +49,7 @@ export const SECTION_KEYS = [
   "calculator",
   "assistant",
   "seasonalOffers",
+  "gallery",
 ] as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -80,4 +82,7 @@ export const SECTION_DEFAULTS = {
     durations: ASSISTANT_DURATIONS,
   },
   seasonalOffers: SEASONAL_OFFERS_DEFAULT,
+  /* Галерея: список альбомів (GAL-01). Демо-ілюстрації — заглушки,
+     адмін керує альбомами, фото й статусом публікації. */
+  gallery: { albums: GALLERY_ALBUMS },
 } satisfies Record<SectionKey, object>;

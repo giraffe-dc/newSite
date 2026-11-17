@@ -5,6 +5,7 @@ import { SECTION_KEYS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
 import AssistantEditor from "./AssistantEditor";
 import CollectionEditor from "./CollectionEditor";
+import GalleryEditor from "./GalleryEditor";
 import SectionForm, {
   type CatalogOptions,
   type VariantOption,
@@ -86,6 +87,11 @@ const SECTION_META: Record<
     icon: "🍂",
     label: "Сезонні пропозиції",
     hint: "Блок на головній замість «Для кого»: увімкнення + список карток (заголовок, текст, емодзі, ціна, посилання).",
+  },
+  gallery: {
+    icon: "🖼️",
+    label: "Галерея",
+    hint: "Альбоми для /gallery: назва, категорія, опис, пов'язана послуга з каталогу, фото (завантаження або URL), обрані, публікація та відео.",
   },
 };
 
@@ -336,6 +342,13 @@ export default function AdminContentPage() {
               />
             ) : active === "assistant" ? (
               <AssistantEditor
+                key={active}
+                data={current}
+                catalog={catalog}
+                onChange={setDraft}
+              />
+            ) : active === "gallery" ? (
+              <GalleryEditor
                 key={active}
                 data={current}
                 catalog={catalog}

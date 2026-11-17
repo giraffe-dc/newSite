@@ -3,6 +3,7 @@
 import MediaUploadButton from "@/components/admin/MediaUploadButton";
 import { SERVICE_CATEGORIES } from "@/components/board/categories";
 import { SERVICE_OPTIONS } from "@/components/board/content";
+import { GALLERY_CATEGORIES } from "@/components/board/galleryContent";
 import { SECTION_DEFAULTS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
 
@@ -150,6 +151,18 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
     ctaLabel: "Підпис кнопки",
     ctaLink: "Посилання кнопки",
   },
+  gallery: {
+    id: "Ключ альбому (для посилань)",
+    title: "Назва альбому",
+    category: "Категорія галереї",
+    summary: "Короткий опис",
+    serviceRef: "Пов'язана послуга / пакет (з каталогу)",
+    serviceLabel: "Назва послуги текстом (якщо не вибрано з каталогу)",
+    images: "Фотографії альбому",
+    featured: "Обраний альбом",
+    published: "Опублікований (видно на сайті)",
+    videoUrl: "Відео альбому (URL, необов'язково)",
+  },
 };
 
 /* Ключі, які не редагуються вручну: homeServiceOptions перераховується із
@@ -258,6 +271,7 @@ export function Field({
   section,
   variantOptions = [],
   catalog,
+  multiline = false,
   onChange,
 }: {
   name: string;
@@ -267,6 +281,8 @@ export function Field({
   section: SectionKey;
   variantOptions?: VariantOption[];
   catalog?: CatalogOptions;
+  /** Примусово textarea (напр. опис альбому), незалежно від дефолту. */
+  multiline?: boolean;
   onChange: (next: unknown) => void;
 }) {
   const label = labels[name] ?? name;
@@ -315,6 +331,64 @@ export function Field({
                 {category.label}
               </option>
             ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
+
+  /* Категорія галереї — спільний список фільтрів сторінки /gallery. */
+  if (name === "category" && section === "gallery") {
+    const text = typeof value === "string" ? value : "";
+    return (
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>
+          {label}
+          <select
+            className={styles.input}
+            value={text}
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="">— без категорії —</option>
+            {GALLERY_CATEGORIES.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.icon} {category.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+    );
+  }
+
+  /* Послуга альбому — вибір із каталогу (service:<id> / package:<id>),
+     а не ручне введення ідентифікаторів. */
+  if (name === "serviceRef" && section === "gallery" && catalog) {
+    const text = typeof value === "string" ? value : "";
+    return (
+      <div className={styles.field}>
+        <label className={styles.fieldLabel}>
+          {label}
+          <select
+            className={styles.input}
+            value={text}
+            onChange={(event) => onChange(event.target.value)}
+          >
+            <option value="">— не пов'язувати —</option>
+            <optgroup label="Послуги">
+              {catalog.services.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Пакети">
+              {catalog.packages.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </optgroup>
           </select>
         </label>
       </div>
@@ -425,7 +499,7 @@ export function Field({
   /* Зображення послуги (MED-01): список URL + прев'ю + завантаження нового
      файлу через безпечний ендпоінт /api/admin/media (адмін не вводить URL
      вручну — натискає «Завантажити фото» і бачить результат). */
-  if (name === "images" && section === "services") {
+  if (name === "images" && (section === "services" || section === "gallery")) {
     const urls = Array.isArray(value)
       ? value.filter((item): item is string => typeof item === "string")
       : [];
@@ -568,11 +642,12 @@ export function Field({
   const text = typeof value === "string" ? value : "";
   /* Багаторядковість визначається за дефолтом (а не поточним значенням),
      щоб поле не «стрибало» між input і textarea під час друку. */
-  const multiline =
-    typeof shapeValue === "string" &&
-    (shapeValue.length > 60 || shapeValue.includes("\n"));
+  const isMultiline =
+    multiline ||
+    (typeof shapeValue === "string" &&
+      (shapeValue.length > 60 || shapeValue.includes("\n")));
 
-  if (multiline) {
+  if (isMultiline) {
     return (
       <div className={styles.field}>
         <label className={styles.fieldLabel}>
