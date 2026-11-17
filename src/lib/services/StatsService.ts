@@ -17,7 +17,9 @@ export const StatsService = {
 
     const dateMatch = startDate ? { timestamp: { $gte: startDate } } : {};
 
-    const totalPageViews = await db.collection("statistics").countDocuments(dateMatch);
+    const totalPageViews = await db
+      .collection("statistics")
+      .countDocuments(dateMatch);
 
     const uniqueVisitorsResult = await db
       .collection("statistics")

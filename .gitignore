@@ -53,4 +53,7 @@ next-env.d.ts
 /.kilo/
 /.playwright-mcp/
 /.workbuddy-ai/
+# тимчасовий JWT для E2E-тестів адмінки (див. docs/REDESIGN_PROGRESS.md)
+/admin_jwt.tmp
 /SERVER_CONFIG.md
+/backup/

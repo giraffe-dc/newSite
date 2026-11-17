@@ -75,8 +75,14 @@ export interface NewsItem {
   content: string;
   date: string;
   type: "news" | "event";
+  /** Обкладинка (окреме від галереї зображення). */
   image?: string;
+  /** Alt-текст обкладинки/галереї (для доступності та SEO). */
+  imageAlt?: string;
   images?: string[];
+  status?: "draft" | "published" | "archived";
+  category?: string;
+  seoDescription?: string;
   survey?: Survey;
 }
 
@@ -150,7 +156,7 @@ export interface Order {
   programId?: string; // обрана програма виїзду
   contactChannel?: "phone" | "telegram" | "whatsapp" | "chat";
   createdAt?: string;
-  /** Нова заявка → В роботі → Виконано / Скасовано (статуси етапу 4). */
+  /** Нова → В роботі → Підтверджена → Виконано / Скасовано (ADM-02). */
   status?: OrderStatus;
 }
 
@@ -172,7 +178,12 @@ export interface ContactInfo {
   };
 }
 
-export type OrderStatus = "new" | "in_progress" | "done" | "cancelled";
+export type OrderStatus =
+  | "new"
+  | "in_progress"
+  | "confirmed"
+  | "done"
+  | "cancelled";
 
 export interface Testimonial {
   _id?: string;

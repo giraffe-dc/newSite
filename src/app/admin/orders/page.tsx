@@ -30,11 +30,18 @@ interface Order {
 
 type Filter = "all" | OrderStatus;
 
-const STATUSES: OrderStatus[] = ["new", "in_progress", "done", "cancelled"];
+const STATUSES: OrderStatus[] = [
+  "new",
+  "in_progress",
+  "confirmed",
+  "done",
+  "cancelled",
+];
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
   new: "Нове",
   in_progress: "В роботі",
+  confirmed: "Підтверджена",
   done: "Виконано",
   cancelled: "Скасовано",
 };
@@ -43,6 +50,7 @@ const FILTER_LABELS: Record<Filter, string> = {
   all: "Усі",
   new: "Нові",
   in_progress: "В роботі",
+  confirmed: "Підтверджені",
   done: "Виконані",
   cancelled: "Скасовані",
 };
@@ -50,6 +58,7 @@ const FILTER_LABELS: Record<Filter, string> = {
 const BADGE_CLASS: Record<OrderStatus, string> = {
   new: styles.badgeNew,
   in_progress: styles.badgeProgress,
+  confirmed: styles.badgeConfirmed,
   done: styles.badgeDone,
   cancelled: styles.badgeCancelled,
 };
@@ -127,6 +136,7 @@ export default function AdminOrdersPage() {
     all: orders.length,
     new: 0,
     in_progress: 0,
+    confirmed: 0,
     done: 0,
     cancelled: 0,
   };
@@ -156,16 +166,28 @@ export default function AdminOrdersPage() {
       });
       if (res.ok) {
         flash("ok", "Статус оновлено");
+      } else if (res.status === 409) {
+        /* Подвійне бронювання: слот уже підтверджений (ADM-02). */
+        const body = (await res.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        throw Object.assign(new Error("conflict"), {
+          conflict: body?.error,
+        });
       } else {
         throw new Error(String(res.status));
       }
-    } catch {
+    } catch (error) {
       setOrders((prev) =>
         prev.map((item) =>
           item._id === order._id ? { ...item, status: previous } : item,
         ),
       );
-      flash("err", "Не вдалося змінити статус");
+      const conflict =
+        error && typeof error === "object" && "conflict" in error
+          ? (error as { conflict?: string }).conflict
+          : undefined;
+      flash("err", conflict ?? "Не вдалося змінити статус");
     } finally {
       setBusyId(null);
     }

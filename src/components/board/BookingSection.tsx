@@ -23,7 +23,12 @@ export default function BookingSection({
   programId?: string;
   /** Назва послуги — з /services (передається окремо від формату «eventType»). */
   serviceName?: string;
-  items?: Array<{ serviceId?: string; serviceName: string; quantity?: number; price?: string | number }>;
+  items?: Array<{
+    serviceId?: string;
+    serviceName: string;
+    quantity?: number;
+    price?: string | number;
+  }>;
   tint?: boolean;
   book?: SectionData<"book">["book"];
   contacts?: SectionData<"contacts">["contacts"];
@@ -56,6 +61,54 @@ export default function BookingSection({
               </div>
               <div>
                 <b>Години:</b> {contacts.hours}
+              </div>
+              <div>
+                <b>Соцмережі:</b>{" "}
+                {contacts.whatsapp && (
+                  <a
+                    href={contacts.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    WhatsApp
+                  </a>
+                )}{" "}
+                {contacts.telegram && (
+                  <a
+                    href={contacts.telegram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Telegram
+                  </a>
+                )}{" "}
+                {contacts.facebook && (
+                  <a
+                    href={contacts.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Facebook
+                  </a>
+                )}{" "}
+                {contacts.instagram && (
+                  <a
+                    href={contacts.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Instagram
+                  </a>
+                )}{" "}
+                {contacts.tiktok && (
+                  <a
+                    href={contacts.tiktok}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    TikTok
+                  </a>
+                )}{" "}
               </div>
             </div>
           </div>

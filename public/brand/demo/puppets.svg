@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Ростові ляльки — демо-зображення">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e6d9ff"/>
+      <stop offset="100%" stop-color="#c3aef0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="140" cy="120" r="60" fill="#fff" opacity="0.35"/>
+  <!-- ростова лялька: голова + костюм -->
+  <g>
+    <circle cx="400" cy="220" r="90" fill="#ffe3c9"/>
+    <path d="M310 210 a90 90 0 0 1 180 0 l-20 -10 a75 75 0 0 0 -140 0 z" fill="#8a5a3b"/>
+    <circle cx="370" cy="215" r="9" fill="#12343a"/><circle cx="430" cy="215" r="9" fill="#12343a"/>
+    <path d="M370 255 q30 26 60 0" stroke="#12343a" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M330 300 h140 l40 200 h-220 z" fill="#ff6b35"/>
+    <path d="M330 300 l-60 130 40 30 60 -90 z" fill="#ff6b35"/>
+    <path d="M470 300 l60 130 -40 30 -60 -90 z" fill="#ff6b35"/>
+    <path d="M330 500 h60 v70 h-70 z" fill="#267765"/><path d="M410 500 h60 l10 70 h-70 z" fill="#267765"/>
+  </g>
+  <text x="400" y="120" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#12343a">Ростові ляльки</text>
+  <text x="400" y="585" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#496069">демо-зображення · замінити на реальне фото</text>
+</svg>

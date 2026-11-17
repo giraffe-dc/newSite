@@ -19,7 +19,11 @@ const csp = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
-  "connect-src 'self' https://va.vercel-scripts.com https://va.vercel-insights.com",
+  // Прямий підписаний upload іде з браузера на API Cloudinary (CLO-05).
+  // res.* додано для випадків, коли клієнт fetches доставлене зображення.
+  "connect-src 'self' https://va.vercel-scripts.com https://va.vercel-insights.com https://api.cloudinary.com https://res.cloudinary.com",
+  // Відео з галереї може віддаватися з CDN Cloudinary.
+  "media-src 'self' https://res.cloudinary.com",
 ].join("; ");
 
 const securityHeaders = [

@@ -181,6 +181,11 @@
   color: #1e40af;
 }
 
+.badgeConfirmed {
+  background: #ccfbf1;
+  color: #115e59;
+}
+
 .badgeDone {
   background: #d1fae5;
   color: #065f46;

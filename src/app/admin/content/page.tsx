@@ -1,9 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { SECTION_KEYS, type SectionKey } from "@/lib/sectionDefaults";
 import styles from "@/styles/admin/AdminContent.module.css";
-import SectionForm from "./SectionForm";
+import AssistantEditor from "./AssistantEditor";
+import CollectionEditor from "./CollectionEditor";
+import GalleryEditor from "./GalleryEditor";
+import SectionForm, {
+  type CatalogOptions,
+  type VariantOption,
+} from "./SectionForm";
+
+/* Секції-колекції (послуги, пакети) редагуються зручним редактором-списком
+   (ADM-03): позиція окремою карткою, а не одним довгим списком полів. */
+/* (assistant має власний редактор AssistantEditor) */
 
 /** Дані секцій у «сирому» вигляді: JSON із GET /api/admin/content. */
 type SectionMap = Partial<Record<SectionKey, Record<string, unknown>>>;
@@ -23,20 +33,10 @@ const SECTION_META: Record<
     label: "Перший екран",
     hint: "Заголовок, підзаголовок, кнопка й мікро-бейджі на головній.",
   },
-  board: {
-    icon: "🛫",
-    label: "Табло маршрутів",
-    hint: "Рядки табло й адреси, що чергуються під шапкою головної.",
-  },
   timeline: {
     icon: "🕒",
     label: "Сценарій дня",
     hint: "Маршрут свята по хвилинах — секція на головній.",
-  },
-  cases: {
-    icon: "🎯",
-    label: "Випадки свят",
-    hint: "Картки підбору випадку. Опції селекта «Формат» оновлюються автоматично.",
   },
   promises: {
     icon: "🛡️",
@@ -66,17 +66,32 @@ const SECTION_META: Record<
   services: {
     icon: "🎭",
     label: "Послуги",
-    hint: "Картки послуг, ціни та позиції калькулятора.",
+    hint: "Картки послуг: категорія, опис, варіанти тривалості та ціни (варіанти — єдине джерело для каталогу й калькулятора), ознака публікації.",
   },
   packages: {
     icon: "🎁",
     label: "Пакети",
-    hint: "Пакети «Міні»/«Стандарт»/«VIP», їхній склад і додатки.",
+    hint: "Пакети: склад із вибором варіантів послуг (видно, що входить і ціна кожного), числова ціна комплексу для розрахунку економії.",
   },
   calculator: {
     icon: "🧮",
     label: "Кошторис",
-    hint: "Опції селекта та примітка на сторінці /calculator.",
+    hint: "Опції селекта, примітка під сумою та транспорт: тариф грн/км, безкоштовна зона і правило розрахунку для клієнта.",
+  },
+  assistant: {
+    icon: "🧭",
+    label: "Підбір програми",
+    hint: "Параметри помічника /assistant: ліміт дітей на аніматора, вікові групи (назва і галочки послуг/пакетів, які показувати під цей фільтр) та варіанти тривалості.",
+  },
+  seasonalOffers: {
+    icon: "🍂",
+    label: "Сезонні пропозиції",
+    hint: "Блок на головній замість «Для кого»: увімкнення + список карток (заголовок, текст, емодзі, ціна, посилання).",
+  },
+  gallery: {
+    icon: "🖼️",
+    label: "Галерея",
+    hint: "Альбоми для /gallery: назва, категорія, опис, пов'язана послуга з каталогу, фото (завантаження або URL), обрані, публікація та відео.",
   },
 };
 
@@ -130,6 +145,69 @@ export default function AdminContentPage() {
 
   const setDraft = (next: Record<string, unknown>) =>
     setDrafts((prev) => ({ ...prev, [active]: next }));
+
+  /* Опції селекта складу пакета: усі варіанти всіх послуг (id → підпис і ціна). */
+  const variantOptions = useMemo<VariantOption[]>(() => {
+    const servicesSection = data?.services as
+      | { services?: Array<Record<string, unknown>> }
+      | undefined;
+    const out: VariantOption[] = [];
+    for (const service of servicesSection?.services ?? []) {
+      const title = typeof service.title === "string" ? service.title : "";
+      if (!Array.isArray(service.variants)) continue;
+      for (const variant of service.variants) {
+        if (
+          typeof variant !== "object" ||
+          variant === null ||
+          typeof (variant as { id?: unknown }).id !== "string"
+        ) {
+          continue;
+        }
+        const v = variant as { id: string; label?: unknown; price?: unknown };
+        out.push({
+          value: v.id,
+          label: `${title} › ${String(v.label ?? "")} — ${Number(v.price ?? 0)} грн`,
+        });
+      }
+    }
+    return out;
+  }, [data]);
+
+  /* Каталог послуг і пакетів — для галочок у налаштуваннях «Підбір програми»
+     (UX-02): адмін обирає, що потрібно під кожну вікову групу. */
+  const catalog = useMemo<CatalogOptions>(() => {
+    const servicesSection = (drafts.services ?? data?.services) as
+      | { services?: Array<Record<string, unknown>> }
+      | undefined;
+    const packagesSection = (drafts.packages ?? data?.packages) as
+      | { packages?: Array<Record<string, unknown>> }
+      | undefined;
+    const services = (servicesSection?.services ?? [])
+      .filter((s) => s.published !== false)
+      .map((s) => {
+        const variants = Array.isArray(s.variants) ? s.variants : [];
+        const first = variants[0] as { price?: unknown } | undefined;
+        const price =
+          first && typeof first.price === "number" ? first.price : 0;
+        return {
+          value: `service:${String(s.id ?? "")}`,
+          label: `${String(s.title ?? "")} — ${price} грн`,
+        };
+      });
+    const packages = (packagesSection?.packages ?? [])
+      .filter((p) => p.published !== false)
+      .map((p) => {
+        const price =
+          typeof p.bundlePrice === "number" && p.bundlePrice > 0
+            ? `${p.bundlePrice} грн`
+            : String(p.price ?? "");
+        return {
+          value: `package:${String(p.id ?? "")}`,
+          label: `${String(p.name ?? "")} — ${price}`,
+        };
+      });
+    return { services, packages };
+  }, [data, drafts]);
 
   const revert = () =>
     setDrafts((prev) => {
@@ -253,14 +331,39 @@ export default function AdminContentPage() {
           </div>
           <p className={styles.hint}>{meta.hint}</p>
 
-          {current && (
-            <SectionForm
-              key={active}
-              section={active}
-              data={current}
-              onChange={setDraft}
-            />
-          )}
+          {current &&
+            (active === "services" || active === "packages" ? (
+              <CollectionEditor
+                key={active}
+                section={active as "services" | "packages"}
+                data={current}
+                variantOptions={variantOptions}
+                onChange={setDraft}
+              />
+            ) : active === "assistant" ? (
+              <AssistantEditor
+                key={active}
+                data={current}
+                catalog={catalog}
+                onChange={setDraft}
+              />
+            ) : active === "gallery" ? (
+              <GalleryEditor
+                key={active}
+                data={current}
+                catalog={catalog}
+                onChange={setDraft}
+              />
+            ) : (
+              <SectionForm
+                key={active}
+                section={active}
+                data={current}
+                variantOptions={variantOptions}
+                catalog={catalog}
+                onChange={setDraft}
+              />
+            ))}
 
           <div className={styles.actions}>
             <button

@@ -1,12 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/auth";
 import { ensureSeeded, getSections } from "@/lib/siteContent";
 
 /** Усі секції `site_content` для адмін-редактора (перший запуск — сідинґ дефолтів). */
 export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get("admin_token")?.value;
-    if (!token || !verifyToken(token)) {
+    if (!token || !verifyAdmin(token)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

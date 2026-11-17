@@ -1,11 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { diffFields, recordAudit } from "@/lib/auditLog";
+import { verifyAdmin } from "@/lib/auth";
 import clientPromise from "@/lib/mongodb";
 
 export async function PUT(request: NextRequest) {
   try {
     const token = request.cookies.get("admin_token")?.value;
-    if (!token || !verifyToken(token)) {
+    const admin = token ? verifyAdmin(token) : null;
+    if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
@@ -17,9 +19,24 @@ export async function PUT(request: NextRequest) {
 
     // Оскільки у нас один документ з контактами, ми можемо його просто оновлювати.
     // Опція upsert: true створить документ, якщо він не існує.
+    const before = await db
+      .collection("contacts")
+      .findOne({}, { projection: { _id: 0 } });
+
     const result = await db
       .collection("contacts")
       .updateOne({}, { $set: dataToUpdate }, { upsert: true });
+
+    await recordAudit({
+      actor: typeof admin.username === "string" ? admin.username : "admin",
+      action: "update",
+      entity: "contacts",
+      summary: "Контакти оновлено",
+      changes: diffFields(
+        before as Record<string, unknown> | null,
+        dataToUpdate as Record<string, unknown>,
+      ),
+    });
 
     return NextResponse.json({ success: true, result });
   } catch (error) {

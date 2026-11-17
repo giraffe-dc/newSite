@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Де можна провести святи — Жирафик, виїзні свята",
   description:
     "Куди приїжджаємо: квартири, приватні будинки, школи, дитячі майданчики та кафе. Дізнайтеся більше про зони діяльності.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/cover" },
 };
 
 export const revalidate = 3600;

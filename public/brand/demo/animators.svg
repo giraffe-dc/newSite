@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Аніматорські програми — демо-зображення">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd9c0"/>
+      <stop offset="100%" stop-color="#ffb08a"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff3d6"/>
+      <stop offset="100%" stop-color="#ffd27a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <circle cx="660" cy="110" r="70" fill="url(#sun)" opacity="0.9"/>
+  <!-- гірлянда -->
+  <path d="M0 90 Q200 170 400 90 T800 90" stroke="#12343a" stroke-width="3" fill="none" opacity="0.35"/>
+  <g>
+    <circle cx="80" cy="118" r="16" fill="#ff6b35"/><circle cx="180" cy="145" r="16" fill="#267765"/><circle cx="280" cy="132" r="16" fill="#f4b942"/><circle cx="380" cy="104" r="16" fill="#e05c7a"/><circle cx="480" cy="104" r="16" fill="#4f86c6"/><circle cx="580" cy="132" r="16" fill="#ff6b35"/><circle cx="680" cy="145" r="16" fill="#267765"/>
+  </g>
+  <!-- фігури дітей -->
+  <g fill="#12343a" opacity="0.85">
+    <circle cx="300" cy="360" r="34"/><rect x="270" y="400" width="60" height="120" rx="24"/>
+    <circle cx="420" cy="380" r="28"/><rect x="396" y="412" width="48" height="100" rx="20"/>
+    <circle cx="520" cy="365" r="32"/><rect x="492" y="403" width="56" height="112" rx="22"/>
+  </g>
+  <text x="400" y="565" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#12343a">Аніматорські програми</text>
+  <text x="400" y="592" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#496069">демо-зображення · замінити на реальне фото</text>
+</svg>

@@ -87,23 +87,46 @@
   color: var(--gd-ink);
 }
 
-:where(.dashboard) h1 { font-size: 40px; letter-spacing: -0.02em; }
-:where(.dashboard) h2 { font-size: 24px; margin-bottom: 10px; }
-:where(.dashboard) h3 { font-size: 17px; color: var(--gd-vine); }
+:where(.dashboard) h1 {
+  font-size: 40px;
+  letter-spacing: -0.02em;
+}
+:where(.dashboard) h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+:where(.dashboard) h3 {
+  font-size: 17px;
+  color: var(--gd-vine);
+}
 
 :where(.dashboard) p {
   margin: 0 0 10px;
   color: var(--gd-ink-soft);
-  font-family: "Source Serif 4", var(--font-body), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Source Serif 4",
+    var(--font-body),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 :where(.dashboard) a {
   color: var(--gd-accent);
   text-decoration: none;
 }
-:where(.dashboard) a:hover { text-decoration: underline; }
+:where(.dashboard) a:hover {
+  text-decoration: underline;
+}
 
-:where(.dashboard) strong { color: var(--gd-ink); }
+:where(.dashboard) strong {
+  color: var(--gd-ink);
+}
 
 /* Hero band — the single bold element */
 .hero {
@@ -123,13 +146,26 @@
   right: -40px;
   width: 160px;
   height: 160px;
-  background: radial-gradient(circle, rgba(200, 125, 46, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(200, 125, 46, 0.15) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   pointer-events: none;
 }
 
 .hero .kicker {
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -160,7 +196,10 @@
   padding-top: 14px;
 }
 
-.hero-stat { font-size: 13px; color: #d8e2d9; }
+.hero-stat {
+  font-size: 13px;
+  color: #d8e2d9;
+}
 
 /* Period filter buttons in the hero band */
 .periodFilters {
@@ -178,19 +217,41 @@
   color: #ffffff;
   font-size: 12px;
   font-weight: 600;
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
-.periodButton:hover { background: rgba(255, 255, 255, 0.18); }
+.periodButton:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
 
 .periodButtonActive {
   background: var(--gd-accent);
   border-color: rgba(255, 255, 255, 0.5);
 }
 .hero-stat strong {
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-size: 20px;
   color: #ffffff;
   display: block;
@@ -220,11 +281,29 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--gd-meta);
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 .metric .value {
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-size: 22px;
   color: var(--gd-ink);
   font-weight: 700;
@@ -235,10 +314,14 @@
   font-weight: 600;
   color: #2d6a4f;
 }
-.metric .delta.down { color: var(--gd-accent-dark); }
+.metric .delta.down {
+  color: var(--gd-accent-dark);
+}
 
 /* Sections */
-.section { margin-bottom: 30px; }
+.section {
+  margin-bottom: 30px;
+}
 
 .section-head {
   display: flex;
@@ -252,7 +335,17 @@
   font-size: 12px;
   color: var(--gd-meta);
   font-style: italic;
-  font-family: "Source Serif 4", var(--font-body), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Source Serif 4",
+    var(--font-body),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 /* Charts */
@@ -288,7 +381,9 @@
   gap: 10px;
 }
 
-.actions-list li { padding: 0; }
+.actions-list li {
+  padding: 0;
+}
 
 .action-link {
   display: flex;
@@ -298,18 +393,38 @@
   border: 1px solid var(--gd-line);
   border-radius: 8px;
   color: var(--gd-ink);
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-weight: 600;
   font-size: 15px;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   cursor: pointer;
   text-decoration: none;
 }
 
-.action-link:hover { background: var(--gd-savanna); border-color: var(--gd-line); }
+.action-link:hover {
+  background: var(--gd-savanna);
+  border-color: var(--gd-line);
+}
 
-.action-link .icon { font-size: 18px; margin-right: 10px; }
-.action-link .chevron { color: var(--gd-meta); font-size: 13px; }
+.action-link .icon {
+  font-size: 18px;
+  margin-right: 10px;
+}
+.action-link .chevron {
+  color: var(--gd-meta);
+  font-size: 13px;
+}
 
 /* Recent activity feed */
 .feed {
@@ -326,7 +441,9 @@
   padding: 10px 0;
   border-bottom: 1px solid var(--gd-line);
 }
-.feed-item:last-child { border-bottom: none; }
+.feed-item:last-child {
+  border-bottom: none;
+}
 
 .feed-icon {
   width: 34px;
@@ -341,18 +458,43 @@
   flex-shrink: 0;
 }
 
-.feed-text { flex: 1; font-size: 14px; }
+.feed-text {
+  flex: 1;
+  font-size: 14px;
+}
 .feed-text .who {
   font-weight: 600;
   color: var(--gd-ink);
   display: block;
   margin-bottom: 2px;
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
-.feed-text .when { font-size: 11px; color: var(--gd-meta); display: block; }
+.feed-text .when {
+  font-size: 11px;
+  color: var(--gd-meta);
+  display: block;
+}
 
 .feed-num {
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--gd-vine);
@@ -367,7 +509,17 @@
   font-size: 12px;
   color: var(--gd-meta);
   text-align: center;
-  font-family: "Source Serif 4", var(--font-body), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    "Source Serif 4",
+    var(--font-body),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 /* Loading / error */
@@ -391,13 +543,26 @@
 
 /* Responsive */
 @media (max-width: 700px) {
-  .charts-row { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 24px; }
-  .metrics { flex-direction: column; }
-  :where(.dashboard) h1 { font-size: 30px; }
-  .dashboard { padding: 0 16px; }
+  .charts-row {
+    grid-template-columns: 1fr;
+  }
+  .hero h1 {
+    font-size: 24px;
+  }
+  .metrics {
+    flex-direction: column;
+  }
+  :where(.dashboard) h1 {
+    font-size: 30px;
+  }
+  .dashboard {
+    padding: 0 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .dashboard * { animation: none !important; transition: none !important; }
+  .dashboard * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

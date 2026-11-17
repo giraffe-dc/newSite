@@ -119,6 +119,16 @@ export default function BookingForm({
     }
   }
 
+  /* Сума обраних позицій (якщо ціна числова) — показуємо разом зі списком. */
+  const itemsTotal = (items ?? []).reduce((sum, item) => {
+    const n =
+      typeof item.price === "number"
+        ? item.price
+        : Number.parseInt(String(item.price ?? "").replace(/[^\d]/g, ""), 10);
+    return sum + (Number.isFinite(n) ? n * (item.quantity ?? 1) : 0);
+  }, 0);
+  const hasSelection = Boolean(items?.length || packageName || serviceName);
+
   if (status === "success") {
     return (
       <output className="m2-form__success" aria-live="polite">
@@ -142,6 +152,41 @@ export default function BookingForm({
 
   return (
     <form onSubmit={(event) => void onSubmit(event)}>
+      {hasSelection && (
+        <div className="m2-form__summary" aria-label="Ваш вибір">
+          <strong>Ваш вибір</strong>
+          {serviceName && (
+            <div className="m2-form__summary-row">
+              <span>Послуга</span>
+              <span>{serviceName}</span>
+            </div>
+          )}
+          {packageName && (
+            <div className="m2-form__summary-row">
+              <span>Пакет</span>
+              <span>{packageName}</span>
+            </div>
+          )}
+          {(items ?? []).map((item, idx) => (
+            <div className="m2-form__summary-row" key={`${item.serviceId ?? idx}`}>
+              <span>{item.serviceName}</span>
+              <span>
+                {item.quantity && item.quantity > 1 ? `×${item.quantity} — ` : ""}
+                {item.price ?? ""}
+              </span>
+            </div>
+          ))}
+          {itemsTotal > 0 && (
+            <div className="m2-form__summary-row m2-form__summary-row--total">
+              <span>Орієнтовна сума</span>
+              <span>{itemsTotal} грн</span>
+            </div>
+          )}
+          <p className="m2-form__summary-note">
+            Остаточну ціну, дату й адресу узгодить команда після заявки.
+          </p>
+        </div>
+      )}
       <div className="m2-two">
         <div className="m2-field">
           <label htmlFor="book-name">Ваше ім'я</label>

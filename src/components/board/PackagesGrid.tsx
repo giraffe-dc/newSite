@@ -24,12 +24,14 @@ export default function PackagesGrid({
               {pkg.price} <small>{pkg.period}</small>
             </div>
             <ul>
-              {pkg.items.map((item) => (
-                <li
-                  className={item.included ? undefined : "m2-no"}
-                  key={item.text}
-                >
+              {pkg.items.map((item, idx) => (
+                <li key={`${pkg.id}-${idx}`}>
                   {item.text}
+                  {item.variantId && (
+                    <small style={{ color: "#888", marginLeft: 4 }}>
+                      (послуга)
+                    </small>
+                  )}
                 </li>
               ))}
             </ul>

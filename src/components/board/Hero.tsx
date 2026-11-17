@@ -44,7 +44,6 @@ export default function Hero({
             })}
           </div>
         </div>
-        {/* <Board /> */}
       </div>
     </section>
   );

@@ -10,6 +10,7 @@ interface NewsItem {
   content: string;
   date: string;
   type?: "news" | "event";
+  category?: string;
   survey?: unknown;
 }
 
@@ -19,6 +20,14 @@ interface PublicContacts {
   workingHours?: string;
   whatsapp?: string;
   telegram?: string;
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  socialMedia?: {
+    facebook?: string;
+    instagram?: string;
+    telegram?: string;
+  };
 }
 
 function formatDate(value: string) {
@@ -43,6 +52,29 @@ export default function NewsContacts({
   const [contacts, setContacts] = useState<PublicContacts | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"news" | "contacts">("news");
+
+  /* Соцмережі й месенджери: основне джерело — site_content (адмінка
+     «Налаштування контенту» → «Контакти»), старі значення з окремої
+     колекції contacts лишаються як фолбек. */
+  const socials = [
+    { label: "WhatsApp", url: fallback.whatsapp || contacts?.whatsapp },
+    {
+      label: "Telegram",
+      url:
+        fallback.telegram ||
+        contacts?.telegram ||
+        contacts?.socialMedia?.telegram,
+    },
+    {
+      label: "Facebook",
+      url: fallback.facebook || contacts?.socialMedia?.facebook,
+    },
+    {
+      label: "Instagram",
+      url: fallback.instagram || contacts?.socialMedia?.instagram,
+    },
+    { label: "TikTok", url: fallback.tiktok },
+  ].filter((item): item is { label: string; url: string } => Boolean(item.url));
 
   useEffect(() => {
     let alive = true;
@@ -109,6 +141,19 @@ export default function NewsContacts({
                     {item.title}
                     <span style={{ fontSize: 13, fontWeight: 400 }}>
                       {formatDate(item.date)}
+                      {item.category && (
+                        <span
+                          style={{
+                            marginLeft: 8,
+                            padding: "1px 8px",
+                            borderRadius: 999,
+                            border: "1px solid currentColor",
+                            fontSize: 12,
+                          }}
+                        >
+                          {item.category}
+                        </span>
+                      )}
                     </span>
                   </summary>
                   <p>
@@ -149,8 +194,25 @@ export default function NewsContacts({
             <p>
               <b>Коли на зв'язку:</b> {contacts?.workingHours || fallback.hours}
             </p>
+            {socials.length > 0 && (
+              <p>
+                <b>Соцмережі та месенджери:</b>{" "}
+                {socials.map((item, index) => (
+                  <span key={item.label}>
+                    {index > 0 && ", "}
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.label}
+                    </a>
+                  </span>
+                ))}
+              </p>
+            )}
             <p>
-              <b>Куди виїжджаємо:</b> по всьому місту та області. Свято може
+              <b>Куди виїжджаємо:</b> по Гайсинському районі. Свято може
               пройти вдома, у школі, садку, ТРЦ, кафе або на вуличному
               майданчику; зону виїзду та умови уточнює команда.
             </p>

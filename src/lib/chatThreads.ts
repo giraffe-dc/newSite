@@ -88,10 +88,7 @@ export function ensureChatIndexes(): Promise<void> {
           { sparse: true, name: "chat_tg_update" },
         ),
         // Бейдж непрочитаних у сайдбарі / фільтр «Непрочитані».
-        col.createIndex(
-          { unreadForAdmin: 1 },
-          { name: "chat_unread_admin" },
-        ),
+        col.createIndex({ unreadForAdmin: 1 }, { name: "chat_unread_admin" }),
       ]);
     })().catch((error) => {
       indexesPromise = null;

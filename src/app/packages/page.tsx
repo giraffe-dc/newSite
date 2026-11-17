@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { publishedOnly } from "@/components/board/content";
 import PackagesGrid from "@/components/board/PackagesGrid";
 import { getSection } from "@/lib/siteContent";
 
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
   title: "Готові пакети — Жирафик, виїзні свята",
   description:
     "Пакети «Міні», «Стандарт» і «VIP»: склад програми, тривалість і орієнтовні ціни. Можна зібрати власний формат із окремих послуг.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/packages" },
 };
 
 export const revalidate = 3600;
@@ -25,7 +27,7 @@ export default async function PackagesPage() {
         </div>
 
         <PackagesGrid
-          packages={packages.packages}
+          packages={publishedOnly(packages.packages)}
           packageAddons={packages.packageAddons}
         />
 

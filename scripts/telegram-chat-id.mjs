@@ -53,8 +53,12 @@ for (const u of updates) {
   seen.add(chat.id);
   console.log(`chat.id = ${chat.id}`);
   console.log(`  тип   : ${chat.type}`);
-  console.log(`  назва : ${chat.title || chat.username || chat.first_name || "—"}`);
-  console.log(`  приклад: ${chat.id < 0 ? "-100" + String(chat.id).slice(4) : chat.id}`);
+  console.log(
+    `  назва : ${chat.title || chat.username || chat.first_name || "—"}`,
+  );
+  console.log(
+    `  приклад: ${chat.id < 0 ? "-100" + String(chat.id).slice(4) : chat.id}`,
+  );
   console.log("");
 }
 console.log("Впиши потрібний chat.id у .env.local → TELEGRAM_CHAT_CHAT_ID");

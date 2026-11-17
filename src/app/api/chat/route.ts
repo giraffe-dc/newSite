@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { UpdateFilter } from "mongodb";
 import { NextResponse } from "next/server";
+import { publishedOnly } from "@/components/board/content";
 import { clientIp, rateLimit } from "@/lib/chatRateLimit";
 import clientPromise from "@/lib/mongodb";
 import { getSections, type Sections } from "@/lib/siteContent";
@@ -114,16 +115,21 @@ function fmtContacts(s: Sections): string {
 }
 
 function fmtServices(s: Sections): string {
-  return s.services.services
-    .map((x) => `• ${x.title} — ${x.price} ${x.unit}. ${x.desc}`)
+  return publishedOnly(s.services.services)
+    .map((x) => {
+      /* Ціни — з варіантів (deprecated price/unit більше не існують). */
+      const prices = (x.variants ?? [])
+        .map((v) => `${v.label} — ${v.price} грн`)
+        .join(", ");
+      return `• ${x.title}${prices ? ` (${prices})` : ""}. ${x.desc}`;
+    })
     .join("\n");
 }
 
 function fmtPackages(s: Sections): string {
-  const lines = s.packages.packages.map(
+  const lines = publishedOnly(s.packages.packages).map(
     (p) =>
       `• ${p.name} (${p.sub}) — ${p.price} ${p.period}; у комплекті: ${p.items
-        .filter((i) => i.included)
         .map((i) => i.text)
         .join(", ")}`,
   );
@@ -133,10 +139,12 @@ function fmtPackages(s: Sections): string {
 
 function fmtFaq(s: Sections): string {
   if (!s.faq.faq.length) return "";
-  return s.faq.faq.map((f) => {
-    const { q, a } = f as { q: string; a: string };
-    return `П: ${q}\nВ: ${a}`;
-  }).join("\n\n");
+  return s.faq.faq
+    .map((f) => {
+      const { q, a } = f as { q: string; a: string };
+      return `П: ${q}\nВ: ${a}`;
+    })
+    .join("\n\n");
 }
 
 function fmtNews(data: unknown): string {

@@ -7,25 +7,30 @@
    завжди збігається зі структурою дефолтів без дублювання. */
 
 import {
-  BOARD,
+  ASSISTANT_AGE_GROUPS,
+  ASSISTANT_DURATIONS,
+  ASSISTANT_KIDS_PER_ANIMATOR,
   BOOK,
   CALC_NOTE,
-  CASES,
   CONTACTS,
   COVER,
   COVER_NOTE,
   FAQ,
   HERO,
-  HOME_SERVICE_OPTIONS,
   PACKAGE_ADDONS,
   PACKAGES,
   PROMISES,
+  ROAD_FREE_KM,
+  ROAD_NOTE,
+  ROAD_TARIFF,
+  SEASONAL_OFFERS_DEFAULT,
   SERVICE_OPTIONS,
   SERVICES,
   STEPS,
   TIMELINE,
   TRUST,
 } from "@/components/board/content";
+import { GALLERY_ALBUMS } from "@/components/board/galleryContent";
 
 /** Порядок і перелік секцій — мапа 2.1 плану підключення до БД.
  *  Секція `reviews` вийшла зі складу в етапі 6: відгуки живуть у власній
@@ -33,9 +38,7 @@ import {
 export const SECTION_KEYS = [
   "contacts",
   "hero",
-  "board",
   "timeline",
-  "cases",
   "promises",
   "steps",
   "cover",
@@ -44,6 +47,9 @@ export const SECTION_KEYS = [
   "services",
   "packages",
   "calculator",
+  "assistant",
+  "seasonalOffers",
+  "gallery",
 ] as const;
 
 export type SectionKey = (typeof SECTION_KEYS)[number];
@@ -52,9 +58,7 @@ export type SectionKey = (typeof SECTION_KEYS)[number];
 export const SECTION_DEFAULTS = {
   contacts: { contacts: CONTACTS },
   hero: { hero: HERO },
-  board: { board: BOARD },
   timeline: { timeline: TIMELINE },
-  cases: { cases: CASES, homeServiceOptions: HOME_SERVICE_OPTIONS },
   promises: { promises: PROMISES, trust: TRUST },
   steps: { steps: STEPS },
   cover: { cover: COVER, coverNote: COVER_NOTE },
@@ -62,5 +66,23 @@ export const SECTION_DEFAULTS = {
   faq: { faq: FAQ },
   services: { services: SERVICES },
   packages: { packages: PACKAGES, packageAddons: PACKAGE_ADDONS },
-  calculator: { serviceOptions: SERVICE_OPTIONS, calcNote: CALC_NOTE },
+  calculator: {
+    serviceOptions: SERVICE_OPTIONS,
+    calcNote: CALC_NOTE,
+    roadTariff: ROAD_TARIFF,
+    roadFreeKm: ROAD_FREE_KM,
+    roadNote: ROAD_NOTE,
+  },
+  /* Помічник підбору (/assistant): параметри добіру замість зашитих
+     у компонент значень — адмін змінює ліміт групи, вікові групи з
+     рекомендованими категоріями та варіанти тривалості. */
+  assistant: {
+    kidsPerAnimator: ASSISTANT_KIDS_PER_ANIMATOR,
+    ageGroups: ASSISTANT_AGE_GROUPS,
+    durations: ASSISTANT_DURATIONS,
+  },
+  seasonalOffers: SEASONAL_OFFERS_DEFAULT,
+  /* Галерея: список альбомів (GAL-01). Демо-ілюстрації — заглушки,
+     адмін керує альбомами, фото й статусом публікації. */
+  gallery: { albums: GALLERY_ALBUMS },
 } satisfies Record<SectionKey, object>;

@@ -31,3 +31,21 @@ export function verifyToken(token: string) {
     return null;
   }
 }
+
+/**
+ * Токен адміністратора: підпис валідний І роль у payload — `admin`.
+ * Використовується всіма `/api/admin/*`-маршрутами (прийом ADM-01 «ролі»):
+ * токен з іншою роллю (або без неї) відхиляється навіть за наявності
+ * підпису. Middleware додатково перевіряє роль на рівні edge, але справжня
+ * перевірка — тут, бо middleware не верифікує підпис.
+ */
+export function verifyAdmin(token: string): jwt.JwtPayload | null {
+  try {
+    const payload = jwt.verify(token, getJwtSecret());
+    if (!payload || typeof payload === "string") return null;
+    if (payload.role !== "admin") return null;
+    return payload;
+  } catch (_error) {
+    return null;
+  }
+}

@@ -1,12 +1,11 @@
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import { Rubik, Rubik_Mono_One } from "next/font/google";
 import type React from "react";
+import ConsentAnalytics from "@/components/ConsentAnalytics";
+import CookieBanner from "@/components/CookieBanner";
 import ChatWidget from "@/components/chat/ChatWidget";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { StatisticsCollector } from "@/components/StatisticsCollector";
 import { getSection } from "@/lib/siteContent";
 import "./globals.css";
 import "@/styles/global.css";
@@ -30,6 +29,7 @@ const description =
   "Аніматори, ростові ляльки, VR-клас і PlayStation 4 з виїздом додому, у клас або на майданчик. Бронювання онлайн за 2 хвилини. Теплик, Вінницька область, Україна. Свято приїжджає до Вас!";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://giraffe-teplyk.vercel.app"),
   title,
   description,
   keywords: [
@@ -46,6 +46,7 @@ export const metadata: Metadata = {
     "Україна",
   ],
   icons: { icon: "/brand/favicon.png" },
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app" },
   openGraph: {
     title,
     description,
@@ -53,11 +54,20 @@ export const metadata: Metadata = {
     siteName: "Жирафик",
     locale: "uk_UA",
     type: "website",
+    images: [
+      {
+        url: "/brand/logo.png",
+        width: 512,
+        height: 512,
+        alt: "Жирафик — свято приїжджає до Вас",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title,
     description,
+    images: ["/brand/logo.png"],
   },
   robots: { index: true, follow: true },
 };
@@ -73,17 +83,40 @@ export default async function RootLayout({
   return (
     <html lang="uk" className={`${rubik.variable} ${mono.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: "Жирафик",
+              description,
+              url: "https://giraffe-teplyk.vercel.app",
+              telephone: contacts.tel,
+              email: contacts.email,
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Теплик",
+                addressRegion: "Вінницька область",
+                addressCountry: "UA",
+              },
+              areaServed: "Вінницька область, Україна",
+              priceRange: "₴₴",
+              openingHours: contacts.hours,
+              sameAs: [],
+            }),
+          }}
+        />
         <div className="m2-page">
           <a className="m2-skip" href="#main">
             Перейти до вмісту
           </a>
-          <SpeedInsights />
-          <StatisticsCollector />
+          <ConsentAnalytics />
           <Header contacts={contacts} />
           <main id="main">{children}</main>
           <Footer contacts={contacts} />
           <ChatWidget />
-          <Analytics />
+          <CookieBanner />
         </div>
       </body>
     </html>

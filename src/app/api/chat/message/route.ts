@@ -106,11 +106,7 @@ export async function POST(req: NextRequest) {
     })
       .then((telegramMessageId) => {
         if (telegramMessageId != null) {
-          return setMessageTelegramId(
-            threadId,
-            message.id,
-            telegramMessageId,
-          );
+          return setMessageTelegramId(threadId, message.id, telegramMessageId);
         }
         return null;
       })

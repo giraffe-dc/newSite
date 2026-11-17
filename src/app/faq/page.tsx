@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "FAQ — Жирафик, виїзні свята",
   description:
     "Відповіді на найпоширеніші питання про бронювання, оплату, зону діяльності та формати свят.",
+  alternates: { canonical: "https://giraffe-teplyk.vercel.app/faq" },
 };
 
 export const revalidate = 3600;

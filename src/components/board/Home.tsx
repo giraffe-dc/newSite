@@ -3,27 +3,32 @@
 import { useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
 import BookingSection from "./BookingSection";
-import CasePicker from "./CasePicker";
 import type { ReviewItem } from "./content";
-import { DATE_SLOTS } from "./content";
 import Hero from "./Hero";
+import PackagesPreview from "./PackagesPreview";
 import PromisesSection from "./PromisesSection";
 import ReviewsSection from "./ReviewsSection";
+import SeasonalOffersSection from "./SeasonalOffersSection";
 import TimelineSection from "./TimelineSection";
+import TopServicesSection from "./TopServicesSection";
 
 /** Секції, які головна отримує пропсами з page.tsx (server → client).
  *  Слоти дат статичні — інтеграція системи бронювання поза цим етапом. */
 interface HomeProps {
   hero: SectionData<"hero">["hero"];
   timeline: SectionData<"timeline">["timeline"];
-  cases: SectionData<"cases">["cases"];
-  homeServiceOptions: readonly string[];
   promises: SectionData<"promises">["promises"];
   trust: SectionData<"promises">["trust"];
   /** Два найновіші опубліковані відгуки (етап 6). */
   reviews: ReviewItem[];
   book: SectionData<"book">["book"];
   contacts: SectionData<"contacts">["contacts"];
+  /** Готові комплекси (етап редизайну). */
+  packages?: SectionData<"packages">["packages"];
+  /** Послуги (для топ-послуг). */
+  services?: SectionData<"services">["services"];
+  /** Сезонні пропозиції на головній (замість «Для кого»). */
+  seasonalOffers?: SectionData<"seasonalOffers">;
 }
 
 /** Головна, варіант Б (docs/home-rework-demo-b.html): унікальні секції
@@ -33,40 +38,28 @@ interface HomeProps {
 export default function Home({
   hero,
   timeline,
-  cases,
-  homeServiceOptions,
   promises,
   trust,
   reviews,
   book,
   contacts,
+  packages,
+  services,
+  seasonalOffers,
 }: HomeProps) {
-  const [date, _setDate] = useState<string>("");
-  const [service, setService] = useState<string>(
-    cases[0]?.service ?? homeServiceOptions[0] ?? "",
-  );
-  const [programId, setProgramId] = useState<string | undefined>(undefined);
+  const [service, setService] = useState<string>("");
 
   return (
     <>
       <Hero hero={hero} contacts={contacts} />
+      <SeasonalOffersSection data={seasonalOffers} />
+      <TopServicesSection services={services} />
       <TimelineSection timeline={timeline} />
-      <CasePicker
-        cases={cases}
-        service={service}
-        onPick={(svc, cid) => {
-          setService(svc);
-          setProgramId(cid);
-        }}
-      />
       <PromisesSection promises={promises} trust={trust} />
+      <PackagesPreview packages={packages} />
       <ReviewsSection reviews={reviews} />
-      {/* <DateChecker date={date} onPick={setDate} /> */}
       <BookingSection
-        date={date}
         service={service}
-        programId={programId}
-        options={homeServiceOptions}
         book={book}
         contacts={contacts}
         tint

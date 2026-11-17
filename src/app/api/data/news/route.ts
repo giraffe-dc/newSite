@@ -7,7 +7,7 @@ export async function GET() {
     const db = client.db("zhyrafyk");
     const news = await db
       .collection("news")
-      .find({})
+      .find({ $or: [{ status: "published" }, { status: { $exists: false } }] })
       .sort({ date: -1 })
       .toArray();
 
@@ -51,8 +51,10 @@ export async function GET() {
         return item;
       }
 
+      // Старий документ з `image` — додаємо в галерею, але поле обкладинки
+      // лишаємо (сторінки й метадані використовують його окремо).
       if (item.image) {
-        return { ...item, images: [item.image], image: undefined };
+        return { ...item, images: [item.image] };
       }
 
       return { ...item, images: [] };

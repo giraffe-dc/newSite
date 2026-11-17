@@ -40,8 +40,11 @@ export function middleware(request: NextRequest) {
     }
 
     const token = request.cookies.get("admin_token")?.value;
+    const payload = token ? decodeJwtPayload(token) : null;
 
-    if (!token || !decodeJwtPayload(token)) {
+    // ADM-01 «ролі»: пускаємо лише role=admin (підпис перевіряється ще раз
+    // у кожному маршруті через verifyAdmin — middleware лише швидкий фільтр).
+    if (!payload || payload.role !== "admin") {
       if (pathname.startsWith("/api")) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }

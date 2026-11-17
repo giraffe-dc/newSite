@@ -7,15 +7,21 @@ export const CONTACTS = {
   tel: "",
   email: "",
   hours: "",
+  whatsapp: "",
+  telegram: "",
+  facebook: "",
+  instagram: "",
+  tiktok: "",
 } as const;
 
 export const NAV = [
+  // { href: "/", label: "Головна" },
   { href: "/services", label: "Послуги" },
   { href: "/packages", label: "Пакети" },
+  { href: "/gallery", label: "Галерея" },
   { href: "/reviews", label: "Відгуки" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/cover", label: "Куди їздимо" },
-  { href: "/news-contacts", label: "Контакти" },
+  { href: "/news-contacts", label: "Новини й контакти" },
+  { href: "/calculator", label: "Збери сам" },
 ] as const;
 
 /** Якір секції бронювання на головній — працює з будь-якої сторінки. */
@@ -36,28 +42,61 @@ export interface BoardRow {
   highlight?: boolean;
 }
 
-export const BOARD = {
-  topLeft: "",
-  topRight: "",
-  rows: [{ label: "", value: "", highlight: false }],
-  destinations: [""],
-  foot: "",
-} as const;
+export interface ServiceVariant {
+  id: string;
+  label: string;
+  durationMin: number;
+  price: number;
+}
 
 export interface Service {
   id: string;
   emoji: string;
   title: string;
   desc: string;
-  price: string;
-  unit: string;
-  calcValue: number;
-  calcLabel: string;
+  /** Категорія для фільтрів каталогу. */
+  category?: string;
+  /** Аудиторії, для яких підходить послуга. */
+  audiences?: string[];
+  /** Зображення (URL). */
+  images?: string[];
+  /** Alt-текст першого зображення (доступність і SEO; MED-01). */
+  imageAlt?: string;
+  /** Опубліковано (для чернеток). */
+  published?: boolean;
+  /** Показувати послугу в блоці «Популярні послуги» на головній. */
+  showOnHome?: boolean;
+  /** Варіанти тривалості та ціни — єдине джерело правди. */
+  variants?: ServiceVariant[];
+  /** Технічні вимоги (електрика, площа тощо). */
+  requirements?: string[];
+  /** Підпис для калькулятора. */
+  calcLabel?: string;
+  /** Значення для селекта «Формат» у формі бронювання. */
   format: string;
+  /* --- Deprecated (залишено для зворотної сумісності) --- */
+  price?: string;
+  unit?: string;
+  calcValue?: number;
 }
 
 export const SERVICES: Service[] = [
-  { id: "", emoji: "", title: "", desc: "", price: "", unit: "", calcValue: 0, calcLabel: "", format: "" },
+  {
+    id: "",
+    emoji: "",
+    title: "",
+    desc: "",
+    category: "",
+    audiences: [],
+    images: [],
+    imageAlt: "",
+    published: true,
+    showOnHome: true,
+    variants: [{ id: "", label: "", durationMin: 0, price: 0 }],
+    requirements: [],
+    calcLabel: "",
+    format: "",
+  },
 ];
 
 export const STEPS: Array<{ time: string; title: string; text: string }> = [
@@ -65,8 +104,12 @@ export const STEPS: Array<{ time: string; title: string; text: string }> = [
 ];
 
 export interface PackageItem {
+  /** Посилання на ServiceVariant.id (якщо позиція — реальна послуга). */
+  variantId?: string;
+  /** Кількість одиниць. */
+  qty?: number;
+  /** Текст для відображення (опис позиції або умова). */
   text: string;
-  included: boolean;
 }
 
 export interface Package {
@@ -75,9 +118,13 @@ export interface Package {
   sub: string;
   price: string;
   period: string;
+  /** Числова ціна комплексу (для розрахунку економії). */
+  bundlePrice?: number;
   items: PackageItem[];
   hit?: boolean;
   format: string;
+  audiences?: string[];
+  published?: boolean;
 }
 
 export const PACKAGES: Package[] = [
@@ -87,13 +134,39 @@ export const PACKAGES: Package[] = [
     sub: "",
     price: "",
     period: "",
-    items: [{ text: "", included: false }],
+    bundlePrice: 0,
+    items: [{ variantId: "", qty: 1, text: "" }],
     hit: false,
     format: "",
+    audiences: [],
+    published: true,
   },
 ];
 
 export const PACKAGE_ADDONS = "";
+
+/* --- Сезонні пропозиції на головній (замість блоку «Для кого») ---
+   Рекламний банер: фото + текст + посилання на сезонні послуги.
+   Налаштовується в адмінці (секція «Сезонні пропозиції»): увімкнення
+   блоку + зображення, заголовок, текст, підпис і посилання кнопки. */
+
+export const SEASONAL_OFFERS_DEFAULT = {
+  enabled: true,
+  image: "",
+  imageAlt: "Сезонна пропозиція Жирафик",
+  title: "Скоро Новий рік і день святого Миколая!",
+  text: "Не забудьте замовити привітання — Дід Мороз, Снігуронька, ростові ляльки та новорічні програми. Бронюйте заздалегідь, поки є вільні дати.",
+  ctaLabel: "Сезонні послуги",
+  ctaLink: "/services",
+};
+
+/** Прибирає чернетки (published === false) — для публічних сторінок.
+ *   Поле відсутнє (старі дані) → позиція показується. */
+export function publishedOnly<T extends { published?: boolean }>(
+  list: readonly T[],
+): T[] {
+  return list.filter((item) => item.published !== false);
+}
 
 /** Відгук у форматі показу (картки на головній, /reviews і в сітці).
  *  Джерело — колекція `reviews` (етап 6); REVIEWS нижче — лише fallback,
@@ -112,7 +185,16 @@ export interface ReviewItem {
 }
 
 export const REVIEWS: ReviewItem[] = [
-  { id: "", stars: "", rating: 0, quote: "", initial: "", name: "", context: "", avatar: "" },
+  {
+    id: "",
+    stars: "",
+    rating: 0,
+    quote: "",
+    initial: "",
+    name: "",
+    context: "",
+    avatar: "",
+  },
 ];
 
 export const FAQ: Array<{ q: string; a: string }> = [{ q: "", a: "" }];
@@ -142,6 +224,57 @@ export const SERVICE_OPTIONS: string[] = [
 
 export const CALC_NOTE = "";
 
+/* --- Транспорт (CALC-02): тариф погоджено з власником 16.11.2026 ---
+   25 грн/км в один бік, без безкоштовної зони (платимо від першого км).
+   Значення налаштовуються в адмінці (секція «Кошторис»); ці дефолти —
+   для сторінок, коли поле відсутнє в БД. */
+export const ROAD_TARIFF = 25;
+export const ROAD_FREE_KM = 0;
+export const ROAD_NOTE =
+  "Транспорт: 25 грн за кілометр в один бік від Теплика. Відстань і вартість уточнюється за адресою — остаточно підтвердить менеджер.";
+
+/* --- Помічник підбору (/assistant, UX-02) --------------------------------
+   Параметри добіру редагуються в адмінці (секція «Підбір програми»):
+   вікові групи з рекомендованими категоріями, варіанти тривалості та
+   місткість групи (BIZ-02: до 10 дітей на аніматора). Ці дефолти —
+   фолбек, коли документа в БД ще немає або поле відсутнє. */
+
+export interface AssistantAgeGroup {
+  id: string;
+  label: string;
+  /** id послуг (service:<id>) і пакетів (package:<id>), які рекомендуємо
+   *  під цю вікову групу. В адмінці обираються з випадаючого списку
+   *  каталогу (секція «Підбір програми»); порожній список = без вікового
+   *  фільтра. */
+  refs: string[];
+  /** Немає даних про вік — замість добору пропонуємо менеджера. */
+  askManager?: boolean;
+}
+
+export interface AssistantDurationOption {
+  min: number;
+  label: string;
+}
+
+export const ASSISTANT_AGE_GROUPS: AssistantAgeGroup[] = [
+  { id: "0-3", label: "Малюки (0–3)", refs: [], askManager: true },
+  { id: "4-6", label: "Дошкільнята (4–6)", refs: [] },
+  { id: "7-11", label: "Школярики (7–11)", refs: [] },
+  { id: "12-17", label: "Підлітки (12–17)", refs: [] },
+  { id: "adults", label: "Дорослі", refs: [] },
+  { id: "mixed", label: "Різний вік", refs: [] },
+];
+
+export const ASSISTANT_DURATIONS: AssistantDurationOption[] = [
+  { min: 30, label: "до 30 хв" },
+  { min: 60, label: "1 год" },
+  { min: 90, label: "1,5 год" },
+  { min: 120, label: "2 год" },
+];
+
+/** Місткість: до 10 дітей на одного аніматора (BIZ-02). */
+export const ASSISTANT_KIDS_PER_ANIMATOR = 10;
+
 /* --- Головна, варіант Б (docs/home-rework-demo-b.html) ------------------
    Секції, яких немає на жодній сторінці сайту: сценарій дня, підбір
    випадку, гарантії, перевірка дати. Дані поки статичні — на етапі
@@ -155,9 +288,7 @@ export interface TimelineStep {
   on?: boolean;
 }
 
-export const TIMELINE: TimelineStep[] = [
-  { time: "", title: "", text: "" },
-];
+export const TIMELINE: TimelineStep[] = [{ time: "", title: "", text: "" }];
 
 export interface HolidayCase {
   id: string;
@@ -203,9 +334,7 @@ export interface PromiseItem {
   text: string;
 }
 
-export const PROMISES: PromiseItem[] = [
-  { ico: "", title: "", text: "" },
-];
+export const PROMISES: PromiseItem[] = [{ ico: "", title: "", text: "" }];
 
 export interface TrustItem {
   value: string;
@@ -213,36 +342,7 @@ export interface TrustItem {
 }
 
 /** Цифри довіри з брифу. На етапі даних заміняться на показники з бази. */
-export const TRUST: TrustItem[] = [
-  { value: "", label: "" },
-];
-
-export type SlotStatus = "free" | "few" | "busy";
-
-export interface DateSlot {
-  iso: string;
-  status: SlotStatus;
-  label: string;
-  hint: string;
-}
-
-export const DATE_SLOTS: DateSlot[] = [
-  { iso: "", status: "free", label: "", hint: "" },
-];
-
-export const DATE_VERDICT: Record<SlotStatus, { lead: string; rest: string }> =
-  {
-    free: { lead: "", rest: "" },
-    few: { lead: "", rest: "" },
-    busy: { lead: "", rest: "" },
-  };
-
-export const DATE_BOARD = {
-  characters: "",
-  foot: "",
-  slots: { free: "", few: "", busy: "" },
-  arrival: { free: "", few: "", busy: "" },
-};
+export const TRUST: TrustItem[] = [{ value: "", label: "" }];
 
 /** Два відгуки для головної добирає дані-шар (два найновіші опубліковані,
  *  див. src/lib/reviews.ts); ручний вибір homeReviewIndexes прибрано в етапі 6. */
