@@ -516,6 +516,7 @@
   background: var(--paper-2);
   border-top: 2px dashed var(--line);
   font-weight: 700;
+  text-align: center;
 }
 
 .m2-ticket__price b {
@@ -554,6 +555,8 @@
   flex-wrap: wrap;
   gap: 5px;
   margin-top: 7px;
+  justify-content: center;
+  
 }
 
 .m2-ticket__variant {
@@ -563,7 +566,7 @@
   padding: 2px 8px;
   font-family: inherit;
   font-size: 11px;
-  font-weight: 400;
+  font-weight: 800;
   line-height: 1.5;
   color: var(--muted-on-paper);
   background: var(--paper);

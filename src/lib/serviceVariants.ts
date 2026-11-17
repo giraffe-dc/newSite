@@ -104,11 +104,12 @@ export function durationHeadline(
   const min = Math.min(...values);
   const max = Math.max(...values);
   if (min === max) return formatDuration(min);
-  if (max < 60) return `${min}–${max} хв`;
-  if (min % 60 === 0 && max % 60 === 0) {
-    return `${min / 60}–${max / 60} год`;
-  }
-  return `${formatDuration(min)} – ${formatDuration(max)}`;
+  // if (max < 60) return `${min}–${max} хв`;
+  // if (min % 60 === 0 && max % 60 === 0) {
+  //   return `${min / 60}–${max / 60} год`;
+  // }
+  // return `${formatDuration(min)} – ${formatDuration(max)}`;
+  return "";
 }
 
 /** Українська множина для лічильника варіантів в адмінці. */

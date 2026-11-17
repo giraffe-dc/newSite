@@ -50,7 +50,7 @@ export default function ServicesGrid({
               <span className="m2-ticket__pricing">
                 <span className="m2-ticket__priceLine">
                   <b>{priceLabel}</b>
-                  {durationLabel && (
+                  {durationLabel  && (
                     <span className="m2-ticket__duration">
                       {" "}
                       · {durationLabel}
