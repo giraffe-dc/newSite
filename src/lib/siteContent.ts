@@ -6,7 +6,6 @@
    Читання ніколи не валить сторінку: БД недоступна, документа немає або
    форма зламана → дефолти з content.ts + console.error (див. план, 6.2). */
 
-import { HOME_SERVICE_EXTRA } from "@/components/board/content";
 import { getDb } from "@/lib/mongodb";
 import {
   SECTION_DEFAULTS,
@@ -170,18 +169,7 @@ export async function saveSection<K extends SectionKey>(
   key: K,
   data: SectionData<K>,
 ): Promise<void> {
-  /* `homeServiceOptions` — похідне поле (випадки + «ще не визначився»):
-     перераховуємо при записі, щоб селект «Формат» не розходився з CASES. */
-  const payload =
-    key === "cases"
-      ? ({
-          ...(data as SectionData<"cases">),
-          homeServiceOptions: [
-            ...(data as SectionData<"cases">).cases.map((c) => c.service),
-            HOME_SERVICE_EXTRA,
-          ],
-        } as object)
-      : (data as object);
+  const payload = data as object;
 
   const db = await getDb();
   await db

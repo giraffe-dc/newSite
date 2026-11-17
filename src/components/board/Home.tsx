@@ -3,7 +3,6 @@
 import { useState } from "react";
 import type { SectionData } from "@/lib/siteContent";
 import BookingSection from "./BookingSection";
-import CasePicker from "./CasePicker";
 import type { ReviewItem } from "./content";
 import Hero from "./Hero";
 import PackagesPreview from "./PackagesPreview";
@@ -18,8 +17,6 @@ import TopServicesSection from "./TopServicesSection";
 interface HomeProps {
   hero: SectionData<"hero">["hero"];
   timeline: SectionData<"timeline">["timeline"];
-  cases: SectionData<"cases">["cases"];
-  homeServiceOptions: readonly string[];
   promises: SectionData<"promises">["promises"];
   trust: SectionData<"promises">["trust"];
   /** Два найновіші опубліковані відгуки (етап 6). */
@@ -41,8 +38,6 @@ interface HomeProps {
 export default function Home({
   hero,
   timeline,
-  cases,
-  homeServiceOptions,
   promises,
   trust,
   reviews,
@@ -52,10 +47,7 @@ export default function Home({
   services,
   seasonalOffers,
 }: HomeProps) {
-  const [service, setService] = useState<string>(
-    cases[0]?.service ?? homeServiceOptions[0] ?? "",
-  );
-  const [programId, setProgramId] = useState<string | undefined>(undefined);
+  const [service, setService] = useState<string>("");
 
   return (
     <>
@@ -68,8 +60,6 @@ export default function Home({
       <ReviewsSection reviews={reviews} />
       <BookingSection
         service={service}
-        programId={programId}
-        options={homeServiceOptions}
         book={book}
         contacts={contacts}
         tint

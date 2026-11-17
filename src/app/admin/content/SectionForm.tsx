@@ -48,7 +48,6 @@ const LABELS: Record<string, string> = {
   time: "Час",
   on: "Акцентований крок",
   // випадки свят
-  cases: "Випадки свят",
   when: "Для кого / коли",
   list: "Що входить",
   meta: "Додатковий рядок",
@@ -119,7 +118,6 @@ const LABELS: Record<string, string> = {
 /* Назви ключів, що означають різне в різних секціях (однакові ключі
    в табло та цифрах довіри). */
 const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
-  cases: { title: "Назва випадку", text: "Опис" },
   promises: { value: "Число", label: "Підпис під числом" },
   services: {
     title: "Назва послуги",
@@ -151,9 +149,7 @@ const LABEL_OVERRIDES: Partial<Record<SectionKey, Record<string, string>>> = {
 
 /* Ключі, які не редагуються вручну: homeServiceOptions перераховується із
    списку випадків при збереженні. */
-const HIDDEN: Partial<Record<SectionKey, readonly string[]>> = {
-  cases: ["homeServiceOptions"],
-};
+const HIDDEN: Partial<Record<SectionKey, readonly string[]>> = {};
 
 /** Мітки полів секції (спільні + перекриття для конкретної секції). */
 export function sectionLabels(section: SectionKey): Record<string, string> {
@@ -792,13 +788,6 @@ export default function SectionForm({
           catalog={catalog}
           onChange={onChange}
         />
-      )}
-
-      {section === "cases" && (
-        <p className={styles.note}>
-          Опції селекта «Формат» на головній перераховуються зі списку випадків
-          автоматично при збереженні.
-        </p>
       )}
     </div>
   );

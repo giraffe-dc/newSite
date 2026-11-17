@@ -20,7 +20,6 @@ export default async function HomePage() {
   const [
     hero,
     timeline,
-    cases,
     promises,
     book,
     contacts,
@@ -31,7 +30,6 @@ export default async function HomePage() {
   ] = await Promise.all([
     getSection("hero"),
     getSection("timeline"),
-    getSection("cases"),
     getSection("promises"),
     getSection("book"),
     getSection("contacts"),
@@ -45,8 +43,6 @@ export default async function HomePage() {
     <Home
       hero={hero.hero}
       timeline={timeline.timeline}
-      cases={cases.cases}
-      homeServiceOptions={cases.homeServiceOptions}
       promises={promises.promises}
       trust={promises.trust}
       reviews={reviews}
