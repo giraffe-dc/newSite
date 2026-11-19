@@ -23,7 +23,7 @@ export const NAV = [
   { href: "/reviews", label: "Відгуки" },
   { href: "/news-contacts", label: "Новини й контакти" },
   { href: "/calculator", label: "Збери сам" },
-  { href: "/app", label: "Додаток" },
+  // { href: "/app", label: "Додаток" },
 ] as const;
 
 /** Якір секції бронювання на головній — працює з будь-якої сторінки. */

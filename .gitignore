@@ -57,3 +57,7 @@ next-env.d.ts
 /admin_jwt.tmp
 /SERVER_CONFIG.md
 /backup/
+
+# APK ne zberihayetsya v repozitoriyi (limit GitHub 50 MB, Vercel ne maye trymaty binary).
+# Dystrybutsiya cherez GitHub Releases: div. giraffe-mobile/scripts/build-apk.ps1.
+public/app/*.apk

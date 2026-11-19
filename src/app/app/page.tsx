@@ -18,20 +18,28 @@ type Release = {
   changelog: string[];
   publishedAt: string;
   sha256?: string;
+  apkUrl?: string;
 };
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://giraffe-teplyk.vercel.app";
+// APK не зберігається на Vercel (ліміт розміру) — він лежить у GitHub Releases.
+const APK_FALLBACK = "https://github.com/giraffe-dc/newSite/releases/latest";
+
+// URL PWA-версії для iPhone (окремий Vercel-проєкт з web-експорту giraffe-mobile).
+// Порожній рядок — кнопка «Відкрити PWA» на сторінці ховається.
+const PWA_URL = process.env.NEXT_PUBLIC_PWA_URL || "";
 
 export default async function AppPage() {
   let release: Release | null = null;
   let qr = "";
+  let apkUrl = APK_FALLBACK;
   try {
     const raw = await readFile(
       path.join(process.cwd(), "public", "app", "version.json"),
       "utf8",
     );
     release = JSON.parse(raw) as Release;
-    qr = await QRCode.toDataURL(`${SITE_URL}/app/giraffe-mobile.apk`, {
+    apkUrl = release.apkUrl || APK_FALLBACK;
+    qr = await QRCode.toDataURL(apkUrl, {
       width: 220,
       margin: 1,
       color: { dark: "#123B28", light: "#FFFFFF" },
@@ -76,11 +84,15 @@ export default async function AppPage() {
               </p>
               <a
                 className="m2-btn m2-btn--green"
-                href="/app/giraffe-mobile.apk"
-                download="giraffe-mobile.apk"
+                href={apkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Завантажити APK
               </a>
+              <p style={{ marginTop: 10, fontSize: 12, color: "#5C6B62" }}>
+                Файл хоститься на GitHub Releases — з сайту він не завантажується.
+              </p>
               {release ? (
                 <p style={{ marginTop: 16, fontSize: 13 }}>
                   Версія <strong>{release.versionName}</strong> (збірка {release.versionCode}) ·
@@ -107,17 +119,34 @@ export default async function AppPage() {
         </section>
 
         <section className="m2-sec">
-          <h2>Як встановити на iPhone</h2>
+          <h2>Як встановити на iPhone (PWA)</h2>
           <div className="m2-prose">
+            <p>
+              Додаток для iPhone — це PWA-версія: відкривається з іконки на екрані,
+              без Safari, і працює офлайн для перегляду каталогу.
+            </p>
             <ol>
-              <li>Відкрийте сайт у Safari.</li>
+              <li>Відкрийте PWA-версію в Safari (кнопка нижче або посилання).</li>
               <li>Натисніть «Поділитися» (квадрат зі стрілкою).</li>
               <li>Оберіть «На головний екран» і підтвердьте.</li>
             </ol>
             <p>
-              Після цього додаток з&apos;явиться на головному екрані як звичайна іконка.
+              Після цього додаток з&apos;явиться на головному екрані як звичайна іконка
+              і відкриватиметься на весь екран.
+            </p>
+            <p>
+              {PWA_URL ? (
+                <a
+                  className="m2-btn m2-btn--green"
+                  href={PWA_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Відкрити PWA-версію
+                </a>
+              ) : null}{" "}
               <a className="m2-btn m2-btn--ghost m2-btn--sm" href="/">
-                Відкрити мобільну версію
+                Відкрити мобільну версію сайту
               </a>
             </p>
           </div>

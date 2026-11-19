@@ -31,12 +31,15 @@ export async function GET() {
       changelog: string[];
       publishedAt: string;
       sha256?: string;
+      apkUrl?: string;
     };
 
     return NextResponse.json(
       {
         ...release,
-        apkUrl: "/app/giraffe-mobile.apk",
+        // APK живе у GitHub Releases (ліміт GitHub на файл у репозиторії — 50 МБ,
+        // Vercel також не має зберігати бінарі). Сайт віддає лише маніфест.
+        apkUrl: release.apkUrl || "https://github.com/giraffe-dc/newSite/releases/latest",
       },
       {
         headers: {

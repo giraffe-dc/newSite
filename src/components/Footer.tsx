@@ -97,6 +97,7 @@ export default function Footer({
                 TikTok
               </a>
             )}
+            <Link href="/app">Мобільний додаток</Link>
           </div>
         )}
       </div>
