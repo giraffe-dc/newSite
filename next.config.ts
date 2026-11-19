@@ -58,6 +58,21 @@ const nextConfig: NextConfig = {
         source: "/admin/:path*",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
+      {
+        // APK для прямий розсилки клієнтам (без Play Store).
+        source: "/app/giraffe-mobile.apk",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "application/vnd.android.package-archive",
+          },
+          {
+            key: "Cache-Control",
+            value: "public, max-age=3600, must-revalidate",
+          },
+          { key: "Content-Disposition", value: 'attachment; filename="giraffe-mobile.apk"' },
+        ],
+      },
     ];
   },
 };
