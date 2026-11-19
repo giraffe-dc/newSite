@@ -1,11 +1,11 @@
 {
-  "versionName": "1.0.2",
-  "versionCode": 3,
-  "changelog": [
-    "Додано перевірку нових версій прямо в додатку",
-    "Каталог послуг і пакетів, бронювання, контакти"
-  ],
-  "publishedAt": "2026-11-19",
-  "sha256": "332FDF5B857D2087F3C11118D9F770A17FEDD7FECE6B31BD02A88E15327D74F0",
-  "apkUrl": "https://github.com/giraffe-dc/newSite/releases/download/v1.0.2/giraffe-mobile.apk"
+    "versionName":  "1.0.3",
+    "versionCode":  4,
+    "changelog":  [
+                      "Додано перевірку нових версій прямо в додатку",
+                      "Каталог послуг і пакетів, бронювання, контакти"
+                  ],
+    "publishedAt":  "2026-11-19",
+    "sha256":  "2C6CA653262E61A77E628217680A489154C1762321772487363FC89EBE6C80D4",
+    "apkUrl":  "https://github.com/giraffe-dc/newSite/releases/download/v1.0.3/giraffe-mobile-1.0.3-b4.apk"
 }
