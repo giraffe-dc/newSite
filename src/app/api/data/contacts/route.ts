@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { SECTION_DEFAULTS } from "@/lib/sectionDefaults";
 
+/** Публічні дані для сайту й мобільного додатка (Expo Web потребує CORS). */
+const CORS = { "Access-Control-Allow-Origin": "*" };
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
+
 export async function GET() {
   try {
     const client = await clientPromise;
@@ -12,17 +19,20 @@ export async function GET() {
       // Документа немає → дефолти з content.ts (те саме джерело, що й на
       // сайті через site_content); демо-контакти макета прибрано (етап 5).
       const c = SECTION_DEFAULTS.contacts.contacts;
-      return NextResponse.json({
-        phone: c.phone,
-        email: c.email,
-        workingHours: c.hours,
-        whatsapp: "",
-        telegram: "",
-        socialMedia: {},
-      });
+      return NextResponse.json(
+        {
+          phone: c.phone,
+          email: c.email,
+          workingHours: c.hours,
+          whatsapp: "",
+          telegram: "",
+          socialMedia: {},
+        },
+        { headers: CORS },
+      );
     }
 
-    return NextResponse.json(contacts);
+    return NextResponse.json(contacts, { headers: CORS });
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json(

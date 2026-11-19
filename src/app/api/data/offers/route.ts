@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 
+const CORS = { "Access-Control-Allow-Origin": "*" };
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
+
 export async function GET() {
   try {
     const client = await clientPromise;
@@ -17,7 +23,7 @@ export async function GET() {
       })
       .sort({ priority: -1, startDate: -1, _id: -1 })
       .toArray();
-    return NextResponse.json(offers);
+    return NextResponse.json(offers, { headers: CORS });
   } catch (_e) {
     return NextResponse.json(
       { error: "Failed to fetch offers" },

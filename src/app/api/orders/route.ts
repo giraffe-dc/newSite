@@ -5,6 +5,26 @@ import clientPromise from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { Order } from "@/types";
 
+/** Дозволяємо надсилати заявки з мобільного додатка (Expo Web / браузер).
+ *  Для нативних RN запитів CORS не застосовується, але заголовки не шкодять. */
+const MOBILE_CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: MOBILE_CORS });
+}
+
+/** Обгортка відповіді з CORS-заголовками для всіх варіантів відповіді. */
+function apiJson(body: unknown, init?: ResponseInit) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: { ...MOBILE_CORS, ...(init?.headers ?? {}) },
+  });
+}
+
 function formatOrderForTelegram(order: Order) {
   const e = escapeTelegramHtml;
   const lines: string[] = [];
@@ -48,7 +68,7 @@ export async function POST(request: NextRequest) {
   // Кожна заявка шле Telegram + зовнішній вебхук — без ліміту ендпоінт
   // стає флуд-каналом для сповіщень адмінів.
   if (!rateLimit(`orders:${clientIp(request)}`, 5, 10 * 60_000)) {
-    return NextResponse.json(
+    return apiJson(
       { error: "Занадто багато заявок. Спробуйте пізніше." },
       { status: 429 },
     );
@@ -60,13 +80,13 @@ export async function POST(request: NextRequest) {
     const customerName = cut(body?.customerName, 100);
     const phone = cut(body?.phone, 30);
     if (!customerName || !phone) {
-      return NextResponse.json(
+      return apiJson(
         { error: "Вкажіть ім'я та номер телефону" },
         { status: 400 },
       );
     }
     if (!PHONE_PATTERN.test(phone)) {
-      return NextResponse.json(
+      return apiJson(
         { error: "Введіть коректний номер телефону" },
         { status: 400 },
       );
@@ -135,10 +155,10 @@ export async function POST(request: NextRequest) {
         .catch((err) => console.error("External notification error:", err));
     }
 
-    return NextResponse.json({ success: true, id: result.insertedId });
+    return apiJson({ success: true, id: result.insertedId });
   } catch (error) {
     console.error("Order creation error:", error);
-    return NextResponse.json(
+    return apiJson(
       { error: "Failed to create order" },
       { status: 500 },
     );
@@ -150,7 +170,7 @@ export async function GET(request: NextRequest) {
     // Замовлення — приватні дані: лише адмін-кука з валідним JWT.
     const token = request.cookies.get("admin_token")?.value;
     if (!token || !verifyAdmin(token)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiJson({ error: "Unauthorized" }, { status: 401 });
     }
 
     const client = await clientPromise;
@@ -167,10 +187,10 @@ export async function GET(request: NextRequest) {
       )
       .sort({ createdAt: -1 })
       .toArray();
-    return NextResponse.json(orders);
+    return apiJson(orders);
   } catch (error) {
     console.error("Orders fetch error:", error);
-    return NextResponse.json(
+    return apiJson(
       { error: "Failed to fetch orders" },
       { status: 500 },
     );

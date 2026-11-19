@@ -7,6 +7,7 @@ export const CONTACTS = {
   tel: "",
   email: "",
   hours: "",
+  address: "",
   whatsapp: "",
   telegram: "",
   facebook: "",

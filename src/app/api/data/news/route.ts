@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 
+const CORS = { "Access-Control-Allow-Origin": "*" };
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
+
 export async function GET() {
   try {
     const client = await clientPromise;
@@ -41,7 +47,7 @@ export async function GET() {
             "https://via.placeholder.com/400x250/f7b731/ffffff?text=Новий+Рік",
           ],
         },
-      ]);
+      ], { headers: CORS });
     }
 
     // Normalize documents: ensure every item has `images: string[]`
@@ -60,7 +66,7 @@ export async function GET() {
       return { ...item, images: [] };
     });
 
-    return NextResponse.json(normalized);
+    return NextResponse.json(normalized, { headers: CORS });
   } catch (error) {
     console.error("Database error:", error);
     return NextResponse.json(
