@@ -49,3 +49,31 @@ export function verifyAdmin(token: string): jwt.JwtPayload | null {
     return null;
   }
 }
+
+/** Життєвий час токена кабінету клієнта — 30 днів (рішення власника). */
+export const CLIENT_TOKEN_TTL = "30d";
+
+/**
+ * Токен кабінету клієнта (Етап 3): підпис з `role: "user"` і `phone`.
+ * Віддається як `Authorization: Bearer` (основний шлях для React Native,
+ * де HttpOnly cookie з fetch не працює) і додатково ставить cookie
+ * `client_token` для PWA/сайту.
+ */
+export function signClientToken(phone: string): string {
+  return jwt.sign({ phone, role: "user" }, getJwtSecret(), {
+    expiresIn: CLIENT_TOKEN_TTL,
+  });
+}
+
+/** Перевірка токена кабінету: підпис валідний, роль `user`, є телефон. */
+export function verifyClient(token: string): { phone: string } | null {
+  try {
+    const payload = jwt.verify(token, getJwtSecret());
+    if (!payload || typeof payload === "string") return null;
+    if (payload.role !== "user") return null;
+    if (typeof payload.phone !== "string" || !payload.phone) return null;
+    return { phone: payload.phone };
+  } catch (_error) {
+    return null;
+  }
+}

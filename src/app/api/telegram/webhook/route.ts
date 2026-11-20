@@ -10,6 +10,8 @@ import {
   setThreadStatus,
 } from "@/lib/chatThreads";
 import { sendChatBotMessage } from "@/lib/chatTelegram";
+import { rateLimit } from "@/lib/chatRateLimit";
+import { confirmOtpByLink, maskPhone } from "@/lib/clientAuth";
 
 /* Етап 3b плану docs/2026-11-12-chat-admin-telegram-plan.md:
    вхідні оновлення Bot API окремого бота чату.
@@ -108,6 +110,48 @@ function shortIdOf(threadId: string): string {
 
 type HandleResult = { status: number; body: Record<string, unknown> };
 
+/**
+ * `/start otp_<id>` — підтвердження прив'язки з додатка (перший вхід).
+ * Викликається до перевірки allowlist: клієнт ще не відомий боту.
+ * Захист: 10 спроб на чат за 10 хв (id — випадкові 16 байтів, брутфорс
+ * безглуздий, але ліміт зупиняє flood), плюс перевірки всередині
+ * confirmOtpByLink (прив'язка вже існує → відмова).
+ */
+async function handleOtpStart(
+  msg: TgMessage,
+  otpId: string,
+): Promise<HandleResult> {
+  const chatId = msg.chat.id;
+  if (!rateLimit(`otp-start:${chatId}`, 10, 10 * 60_000)) {
+    return { status: 200, body: { ok: true, action: "otp-rate-limited" } };
+  }
+
+  const result = await confirmOtpByLink(otpId, chatId);
+  if (result.ok) {
+    await sendChatBotMessage(
+      chatId,
+      [
+        "✅ Номер прив'язано до кабінету «Жирафик».",
+        `Кабінет: ${maskPhone(result.phone)}`,
+        "",
+        "Повернись у додаток — вхід завершено.",
+      ].join("\n"),
+      msg.message_id,
+    );
+    return { status: 200, body: { ok: true, action: "otp-confirmed" } };
+  }
+
+  const text =
+    result.reason === "bound"
+      ? "⛔ Цей номер уже прив'язаний до іншого акаунта Telegram. Увійди кодом із повідомлення бота або звернись до підтримки."
+      : "⌛ Посилання застаріле або вже використане. Запроси новий код у додатку.";
+  await sendChatBotMessage(chatId, text, msg.message_id);
+  return {
+    status: 200,
+    body: { ok: true, action: "otp-rejected", reason: result.reason },
+  };
+}
+
 async function handleCommand(
   update: TgUpdate,
   msg: TgMessage,
@@ -118,6 +162,16 @@ async function handleCommand(
   const replyTo = msg.message_id;
 
   if (cmd === "start" || cmd === "help") {
+    // Кабінет клієнта (Етап 3): deep link `?start=otp_<id>` — перший вхід
+    // через прив'язку phone ↔ chatId. Обробляється ДО allowlist, бо клієнт
+    // ще не прив'язаний і не є адміном. Обмеження — лише приватний чат
+    // (у групі карток /start з otp не має сенсу).
+    if (cmd === "start" && msg.chat.type === "private") {
+      const otpMatch = rest.trim().match(/^otp_([a-f0-9]{32})$/i);
+      if (otpMatch) {
+        return handleOtpStart(msg, otpMatch[1]);
+      }
+    }
     if (!isAllowed(msg) && cmd === "start") {
       // Bootstrap: невідомому відповідаємо його ж ID (без інших даних).
       await sendChatBotMessage(

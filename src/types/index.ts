@@ -155,6 +155,9 @@ export interface Order {
   serviceName?: string; // назва послуги (при бронюванні з картки послуги)
   programId?: string; // обрана програма виїзду
   contactChannel?: "phone" | "telegram" | "whatsapp" | "chat";
+  /** Нормалізований номер `+380XXXXXXXXX` — для пошуку заявок у кабінеті
+   *  (порожній для старих записів і некоректних номерів). */
+  phoneNorm?: string;
   createdAt?: string;
   /** Нова → В роботі → Підтверджена → Виконано / Скасовано (ADM-02). */
   status?: OrderStatus;

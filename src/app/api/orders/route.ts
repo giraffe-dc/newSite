@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { verifyAdmin } from "@/lib/auth";
 import { clientIp, rateLimit } from "@/lib/chatRateLimit";
+import { normalizePhone } from "@/lib/clientAuth";
 import clientPromise from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { Order } from "@/types";
@@ -126,6 +127,9 @@ export async function POST(request: NextRequest) {
       packageName: cut(body.packageName, 200) || undefined,
       serviceName: cut(body.serviceName, 200) || undefined,
       status: "new",
+      // Нормалізований номер для кабінету клієнта (мобільний додаток):
+      // старі заявки без phoneNorm знаходяться через ordersPhoneFilter.
+      phoneNorm: normalizePhone(phone) ?? undefined,
       createdAt: nowIso,
     };
 
