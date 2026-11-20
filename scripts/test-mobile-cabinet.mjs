@@ -93,6 +93,7 @@ async function main() {
   const env = readEnvLocal();
   const uri = env.MONGODB_URI;
   if (!uri) throw new Error("MONGODB_URI не задано у .env.local");
+  let authToken = "";
   const dbUri = new URL(uri);
   const dbName = (dbUri.pathname || "/zhyrafyk").replace(/^\//, "") || "zhyrafyk";
 
@@ -103,6 +104,7 @@ async function main() {
   const otps = db.collection("otp_codes");
   const bindings = db.collection("client_telegrams");
   const threads = db.collection("chat_threads");
+  const pushTokens = db.collection("push_tokens");
   const THREAD_ID = `m_test_${Date.now().toString(36)}_mobiletest01`;
 
   // Чистимо за собою (тільки локальна БД). Телефони унікальні для кожного
@@ -229,6 +231,7 @@ async function main() {
       `status=${r.status} data=${JSON.stringify(r.data)}`,
     );
     const tokenA = r.data?.token;
+    if (tokenA) authToken = tokenA;
     check(
       "T6b у відповіді role=user і cookie client_token",
       r.data?.role === "user" &&
@@ -467,6 +470,55 @@ async function main() {
     }
   }
 
+  console.log("\n— Push-нагадування —");
+  const PUSH_TOKEN = `ExpoPushToken[test-${RUN}]`;
+  r = await post("/api/mobile/push-token", { token: PUSH_TOKEN });
+  check("T16a.push без авторизації → 401", r.status === 401, `status=${r.status}`);
+
+  r = await post(
+    "/api/mobile/push-token",
+    { token: "not-a-token" },
+    { Authorization: `Bearer ${authToken}` },
+  );
+  check("T16b хибний токен → 400", r.status === 400, `status=${r.status}`);
+
+  r = await post(
+    "/api/mobile/push-token",
+    { token: PUSH_TOKEN, deviceId: "test" },
+    { Authorization: `Bearer ${authToken}` },
+  );
+  check("T16c реєстрація токена → 201", r.status === 201, `status=${r.status}`);
+  const pushDoc = await pushTokens.findOne({ _id: PUSH_TOKEN });
+  check(
+    "T16d токен збережено з нормалізованим номером",
+    pushDoc?.phone === PHONE_A && typeof pushDoc?.phone9 === "string",
+    JSON.stringify(pushDoc),
+  );
+
+  // DELETE окремо (post-хелпер підтримує лише POST)
+  const del = await fetch(`${BASE}/api/mobile/push-token?token=${encodeURIComponent(PUSH_TOKEN)}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  check("T16e видалення токена → 200", del.status === 200, `status=${del.status}`);
+  check(
+    "T16f токен видалено з БД",
+    (await pushTokens.findOne({ _id: PUSH_TOKEN })) === null,
+    "залишився",
+  );
+
+  const cronNoKey = await fetch(`${BASE}/api/cron/push-reminders`);
+  check("T16g cron без ключа → 401", cronNoKey.status === 401, `status=${cronNoKey.status}`);
+  const cron = await fetch(`${BASE}/api/cron/push-reminders`, {
+    headers: { Authorization: `Bearer ${env.MOBILE_RELEASE_KEY}` },
+  });
+  const cronBody = await cron.json().catch(() => null);
+  check(
+    "T16h cron з ключем → 200, ok=true",
+    cron.status === 200 && cronBody?.ok === true,
+    `status=${cron.status} body=${JSON.stringify(cronBody)}`,
+  );
+
   console.log("\n— CORS —");
   r = await get("/api/mobile/orders", {
     Origin: "https://giraffe-mobile.vercel.app",
@@ -495,6 +547,7 @@ async function main() {
     bindings.deleteMany({ _id: { $in: [PHONE_A, PHONE_B] } }),
     orders.deleteMany({ phone: { $in: [PHONE_B, LEGACY_PHONE] } }),
     threads.deleteOne({ threadId: THREAD_ID }),
+    pushTokens.deleteOne({ _id: PUSH_TOKEN }),
   ]);
   await client.close();
 

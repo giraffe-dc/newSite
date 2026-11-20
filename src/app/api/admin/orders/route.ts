@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { recordAudit } from "@/lib/auditLog";
 import { verifyAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
+import { notifyOrderStatus } from "@/lib/pushNotifications";
 
 /* Зміна статусу та видалення заявок — лише для адміна (етап 4, п. 3).
    Статуси (ADM-02): нова → в роботі → підтверджена → виконано / скасована.
@@ -151,6 +152,16 @@ export async function PATCH(request: NextRequest) {
       summary: `Заявка «${String(current.customerName ?? id)}»: статус ${previous} → ${next}`,
       changes: { status: { from: previous, to: next } },
     });
+
+    // Push клієнту — best-effort: помилка Expo не ламає адмінку.
+    void notifyOrderStatus(
+      {
+        phone: current.phone,
+        customerName: current.customerName,
+        date: current.date,
+      },
+      next,
+    );
   }
 
   return NextResponse.json({ success: true });
