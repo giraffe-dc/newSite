@@ -1,16 +1,27 @@
-import type { Document } from "mongodb";
-import { ObjectId } from "mongodb";
-import { NextResponse } from "next/server";
+import { type Document, ObjectId } from "mongodb";
+import { type NextRequest, NextResponse } from "next/server";
 import { clientIp, rateLimit } from "@/lib/chatRateLimit";
+import { corsHeaders } from "@/lib/mobileCors";
 import clientPromise from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessageSurvey } from "@/lib/utils";
 
-export async function POST(req: Request) {
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
+export async function POST(req: NextRequest) {
+  /** Усі відповіді — з CORS (PWA на іншому домені). */
+  const reply = (body: unknown, status = 200) =>
+    NextResponse.json(body, {
+      status,
+      headers: corsHeaders(req),
+    });
+
   // Кожна відповідь шле Telegram-сповіщення — ліміт від флуду.
   if (!rateLimit(`survey:${clientIp(req)}`, 5, 10 * 60_000)) {
-    return NextResponse.json(
+    return reply(
       { error: "Занадто багато відповідей. Спробуйте пізніше." },
-      { status: 429 },
+      429,
     );
   }
 
@@ -19,7 +30,7 @@ export async function POST(req: Request) {
     const { newsId, answers } = body || {};
 
     if (!newsId || !answers || typeof answers !== "object") {
-      return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+      return reply({ error: "Invalid data" }, 400);
     }
 
     const client = await clientPromise;
@@ -53,7 +64,7 @@ export async function POST(req: Request) {
     );
 
     if (!hasSurvey) {
-      return NextResponse.json({ error: "Survey not found" }, { status: 404 });
+      return reply({ error: "Survey not found" }, 404);
     }
 
     // Persist the free-form answers
@@ -85,12 +96,9 @@ export async function POST(req: Request) {
       console.error("Telegram notify error:", tgErr);
     }
 
-    return NextResponse.json({ success: true });
+    return reply({ success: true });
   } catch (err) {
     console.error("Error submitting survey response:", err);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return reply({ error: "Internal server error" }, 500);
   }
 }

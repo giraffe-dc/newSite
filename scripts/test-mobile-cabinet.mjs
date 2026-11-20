@@ -102,6 +102,8 @@ async function main() {
   const orders = db.collection("orders");
   const otps = db.collection("otp_codes");
   const bindings = db.collection("client_telegrams");
+  const threads = db.collection("chat_threads");
+  const THREAD_ID = `m_test_${Date.now().toString(36)}_mobiletest01`;
 
   // Чистимо за собою (тільки локальна БД). Телефони унікальні для кожного
   // прогону: rate-limit тримається в пам'яті dev-сервера між прогонами.
@@ -380,6 +382,91 @@ async function main() {
     JSON.stringify(r.data),
   );
 
+  console.log("\n— Чат із командою (CORS для PWA) —");
+  await threads.insertOne({
+    threadId: THREAD_ID,
+    deviceId: `dev_${THREAD_ID}`,
+    status: "open",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    lastMessageAt: new Date().toISOString(),
+    messages: [
+      {
+        id: `msg_${THREAD_ID}_1`,
+        role: "client",
+        content: "Тестове повідомлення клієнта",
+        channel: "site",
+        createdAt: new Date().toISOString(),
+      },
+      {
+        id: `msg_${THREAD_ID}_2`,
+        role: "operator",
+        content: "Тестова відповідь оператора",
+        author: "Тест",
+        channel: "telegram",
+        createdAt: new Date().toISOString(),
+      },
+    ],
+  });
+  const PWA_ORIGIN = "https://giraffe-mobile.vercel.app";
+  r = await get(`/api/chat/history?threadId=${THREAD_ID}`, { Origin: PWA_ORIGIN });
+  check(
+    "T14a history → повідомлення + CORS для PWA",
+    r.status === 200 &&
+      (r.data?.messages?.length ?? 0) === 2 &&
+      r.headers.get("access-control-allow-origin") === PWA_ORIGIN,
+    `status=${r.status} count=${r.data?.messages?.length} acao=${r.headers.get("access-control-allow-origin")}`,
+  );
+  r = await get(`/api/chat/poll?threadId=${THREAD_ID}`, { Origin: PWA_ORIGIN });
+  check(
+    "T14b poll → відповідь оператора + CORS",
+    r.status === 200 &&
+      (r.data?.messages?.length ?? 0) === 1 &&
+      r.headers.get("access-control-allow-credentials") === "true",
+    `status=${r.status} count=${r.data?.messages?.length}`,
+  );
+  const pre = await fetch(`${BASE}/api/chat/message`, {
+    method: "OPTIONS",
+    headers: {
+      Origin: PWA_ORIGIN,
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "content-type",
+    },
+  });
+  check(
+    "T14c preflight POST /api/chat/message → 204 + CORS",
+    pre.status === 204 &&
+      pre.headers.get("access-control-allow-origin") === PWA_ORIGIN,
+    `status=${pre.status}`,
+  );
+
+  console.log("\n— Опитування (CORS для PWA) —");
+  for (const [label, url, method, hdr] of [
+    ["submit", "/api/survey/submit", "POST", { "Access-Control-Request-Method": "POST" }],
+    ["vote", "/api/survey/vote", "POST", { "Access-Control-Request-Method": "POST" }],
+    ["results", "/api/survey/results?newsId=000000000000000000000000", "GET", {}],
+  ]) {
+    if (method === "POST") {
+      const p = await fetch(`${BASE}${url}`, {
+        method: "OPTIONS",
+        headers: { Origin: PWA_ORIGIN, ...hdr },
+      });
+      check(
+        `T15 preflight /api/survey/${label} → CORS`,
+        p.status === 204 &&
+          p.headers.get("access-control-allow-origin") === PWA_ORIGIN,
+        `status=${p.status}`,
+      );
+    } else {
+      const g = await get(url, { Origin: PWA_ORIGIN });
+      check(
+        `T15 GET /api/survey/${label} → CORS`,
+        g.headers.get("access-control-allow-origin") === PWA_ORIGIN,
+        `status=${g.status} acao=${g.headers.get("access-control-allow-origin")}`,
+      );
+    }
+  }
+
   console.log("\n— CORS —");
   r = await get("/api/mobile/orders", {
     Origin: "https://giraffe-mobile.vercel.app",
@@ -407,6 +494,7 @@ async function main() {
     otps.deleteMany({ phone: { $in: [PHONE_A, PHONE_B] } }),
     bindings.deleteMany({ _id: { $in: [PHONE_A, PHONE_B] } }),
     orders.deleteMany({ phone: { $in: [PHONE_B, LEGACY_PHONE] } }),
+    threads.deleteOne({ threadId: THREAD_ID }),
   ]);
   await client.close();
 

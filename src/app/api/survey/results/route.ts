@@ -1,17 +1,21 @@
 import type { ObjectId } from "mongodb";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { corsHeaders } from "@/lib/mobileCors";
 import { getDb } from "@/lib/mongodb";
 
-export async function GET(req: Request) {
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
+export async function GET(req: NextRequest) {
+  const reply = (body: unknown, status = 200) =>
+    NextResponse.json(body, { status, headers: corsHeaders(req) });
   try {
     const { searchParams } = new URL(req.url);
     const newsId = searchParams.get("newsId");
 
     if (!newsId) {
-      return NextResponse.json(
-        { error: "News ID is required" },
-        { status: 400 },
-      );
+      return reply({ error: "News ID is required" }, 400);
     }
 
     const db = await getDb();
@@ -27,10 +31,10 @@ export async function GET(req: Request) {
     );
 
     if (!news || !news.survey) {
-      return NextResponse.json({ error: "Survey not found" }, { status: 404 });
+      return reply({ error: "Survey not found" }, 404);
     }
 
-    return NextResponse.json(
+    return reply(
       news.survey.results || {
         totalVotes: 0,
         optionResults: {},
@@ -39,9 +43,6 @@ export async function GET(req: Request) {
     );
   } catch (error) {
     console.error("Error getting survey results:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return reply({ error: "Internal server error" }, 500);
   }
 }

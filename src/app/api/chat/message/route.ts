@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { checkChatRateLimit, clientIp } from "@/lib/chatRateLimit";
+import { clientIp, checkChatRateLimit } from "@/lib/chatRateLimit";
+import { corsHeaders } from "@/lib/mobileCors";
 import { sendChatThreadCard } from "@/lib/chatTelegram";
 import {
   appendClientMessage,
@@ -21,6 +22,11 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+/** Preflight для PWA (POST з Content-Type: application/json). */
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
 interface Body {
   threadId?: unknown;
   text?: unknown;
@@ -34,9 +40,16 @@ interface Body {
 }
 
 export async function POST(req: NextRequest) {
+  /** Кожна відповідь — з CORS для PWA (інакше cross-origin fetch падає). */
+  const reply = (body: unknown, init?: ResponseInit) =>
+    NextResponse.json(body, {
+      ...init,
+      headers: { ...corsHeaders(req), ...(init?.headers ?? {}) },
+    });
+
   const body = (await req.json().catch(() => null)) as Body | null;
   if (!body) {
-    return NextResponse.json(
+    return reply(
       { error: "Некоректне тіло запиту" },
       { status: 400 },
     );
@@ -44,12 +57,12 @@ export async function POST(req: NextRequest) {
 
   // Honeypot: людина його не бачить, бот заповнює. Вдаємо успіх без запису.
   if (normalizeText(body.website, 200)) {
-    return NextResponse.json({ success: true }, { status: 201 });
+    return reply({ success: true }, { status: 201 });
   }
 
   const ip = clientIp(req);
   if (!checkChatRateLimit(`msg:${ip}`)) {
-    return NextResponse.json(
+    return reply(
       { error: "Занадто багато повідомлень. Зачекайте хвилину." },
       { status: 429 },
     );
@@ -62,7 +75,7 @@ export async function POST(req: NextRequest) {
     ? rawThreadId
     : legacyThreadId(rawDeviceId);
   if (!isValidThreadId(threadId)) {
-    return NextResponse.json(
+    return reply(
       { error: "Некоректний ідентифікатор діалогу" },
       { status: 400 },
     );
@@ -71,7 +84,7 @@ export async function POST(req: NextRequest) {
 
   const text = normalizeText(body.text ?? body.message, 2000);
   if (!text) {
-    return NextResponse.json(
+    return reply(
       { error: "Повідомлення не може бути порожнім" },
       { status: 400 },
     );
@@ -114,13 +127,13 @@ export async function POST(req: NextRequest) {
         console.error("chat/message: не вдалося прив'язати картку", error);
       });
 
-    return NextResponse.json(
+    return reply(
       { success: true, threadId, messageId: message.id, isNew },
       { status: 201 },
     );
   } catch (error) {
     console.error("chat/message: не вдалося зберегти повідомлення", error);
-    return NextResponse.json(
+    return reply(
       { error: "Не вдалося відправити повідомлення. Спробуйте пізніше." },
       { status: 503 },
     );

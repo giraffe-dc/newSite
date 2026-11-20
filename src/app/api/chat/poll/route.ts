@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { corsHeaders } from "@/lib/mobileCors";
 import {
   isValidThreadId,
   legacyThreadId,
@@ -18,6 +19,10 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const rawThreadId = params.get("threadId");
@@ -27,7 +32,7 @@ export async function GET(req: NextRequest) {
     ? rawThreadId
     : legacyThreadId(rawDeviceId);
   if (!isValidThreadId(threadId)) {
-    return NextResponse.json({ messages: [] });
+    return NextResponse.json({ messages: [] }, { headers: corsHeaders(req) });
   }
 
   try {
@@ -43,10 +48,10 @@ export async function GET(req: NextRequest) {
           createdAt: m.createdAt,
         })),
       },
-      { headers: { "Cache-Control": "no-store" } },
+      { headers: { "Cache-Control": "no-store", ...corsHeaders(req) } },
     );
   } catch (error) {
     console.error("chat/poll: не вдалося прочитати відповіді", error);
-    return NextResponse.json({ messages: [] });
+    return NextResponse.json({ messages: [] }, { headers: corsHeaders(req) });
   }
 }

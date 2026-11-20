@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { clientIp, rateLimit } from "@/lib/chatRateLimit";
+import { corsHeaders } from "@/lib/mobileCors";
 import { getDb } from "@/lib/mongodb";
 import { escapeTelegramHtml, sendTelegramMessage } from "@/lib/utils";
 import type { SurveyVoteData } from "@/types";
@@ -10,12 +11,19 @@ interface SurveyOption {
   text: string;
 }
 
-export async function POST(req: Request) {
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(req) });
+}
+
+export async function POST(req: NextRequest) {
+  const reply = (body: unknown, status = 200) =>
+    NextResponse.json(body, { status, headers: corsHeaders(req) });
+
   // Голосування без ліміту = маніпуляція результатами одним запитом-цунамі.
   if (!rateLimit(`vote:${clientIp(req)}`, 10, 60_000)) {
-    return NextResponse.json(
+    return reply(
       { error: "Занадто багато голосів. Зачекайте хвилину." },
-      { status: 429 },
+      429,
     );
   }
 
@@ -31,7 +39,7 @@ export async function POST(req: Request) {
       optionIds.length === 0 ||
       !optionIds.every((id) => typeof id === "string")
     ) {
-      return NextResponse.json({ error: "Invalid vote data" }, { status: 400 });
+      return reply({ error: "Invalid vote data" }, 400);
     }
 
     const newsObjectId = new ObjectId(newsId);
@@ -44,10 +52,7 @@ export async function POST(req: Request) {
     });
 
     if (!news || !news.survey) {
-      return NextResponse.json(
-        { error: "Survey not found or expired" },
-        { status: 404 },
-      );
+      return reply({ error: "Survey not found or expired" }, 404);
     }
 
     // Verify option IDs are valid
@@ -59,18 +64,12 @@ export async function POST(req: Request) {
     );
 
     if (invalidOptions.length > 0) {
-      return NextResponse.json(
-        { error: "Invalid option IDs" },
-        { status: 400 },
-      );
+      return reply({ error: "Invalid option IDs" }, 400);
     }
 
     // If multiple votes not allowed, ensure only one option
     if (!news.survey.allowMultiple && optionIds.length > 1) {
-      return NextResponse.json(
-        { error: "Multiple votes not allowed" },
-        { status: 400 },
-      );
+      return reply({ error: "Multiple votes not allowed" }, 400);
     }
 
     // Record the vote
@@ -128,12 +127,9 @@ export async function POST(req: Request) {
       console.error("Telegram notify error:", tgErr);
     }
 
-    return NextResponse.json({ success: true });
+    return reply({ success: true });
   } catch (error) {
     console.error("Error recording vote:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return reply({ error: "Internal server error" }, 500);
   }
 }
