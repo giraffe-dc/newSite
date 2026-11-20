@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import QRCode from "qrcode";
+import {
+  APK_FALLBACK,
+  getMobileRelease,
+  type MobileRelease,
+} from "@/lib/mobileRelease";
 
 export const metadata: Metadata = {
   title: "Мобільний додаток — Жирафик",
@@ -12,38 +15,27 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-type Release = {
-  versionName: string;
-  versionCode: number;
-  changelog: string[];
-  publishedAt: string;
-  sha256?: string;
-  apkUrl?: string;
-};
-
 // APK не зберігається на Vercel (ліміт розміру) — він лежить у GitHub Releases.
-const APK_FALLBACK = "https://github.com/giraffe-dc/newSite/releases/latest";
+// Актуальна версія — у БД сайту (див. @/lib/mobileRelease), fallback — файл.
 
 // URL PWA-версії для iPhone (окремий Vercel-проєкт з web-експорту giraffe-mobile).
 // Порожній рядок — кнопка «Відкрити PWA» на сторінці ховається.
 const PWA_URL = process.env.NEXT_PUBLIC_PWA_URL || "";
 
 export default async function AppPage() {
-  let release: Release | null = null;
+  let release: MobileRelease | null = null;
   let qr = "";
   let apkUrl = APK_FALLBACK;
   try {
-    const raw = await readFile(
-      path.join(process.cwd(), "public", "app", "version.json"),
-      "utf8",
-    );
-    release = JSON.parse(raw) as Release;
-    apkUrl = release.apkUrl || APK_FALLBACK;
-    qr = await QRCode.toDataURL(apkUrl, {
-      width: 220,
-      margin: 1,
-      color: { dark: "#123B28", light: "#FFFFFF" },
-    });
+    release = await getMobileRelease();
+    if (release) {
+      apkUrl = release.apkUrl || APK_FALLBACK;
+      qr = await QRCode.toDataURL(apkUrl, {
+        width: 220,
+        margin: 1,
+        color: { dark: "#123B28", light: "#FFFFFF" },
+      });
+    }
   } catch (error) {
     console.error("app page: не вдалося підготувати сторінку", error);
   }

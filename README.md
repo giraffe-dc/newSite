@@ -140,6 +140,8 @@ scripts/                    # migrate-chat-threads.mjs (одноразова м�
 - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID(_2/_3)`, `TELEGRAM_CHAT_IDS`,
   `TELEGRAM_BOT_TOKEN_SURVEY`: сповіщення про заявки й опитування
 - `NOTIFICATIONS_BASE_URL`, `NOTIFICATIONS_API_KEY`: webhook заявок і `/api/admin/chat-logs`
+- `MOBILE_RELEASE_KEY`: ключ публікації версії APK у БД (`POST /api/mobile/version`,
+  пише скрипт збірки giraffe-mobile — завдяки йому реліз додатка не вимагає деплою сайту)
 - `NEXT_PUBLIC_API_URL`: базовий URL для проксі Google Drive (`/api/image`)
 - `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ADMIN_IDS`: **поки не використовуються** —
   знадобляться для вхідного Telegram-webhook (Етап 3 плану чату)
