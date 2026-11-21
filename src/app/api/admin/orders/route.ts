@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { recordAudit } from "@/lib/auditLog";
 import { verifyAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/mongodb";
+import { recordServerEvent } from "@/lib/mobileAnalytics";
 import { notifyOrderStatus } from "@/lib/pushNotifications";
 
 /* Зміна статусу та видалення заявок — лише для адміна (етап 4, п. 3).
@@ -162,6 +163,13 @@ export async function PATCH(request: NextRequest) {
       },
       next,
     );
+
+    // Воронка Етапу 4: фак підтвердження (без телефону й імені).
+    if (next === "confirmed") {
+      void recordServerEvent("order_confirmed", { orderId: id }).catch((error) => {
+        console.error("admin/orders: analytics event", error);
+      });
+    }
   }
 
   return NextResponse.json({ success: true });

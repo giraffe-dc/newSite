@@ -1,0 +1,121 @@
+.page {
+  max-width: 980px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--ink, #22302a);
+  margin: 0 0 6px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--muted, #5a6b60);
+  line-height: 19px;
+  margin: 0 0 22px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.btn {
+  background: #fff;
+  border: 1px solid var(--line, #e3dcc9);
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted, #5a6b60);
+  cursor: pointer;
+}
+
+.btnActive {
+  background: #1e5b3f;
+  border-color: #1e5b3f;
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line, #e3dcc9);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.cardLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted, #5a6b60);
+  font-weight: 800;
+}
+
+.cardValue {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1e5b3f;
+  margin-top: 6px;
+}
+
+.tableWrap {
+  background: #fff;
+  border: 1px solid var(--line, #e3dcc9);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th,
+.table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line, #e3dcc9);
+}
+
+.table th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted, #5a6b60);
+  background: #fbf7ee;
+}
+
+.table tr:last-child td {
+  border-bottom: 0;
+}
+
+.muted {
+  color: var(--muted, #5a6b60);
+}
+
+.bar {
+  display: inline-block;
+  height: 8px;
+  border-radius: 4px;
+  background: #1e5b3f;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.note {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--muted, #5a6b60);
+  line-height: 18px;
+}
